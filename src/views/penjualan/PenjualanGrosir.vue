@@ -675,23 +675,39 @@ const lookupProductByBarcode = async (barcode: string) => {
     }
 };
 
-
 const handleBarcodeScan = async () => {
     const barcode = quickBarcodeInput.value.trim();
     if (!barcode) return;
 
     const product = await lookupProductByBarcode(barcode);
+
     if (product) {
-        addOrUpdateItem(product);
+        // Panggil Popup Quantity
+        const qty = await promptQuantity(product);
+
+        // Jika user menekan Enter/Tambahkan (qty tidak null)
+        if (qty !== null) {
+            addOrUpdateItem(product, qty);
+
+            // Tampilkan notifikasi kecil (Toast)
+            Swal.fire({
+                icon: 'success',
+                title: 'Masuk Keranjang',
+                text: `${qty}x ${product.nama_produk}`,
+                timer: 1000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+    } else {
         Swal.fire({
-            icon: 'success',
-            title: `${product.nama_produk} ditambahkan`,
-            text: `${product.nama_produk} berhasil ditambahkan ke keranjang`,
+            title: 'Tidak Ditemukan',
+            text: `Barcode: ${barcode}`,
+            icon: 'error',
             timer: 1500,
             showConfirmButton: false
         });
-    } else {
-        Swal.fire('Tidak Ditemukan', `Produk dengan barcode ${barcode} tidak ditemukan.`, 'error');
     }
 
     quickBarcodeInput.value = '';
@@ -699,7 +715,6 @@ const handleBarcodeScan = async () => {
         barcodeInputRef.value?.focus();
     });
 };
-// --- Pending Transaction Logic ---
 const saveToLocalStorage = () => {
     try {
         localStorage.setItem(PENDING_TRANSACTIONS_KEY, JSON.stringify(pendingTransactions.value));
@@ -1084,9 +1099,9 @@ const promptQuantity = async (product: CartItem) => {
     const result = await Swal.fire({
         title: 'Jumlah Barang',
         html: `
-            <p class="mb-3 text-gray-700">${product.nama_produk}</p>
+            <p class="mb-3 text-gray-700 font-medium">${product.nama_produk}</p>
             <input id="qty-input" type="number" min="1" value="1" 
-                class="swal2-input w-full text-center text-lg font-semibold" 
+                class="swal2-input w-full text-center text-lg font-bold text-gray-800" 
                 autofocus>
         `,
         showCancelButton: true,
@@ -1097,8 +1112,18 @@ const promptQuantity = async (product: CartItem) => {
         allowOutsideClick: false,
         didOpen: () => {
             const input = document.getElementById('qty-input') as HTMLInputElement;
-            input?.focus();
-            input?.select();
+            if (input) {
+                input.focus();
+                input.select();
+
+                // --- TAMBAHAN: Event Listener untuk tombol ENTER ---
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Mencegah perilaku default
+                        Swal.clickConfirm(); // Paksa klik tombol 'Tambahkan'
+                    }
+                });
+            }
         },
         preConfirm: () => {
             const input = document.getElementById('qty-input') as HTMLInputElement;
@@ -1117,7 +1142,6 @@ const promptQuantity = async (product: CartItem) => {
     }
     return null;
 };
-
 
 // --- Lifecycle Hook ---
 onMounted(async () => {

@@ -103,45 +103,45 @@
                             </tr>
                             <tr v-for="(produk, index) in productList" :key="produk.id"
                                 class="border-t border-gray-100 dark:border-gray-800">
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 text-theme-sm dark:text-white/90">
                                         {{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 font-medium text-theme-sm dark:text-white/90">
                                         {{ produk.nama_produk }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ produk.barcode }}</p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 text-theme-sm dark:text-white/90">
                                         {{ produk.stok_produk }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 text-theme-sm dark:text-white/90">
                                         {{ formatRupiah(produk.harga_beli) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 text-theme-sm dark:text-white/90">
                                         {{ formatRupiah(produk.harga_jual_ritel) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <p class="text-gray-800 text-theme-sm dark:text-white/90">
                                         {{ formatRupiah(produk.harga_jual_biasa) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6" v-if="isSuperAdmin">
+                                <td class="px-5 py-1 sm:px-6" v-if="isSuperAdmin">
                                     <p class="text-gray-500 text-theme-sm dark:text-gray-400">
                                         {{ produk.user?.toko?.nama_toko || 'N/A' }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-4 sm:px-6">
+                                <td class="px-5 py-1 sm:px-6">
                                     <div class="flex gap-2">
                                         <button @click="openEditModal(produk)"
                                             class="px-3 py-1 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition dark:bg-blue-500/15 dark:text-blue-400">

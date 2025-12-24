@@ -1,8 +1,6 @@
 <template>
     <AdminLayout>
-        <div class=" py-3 space-y-5">
-
-            <p class="text-xl font-bold text-gray-900 dark:text-white">Riwayat Transaksi</p>
+        <div class=" py-2 space-y-2">
             <div class="flex justify-end">
                 <input v-model="search" @input="debouncedSearch" type="text" placeholder="Cari nama pelanggan..." class="w-64 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600   
                bg-white dark:bg-white text-sm focus:ring-2 focus:ring-blue-500" />
@@ -15,27 +13,27 @@
                     <thead class="bg-gray-50 dark:bg-gray-700/30">
                         <tr>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Tanggal
                             </th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 ID Transaksi
                             </th>
                             <th
-                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Pelanggan
                             </th>
                             <th
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Total Qty
                             </th>
                             <th
-                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Total Harga
                             </th>
                             <th
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                class="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Aksi
                             </th>
                         </tr>
@@ -53,24 +51,24 @@
                         </tr>
                         <tr v-for="trx in transactions" :key="trx.id"
                             class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                 {{ formatDate(trx.createdAt) }}
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-xs font-mono text-gray-700 dark:text-gray-300">
+                            <td class="px-4 py-2 whitespace-nowrap text-xs font-mono text-gray-700 dark:text-gray-300">
                                 {{ trx.id.substring(0, 8) }}...
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                 {{ getPelangganName(trx.pelanggan_id) }}
                             </td>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
+                                class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 dark:text-gray-300">
                                 {{ trx.total_qty }} ({{ trx.total_item }} item)
                             </td>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-right text-sm font-semibold text-gray-900 dark:text-white">
+                                class="px-4 py-2 whitespace-nowrap text-right text-sm font-semibold text-gray-900 dark:text-white">
                                 {{ formatRupiah(parseFloat(trx.total_harga)) }}
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-center text-sm font-medium space-x-2">
+                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm font-medium space-x-2">
                                 <button @click="openDetailModal(trx)"
                                     class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200 p-1 rounded inline-flex items-center gap-1">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
