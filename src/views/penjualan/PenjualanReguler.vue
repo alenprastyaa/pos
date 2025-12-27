@@ -1,54 +1,42 @@
 <template>
     <AdminLayout>
-        <div class="py-2 space-y-2">
-            <div class="border-b border-gray-200 dark:border-gray-800 pb-2">
-                <p class="text-lg font-bold dark:text-gray-50 tracking-tight uppercase text-blue-500">
+        <div class="page-container">
+            <div class="header-section">
+                <p class="page-title">
                     Transaksi Penjualan Eceran
                 </p>
             </div>
 
-            <div class="flex flex-col space-y-2 md:flex-row md:space-x-3 md:space-y-0 items-end">
-                <div class="flex-1 w-full relative">
-                    <div class="flex space-x-2">
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <div class="flex-row">
                         <input ref="barcodeInputRef" v-model="quickBarcodeInput" type="text"
                             placeholder="Scan/ketik barcode..." @keyup.enter="handleBarcodeScan"
-                            :disabled="role_name !== 'admin'" class="flex-1 h-9 px-3 rounded border-2 border-blue-400 dark:border-blue-600
-                            bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white
-                            placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1
-                            focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500
-                            dark:disabled:bg-gray-700 dark:disabled:text-gray-400" />
+                            :disabled="role_name !== 'admin'" class="input-field primary-border" />
                     </div>
                 </div>
 
-                <div class="flex-1 w-full relative">
+                <div class="input-wrapper relative">
                     <input v-model="productSearchInput" type="text"
                         placeholder="Cari nama produk (Panah Bawah utk pilih)..."
                         @input="searchProducts(productSearchInput)" @keydown.down.prevent="navigateSearch('down')"
                         @keydown.up.prevent="navigateSearch('up')" @keydown.enter.prevent="handleSearchEnter"
-                        :disabled="role_name !== 'admin'" class="w-full h-9 px-3 rounded border-2 border-blue-400 dark:border-blue-600
-                        bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white
-                        placeholder-gray-500 dark:placeholder-gray-400 focus:ring-1
-                        focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500
-                        dark:disabled:bg-gray-700 dark:disabled:text-gray-400" />
+                        :disabled="role_name !== 'admin'" class="input-field primary-border" />
 
-                    <div v-if="showSearchResults && searchResults.length > 0"
-                        class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 max-h-200 overflow-y-auto">
+                    <div v-if="showSearchResults && searchResults.length > 0" class="search-dropdown">
                         <div v-for="(product, index) in searchResults" :key="product.barcode"
                             @click="selectProductFromSearch(product)" :class="[
-                                'p-2 cursor-pointer border-b dark:border-gray-700 last:border-b-0 text-sm',
-                                index === selectedSearchIndex
-                                    ? 'bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white'
-                                    : 'hover:bg-green-50 dark:hover:bg-green-900/30 text-gray-900 dark:text-white'
+                                'search-item',
+                                index === selectedSearchIndex ? 'search-item-active' : 'search-item-default'
                             ]">
-                            <div class="font-medium truncate">{{ product.nama_produk }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-300">{{ product.barcode }} - {{
+                            <div class="product-name">{{ product.nama_produk }}</div>
+                            <div class="product-meta">{{ product.barcode }} - {{
                                 formatRupiah(product.harga_jual_biasa) }}</div>
                         </div>
                     </div>
                 </div>
 
-                <select v-model="selectedPelangganId" required
-                    class="flex-1 w-full md:w-auto h-9 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 text-sm text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500">
+                <select v-model="selectedPelangganId" required class="select-field">
                     <option value="" disabled>Pilih Pelanggan</option>
                     <option v-if="loadingPelanggan" disabled>Memuat...</option>
                     <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
@@ -57,42 +45,36 @@
                 </select>
             </div>
 
-            <div v-if="selectedPelangganId"
-                class="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="font-medium text-blue-700 dark:text-blue-300">Hutang Pelanggan</span>
-                    <span class="font-bold text-base"
-                        :class="hutangPelanggan > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'">
+            <div v-if="selectedPelangganId" class="debt-card">
+                <div class="debt-content">
+                    <span class="debt-label">Hutang Pelanggan</span>
+                    <span class="debt-value" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
                         {{ formatRupiah(hutangPelanggan) }}
                     </span>
                 </div>
             </div>
 
-            <div v-if="pendingTransactions.length > 0" class="space-y-1 pt-1">
-                <p class="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                    <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <div v-if="pendingTransactions.length > 0" class="pending-section">
+                <p class="pending-header">
+                    <svg class="icon-warning" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.414L11 9.586V6z"
                             clip-rule="evenodd"></path>
                     </svg>
                     Pending ({{ pendingTransactions.length }})
                 </p>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                    <div v-for="t in pendingTransactions" :key="t.id"
-                        class="p-2 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded shadow-sm flex flex-col justify-between"
-                        :class="{ 'ring-1 ring-blue-500': t.id === currentPendingId }">
+                <div class="pending-grid">
+                    <div v-for="t in pendingTransactions" :key="t.id" class="pending-card"
+                        :class="{ 'active-pending': t.id === currentPendingId }">
                         <div>
-                            <p class="text-xs text-yellow-800 dark:text-yellow-200 truncate font-semibold">{{
-                                t.nama_pelanggan }}</p>
-                            <p class="text-[10px] text-gray-600 dark:text-gray-400">{{ formatRupiah(t.total) }}</p>
+                            <p class="pending-customer">{{ t.nama_pelanggan }}</p>
+                            <p class="pending-total">{{ formatRupiah(t.total) }}</p>
                         </div>
-                        <div class="flex justify-end gap-1 mt-1">
-                            <button @click="loadTransaction(t)"
-                                class="text-[10px] bg-blue-500 hover:bg-blue-600 text-white px-1.5 py-0.5 rounded">
+                        <div class="pending-actions">
+                            <button @click="loadTransaction(t)" class="btn-xs btn-blue">
                                 Muat
                             </button>
-                            <button @click="removePendingTransaction(t.id)"
-                                class="text-[10px] bg-red-500 hover:bg-red-600 text-white px-1.5 py-0.5 rounded">
+                            <button @click="removePendingTransaction(t.id)" class="btn-xs btn-red">
                                 Hapus
                             </button>
                         </div>
@@ -100,81 +82,68 @@
                 </div>
             </div>
 
-            <hr class="border-gray-200 dark:border-gray-700">
+            <hr class="divider">
 
-            <div
-                class="bg-white dark:bg-gray-800 rounded shadow border border-gray-200 dark:border-gray-700 overflow-x-auto">
+            <div class="table-container">
 
-                <div class="md:hidden divide-y divide-gray-100 dark:divide-gray-700">
-                    <div v-if="transactionItems.length === 0"
-                        class="px-3 py-6 text-center text-xs text-gray-400 dark:text-gray-500">
+                <div class="mobile-list">
+                    <div v-if="transactionItems.length === 0" class="empty-state">
                         Belum ada produk.
                     </div>
-                    <div v-for="(item, index) in transactionItems" :key="item.barcode"
-                        class="p-2 dark:hover:bg-gray-700/50 space-y-1">
-                        <div class="flex justify-between items-center">
-                            <div class="font-semibold text-sm text-gray-900 dark:text-white truncate">{{ index + 1 }}.
-                                {{ item.nama_produk }}</div>
-                            <button type="button" @click="removeItem(item.barcode)" class="text-red-500 p-1">
+                    <div v-for="(item, index) in transactionItems" :key="item.barcode" class="mobile-item">
+                        <div class="mobile-item-header">
+                            <div class="item-title">{{ index + 1 }}. {{ item.nama_produk }}</div>
+                            <button type="button" @click="removeItem(item.barcode)" class="btn-icon-red">
                                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
                         </div>
-                        <div class="grid grid-cols-3 gap-1 text-xs">
-                            <div class="col-span-1 text-gray-500">Barcode: {{ item.barcode }}</div>
-                            <div class="col-span-2 text-right">{{ formatRupiah(item.harga_jual_biasa) }}</div>
+                        <div class="mobile-item-details">
+                            <div class="item-barcode">Barcode: {{ item.barcode }}</div>
+                            <div class="item-price">{{ formatRupiah(item.harga_jual_biasa) }}</div>
                         </div>
-                        <div
-                            class="flex justify-between items-center pt-1 border-t border-gray-100 dark:border-gray-700/50">
-                            <div class="flex items-center space-x-1">
-                                <span class="text-xs text-gray-700 dark:text-gray-300">Qty:</span>
+                        <div class="mobile-item-footer">
+                            <div class="qty-control">
+                                <span class="qty-label">Qty:</span>
                                 <input v-model.number="item.qty" type="number" min="1"
-                                    @change="updateItem(item.barcode, item.qty)"
-                                    class="w-12 text-center border rounded px-1 py-0.5 text-xs bg-white dark:bg-gray-700" />
+                                    @change="updateItem(item.barcode, item.qty)" class="qty-input" />
                             </div>
-                            <div class="font-bold text-sm text-blue-600 dark:text-blue-400">{{ formatRupiah(item.qty *
-                                item.harga_jual_biasa) }}</div>
+                            <div class="item-subtotal">{{ formatRupiah(item.qty * item.harga_jual_biasa) }}</div>
                         </div>
                     </div>
                 </div>
 
-                <table class="min-w-full hidden md:table">
-                    <thead class="bg-gray-50 dark:bg-gray-700/30 text-gray-600 dark:text-gray-300 text-xs uppercase">
+                <table class="desktop-table">
+                    <thead>
                         <tr>
-                            <th class="px-3 py-2 text-left w-10">No</th>
-                            <th class="px-3 py-2 text-left">Produk</th>
-                            <th class="px-3 py-2 text-center w-24">Qty</th>
-                            <th class="px-3 py-2 text-right w-32">Harga</th>
-                            <th class="px-3 py-2 text-right w-32">Subtotal</th>
-                            <th class="px-3 py-2 text-center w-10"></th>
+                            <th class="th-no">No</th>
+                            <th class="th-product">Produk</th>
+                            <th class="th-qty">Qty</th>
+                            <th class="th-price">Harga</th>
+                            <th class="th-subtotal">Subtotal</th>
+                            <th class="th-action"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody>
                         <tr v-if="transactionItems.length === 0">
-                            <td colspan="6" class="px-3 py-6 text-center text-sm text-gray-400">Belum ada produk.</td>
+                            <td colspan="6" class="empty-table">Belum ada produk.</td>
                         </tr>
-                        <tr v-for="(item, index) in transactionItems" :key="item.barcode"
-                            class="dark:hover:bg-gray-700/50">
-                            <td class="px-3 py-1.5 text-xs text-gray-900 dark:text-white">{{ index + 1 }}</td>
-                            <td class="px-3 py-1.5">
-                                <div class="font-medium text-sm text-gray-900 dark:text-white">{{ item.nama_produk }}
-                                </div>
-                                <!-- <div class="text-[10px] text-gray-500 dark:text-gray-400">{{ item.barcode }}</div> -->
+                        <tr v-for="(item, index) in transactionItems" :key="item.barcode">
+                            <td>{{ index + 1 }}</td>
+                            <td>
+                                <div class="table-product-name">{{ item.nama_produk }}</div>
                             </td>
-                            <td class="px-3 py-1.5 text-center">
+                            <td class="td-center">
                                 <input v-model.number="item.qty" type="number" min="1"
-                                    @change="updateItem(item.barcode, item.qty)"
-                                    class="w-14 text-center text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded px-1 py-1 text-xs bg-white dark:bg-gray-700" />
+                                    @change="updateItem(item.barcode, item.qty)" class="table-qty-input" />
                             </td>
-                            <td class="px-3 py-1.5 text-right text-xs text-gray-700 dark:text-gray-200">{{
-                                formatRupiah(item.harga_jual_biasa) }}</td>
-                            <td class="px-3 py-1.5 text-right font-semibold text-sm text-gray-900 dark:text-white">{{
-                                formatRupiah(item.qty * item.harga_jual_biasa) }}</td>
-                            <td class="px-3 py-1.5 text-center">
-                                <button type="button" @click="removeItem(item.barcode)"
-                                    class="text-red-500 hover:text-red-700 p-1">
+                            <td class="td-right table-price">{{ formatRupiah(item.harga_jual_biasa) }}</td>
+                            <td class="td-right table-subtotal">{{ formatRupiah(item.qty * item.harga_jual_biasa) }}
+                            </td>
+                            <td class="td-center">
+                                <button type="button" @click="removeItem(item.barcode)" class="btn-icon-red">
                                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -185,39 +154,38 @@
                     </tbody>
                 </table>
 
-                <div
-                    class="px-3 py-2 flex justify-between items-center bg-gray-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-600 font-bold text-base text-gray-900 dark:text-white">
+                <div class="table-footer">
                     <span>Total Belanja</span>
-                    <span class="text-blue-600 dark:text-blue-400">{{ formatRupiah(totalBelanja) }}</span>
+                    <span class="total-amount">{{ formatRupiah(totalBelanja) }}</span>
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-3 items-center pt-1">
-                <div class="w-full md:w-1/2">
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Bayar <span
-                            class="text-red-500">*</span></label>
-                    <input v-model.number="uangPembayaran" type="number" min="0" required placeholder="Rp 0"
-                        class="w-full h-10 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-base font-bold text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500" />
+            <div class="payment-row">
+                <div class="payment-input-group">
+                    <label class="input-label">
+                        Jumlah Bayar <span class="text-danger">*</span>
+                    </label>
+
+                    <input :value="formatRupiahInput(uangPembayaran)" @input="handleInputUangPembayaran" type="text"
+                        inputmode="numeric" required placeholder="Rp 0" class="payment-field" />
                 </div>
 
-                <div class="w-full md:w-1/2">
-                    <div v-if="uangPembayaran > 0" class="h-10 flex items-center justify-between px-3 rounded"
-                        :class="kembalian >= 0 ? 'bg-green-50 dark:bg-green-900/20 text-green-700' : 'bg-red-50 dark:bg-red-900/20 text-red-700'">
-                        <span class="text-sm font-medium">{{ kembalian >= 0 ? 'Kembalian' : 'Kurang Bayar' }}</span>
-                        <span class="text-base font-bold">{{ formatRupiah(Math.abs(kembalian)) }}</span>
+                <div class="payment-info-group">
+                    <div v-if="uangPembayaran > 0" class="change-display"
+                        :class="kembalian >= 0 ? 'bg-success-light text-success-dark' : 'bg-danger-light text-danger-dark'">
+                        <span class="change-label">{{ kembalian >= 0 ? 'Kembalian' : 'Kurang Bayar' }}</span>
+                        <span class="change-value">{{ formatRupiah(Math.abs(kembalian)) }}</span>
                     </div>
-                    <div v-else
-                        class="h-10 flex items-center px-3 text-xs text-gray-500 italic bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                    <div v-else class="change-placeholder">
                         Input pembayaran untuk lihat kembalian
                     </div>
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-2">
+            <div class="action-row">
                 <button type="button" @click.prevent="saveCurrentTransaction"
-                    :disabled="transactionItems.length === 0 || !selectedPelangganId" class="flex-1 h-10 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 
-                    text-white text-sm font-medium rounded flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    :disabled="transactionItems.length === 0 || !selectedPelangganId" class="btn-action btn-pending">
+                    <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                         </path>
@@ -227,9 +195,8 @@
 
                 <button type="submit" @click.prevent="submitTransaksi"
                     :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId || uangPembayaran < totalBelanja"
-                    class="flex-[2] h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600
-                    text-white text-sm font-bold rounded flex items-center justify-center gap-2 shadow transition hover:scale-[1.01]">
-                    <svg v-if="isSubmitting" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    class="btn-action btn-process">
+                    <svg v-if="isSubmitting" class="spinner" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor"
@@ -487,16 +454,12 @@ const resetForm = () => {
     });
 };
 
-// --- LOGIC BARU: Add Item dengan Quantity ---
-
 const addOrUpdateItem = (product: any, inputQty: number) => {
     const existingItem = transactionItems.value.find(item => item.barcode === product.barcode);
     if (existingItem) {
         existingItem.qty += inputQty;
-        // Pindahkan item ke paling atas agar terlihat oleh user
         transactionItems.value = [existingItem, ...transactionItems.value.filter(i => i.barcode !== product.barcode)];
     } else {
-        // Masukkan item baru di paling atas dengan QTY dari input user
         transactionItems.value.unshift({
             barcode: product.barcode,
             qty: inputQty,
@@ -504,6 +467,17 @@ const addOrUpdateItem = (product: any, inputQty: number) => {
             harga_jual_biasa: parseFloat(product.harga_jual_biasa),
         });
     }
+};
+const formatRupiahInput = (number: number) => {
+    if (number === 0) return '';
+    return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+
+const handleInputUangPembayaran = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const rawValue = target.value.replace(/\D/g, '');
+    uangPembayaran.value = rawValue ? parseInt(rawValue) : 0;
 };
 const promptQuantity = async (product: any) => {
     const { value: qty, isConfirmed } = await Swal.fire({
@@ -522,17 +496,11 @@ const promptQuantity = async (product: any) => {
         cancelButtonText: 'Batal',
         didOpen: () => {
             const input = Swal.getInput();
-
-            // 1. Fokus dan blok angka agar user bisa langsung ketik timpa
             input?.focus();
             input?.select();
-
-            // 2. Event Listener Khusus untuk tombol ENTER
             input?.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
-                    // Mencegah perilaku default browser (jika ada)
                     e.preventDefault();
-                    // Paksa klik tombol Confirm (OK)
                     Swal.clickConfirm();
                 }
             });
@@ -582,18 +550,12 @@ const lookupProductByBarcode = async (barcode: string) => {
 };
 
 const selectProductFromSearch = async (product: CartItem) => {
-    // 1. Tampilkan prompt Qty terlebih dahulu
     const isAdded = await promptQuantity(product);
-
-    // 2. Jika user menekan OK/Enter
     if (isAdded) {
         productSearchInput.value = '';
         searchResults.value = [];
         showSearchResults.value = false;
         selectedSearchIndex.value = -1;
-    } else {
-        // Jika batal, kembalikan fokus ke search (opsional)
-        // productSearchInput.value = ''; 
     }
 };
 
@@ -609,22 +571,25 @@ const handleBarcodeScan = async () => {
             console.warn('Gagal memutar audio', e);
         }
 
-        // Tampilkan Popup Qty
-        const isAdded = await promptQuantity(product);
+        addOrUpdateItem(product, 1);
 
-        if (isAdded) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Ditambahkan',
-                text: `${product.nama_produk}`,
-                timer: 1000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'top-end'
-            });
-        }
+        Swal.fire({
+            icon: 'success',
+            title: 'Masuk Keranjang',
+            text: `${product.nama_produk}`,
+            timer: 1000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
     } else {
-        Swal.fire('Tidak Ditemukan', `Barcode: ${barcode}`, 'error');
+        Swal.fire({
+            icon: 'error',
+            title: 'Tidak Ditemukan',
+            text: `Barcode: ${barcode}`,
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
 
     quickBarcodeInput.value = '';
@@ -893,3 +858,681 @@ onMounted(async () => {
     barcodeInputRef.value?.focus();
 });
 </script>
+
+<style scoped>
+.page-container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header-section {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+.page-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    color: #3b82f6;
+}
+
+.input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+@media (min-width: 768px) {
+    .input-row {
+        flex-direction: row;
+        gap: 0.75rem;
+        margin-bottom: 0;
+    }
+}
+
+.input-wrapper {
+    flex: 1;
+    width: 100%;
+}
+
+.flex-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-field {
+    width: 100%;
+    height: 2.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background-color: #ffffff;
+    border: 2px solid transparent;
+}
+
+.input-field:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.input-field:disabled {
+    background-color: #e5e7eb;
+    color: #6b7280;
+}
+
+.primary-border {
+    border-color: #60a5fa;
+}
+
+.select-field {
+    flex: 1;
+    width: 100%;
+    height: 2.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.select-field:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+@media (min-width: 768px) {
+    .select-field {
+        width: auto;
+    }
+}
+
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.25rem;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+}
+
+.search-item:last-child {
+    border-bottom: none;
+}
+
+.search-item-active {
+    background-color: #fef08a;
+    color: #000000;
+}
+
+.search-item-default {
+    background-color: #ffffff;
+    color: #111827;
+}
+
+.search-item-default:hover {
+    background-color: #f0fdf4;
+}
+
+.product-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.debt-card {
+    padding: 0.5rem;
+    background-color: #eff6ff;
+    border: 1px solid #93c5fd;
+    border-radius: 0.25rem;
+}
+
+.debt-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.debt-label {
+    font-weight: 500;
+    color: #1d4ed8;
+}
+
+.debt-value {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.pending-section {
+    padding-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.pending-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.icon-warning {
+    width: 1rem;
+    height: 1rem;
+    color: #eab308;
+}
+
+.pending-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .pending-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .pending-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.pending-card {
+    padding: 0.5rem;
+    background-color: #fefce8;
+    border: 1px solid #fde047;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.active-pending {
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.pending-customer {
+    font-size: 0.75rem;
+    color: #854d0e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+}
+
+.pending-total {
+    font-size: 10px;
+    color: #4b5563;
+}
+
+.pending-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.btn-xs {
+    font-size: 10px;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-blue {
+    background-color: #3b82f6;
+}
+
+.btn-blue:hover {
+    background-color: #2563eb;
+}
+
+.btn-red {
+    background-color: #ef4444;
+}
+
+.btn-red:hover {
+    background-color: #dc2626;
+}
+
+.divider {
+    border-top: 1px solid #e5e7eb;
+    margin: 0;
+}
+
+.table-container {
+    background-color: #ffffff;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+}
+
+.mobile-list {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .mobile-list {
+        display: none;
+    }
+}
+
+.mobile-item {
+    padding: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mobile-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-item-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.item-barcode {
+    grid-column: span 1;
+    color: #6b7280;
+}
+
+.item-price {
+    grid-column: span 2;
+    text-align: right;
+}
+
+.mobile-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.25rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.qty-label {
+    font-size: 0.75rem;
+    color: #374151;
+}
+
+.qty-input {
+    width: 3rem;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    font-size: 0.75rem;
+    background-color: #ffffff;
+}
+
+.item-subtotal {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: #2563eb;
+}
+
+.desktop-table {
+    display: none;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+@media (min-width: 768px) {
+    .desktop-table {
+        display: table;
+    }
+}
+
+.desktop-table thead {
+    background-color: #f9fafb;
+    color: #4b5563;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.desktop-table th {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.th-no {
+    width: 2.5rem;
+}
+
+.th-qty {
+    text-align: center;
+    width: 6rem;
+}
+
+.th-price {
+    text-align: right;
+    width: 8rem;
+}
+
+.th-subtotal {
+    text-align: right;
+    width: 8rem;
+}
+
+.th-action {
+    text-align: center;
+    width: 2.5rem;
+}
+
+.desktop-table td {
+    padding: 0.375rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.td-center {
+    text-align: center;
+}
+
+.td-right {
+    text-align: right;
+}
+
+.table-product-name {
+    font-weight: 500;
+}
+
+.table-qty-input {
+    width: 3.5rem;
+    text-align: center;
+    color: #111827;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    background-color: #ffffff;
+}
+
+.table-price {
+    font-size: 0.75rem;
+    color: #374151;
+}
+
+.table-subtotal {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.btn-icon-red {
+    color: #ef4444;
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-icon-red:hover {
+    color: #b91c1c;
+}
+
+.table-footer {
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.total-amount {
+    color: #2563eb;
+}
+
+.payment-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    padding-top: 0.25rem;
+}
+
+@media (min-width: 768px) {
+    .payment-row {
+        flex-direction: row;
+    }
+}
+
+.payment-input-group,
+.payment-info-group {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+
+    .payment-input-group,
+    .payment-info-group {
+        width: 50%;
+    }
+}
+
+.input-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.payment-field {
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.payment-field:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.change-display {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.bg-success-light {
+    background-color: #f0fdf4;
+}
+
+.text-success-dark {
+    color: #15803d;
+}
+
+.bg-danger-light {
+    background-color: #fef2f2;
+}
+
+.text-danger-dark {
+    color: #b91c1c;
+}
+
+.change-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.change-value {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.change-placeholder {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-style: italic;
+    background-color: #f9fafb;
+    border-radius: 0.25rem;
+    border: 1px solid #e5e7eb;
+}
+
+.action-row {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.btn-action {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.btn-action:hover {
+    transform: scale(1.01);
+}
+
+.btn-action:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-pending {
+    flex: 1;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.btn-pending:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+.btn-process {
+    flex: 2;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-process:hover:not(:disabled) {
+    background-color: #1d4ed8;
+}
+
+.icon-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    height: 1rem;
+    width: 1rem;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.text-danger {
+    color: #dc2626;
+}
+
+.text-success {
+    color: #16a34a;
+}
+
+.empty-state {
+    padding: 1.5rem 0.75rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+</style>

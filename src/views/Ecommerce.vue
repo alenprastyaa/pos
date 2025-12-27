@@ -54,7 +54,7 @@
                   <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Transaksi Hari Ini</p>
                   <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{
                     dashboardData?.data?.summary?.totalTransaksiHariIni
-                    }}
+                  }}
                   </p>
                 </div>
                 <div class="rounded-full p-2">
@@ -227,7 +227,7 @@
                     class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
                     <td class="py-2 whitespace-nowrap">
                       <p class="font-medium text-gray-800 text-sm dark:text-white/90">{{ transaksi.id.substring(0, 8)
-                        }}...
+                      }}...
                       </p>
                     </td>
                     <td class="py-2 whitespace-nowrap">
@@ -422,9 +422,6 @@ const setupApexChart = (data) => {
 
   chartLoading.value = false
 }
-
-// --- Fetch Data Dashboard ---
-
 const fetchDashboard = async () => {
   isLoading.value = true
   chartLoading.value = true
@@ -432,10 +429,9 @@ const fetchDashboard = async () => {
 
   const authToken = localStorage.getItem('authToken')
 
+  // PERBAIKAN 1: Jika tidak ada token, langsung lempar ke signin
   if (!authToken) {
-    isLoading.value = false
-    error.value = 'Token otentikasi "authToken" tidak ditemukan di LocalStorage. Akses ditolak.'
-    router.push("/signin")
+    router.push('/signin')
     return
   }
 
@@ -450,16 +446,25 @@ const fetchDashboard = async () => {
       dashboardData.value = response.data
       setupApexChart(response.data.data.salesChartData)
     } else {
-      error.value = response.data.message || 'Gagal mengambil data dashboard.'
-
+      // Logic error dari backend (misal success: false)
+      localStorage.removeItem('authToken') // Hapus token yg mungkin rusak
+      router.push("/signin")
     }
   } catch (err) {
     console.error('Fetch error:', err)
+
     if (axios.isAxiosError(err)) {
+      // PERBAIKAN 2: Cek status code 401 (Unauthorized)
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem('authToken') // Hapus token tidak valid
+        router.push('/signin') // Lempar ke login
+        return
+      }
+
       if (err.response) {
         error.value = `Error ${err.response.status}: ${err.response.data?.message || 'Terjadi kesalahan pada server.'}`
       } else if (err.request) {
-        error.value = 'Tidak ada respons dari server. Pastikan API berjalan di http://localhost:3900'
+        error.value = 'Tidak ada respons dari server. Pastikan API berjalan.'
       } else {
         error.value = err.message
       }
@@ -471,8 +476,6 @@ const fetchDashboard = async () => {
     isLoading.value = false
   }
 }
-
-// --- Lifecycle Hook ---
 
 onMounted(() => {
   fetchDashboard()

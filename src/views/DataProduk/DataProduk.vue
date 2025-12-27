@@ -3,28 +3,23 @@
         <div class="space-y-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Data Produk
-                    </h1>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Kelola inventaris produk dan harga di semua toko.
-                    </p>
+                    <h1 class="text-2xl font-semibold text-title"> Data Produk </h1>
+                    <p class="text-subtitle"> Kelola inventaris produk dan harga di semua toko. </p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button @click="downloadProductsExcel"
-                        class="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition dark:bg-blue-500/15 dark:text-blue-400"
+                        class="btn-secondary-blue flex items-center gap-2 px-4 py-2 rounded-lg transition"
                         :disabled="loadingDownload">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
-                            </path>
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"> </path>
                         </svg>
                         {{ loadingDownload ? 'Mempersiapkan...' : 'Download Excel' }}
                     </button>
 
                     <button @click="openUploadModal"
-                        class="flex items-center gap-2 px-4 py-2 text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition dark:bg-emerald-500/15 dark:text-emerald-400">
+                        class="btn-secondary-emerald flex items-center gap-2 px-4 py-2 rounded-lg transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -35,7 +30,7 @@
                     </button>
 
                     <button @click="openCreateModal"
-                        class="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+                        class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg transition">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
@@ -48,107 +43,104 @@
                 <div class="flex-1">
                     <input ref="barcodeInputFocus" v-model="searchProduct" type="text"
                         placeholder="Cari produk (nama/barcode)..."
-                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                        class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm shadow-sm focus:outline-none" />
                 </div>
             </div>
-            <div
-                class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="max-w-full overflow-x-auto custom-scrollbar">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <div class="card-container overflow-hidden rounded-xl border">
+                <div class="max-w-full overflow-x-auto">
+                    <table class="min-w-full divide-y divide-border">
                         <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <tr class="table-header border-b border-divider">
                                 <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">No</p>
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">No</p>
                                 </th>
                                 <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nama Produk
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Nama Produk</p>
+                                </th>
+                                <th class="px-5 py-3 text-left sm:px-6">
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Barcode</p>
+                                </th>
+                                <th class="px-5 py-3 text-left sm:px-6">
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Stok</p>
+                                </th>
+                                <th class="px-5 py-3 text-left sm:px-6">
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Harga Beli</p>
+                                </th>
+                                <th class="px-5 py-3 text-left sm:px-6">
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Harga Jual Ritel
                                     </p>
                                 </th>
                                 <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Barcode</p>
-                                </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Stok</p>
-                                </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Harga Beli</p>
-                                </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Harga Jual
-                                        Ritel</p>
-                                </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Harga Jual
-                                        Biasa</p>
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Harga Jual Biasa
+                                    </p>
                                 </th>
                                 <th class="px-5 py-3 text-left sm:px-6" v-if="isSuperAdmin">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Toko</p>
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Toko</p>
                                 </th>
                                 <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Aksi</p>
+                                    <p class="font-medium text-xs uppercase tracking-wider th-text">Aksi</p>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <tr v-if="loading" class="border-t border-gray-100 dark:border-gray-800">
+                        <tbody class="divide-y divide-border bg-white">
+                            <tr v-if="loading" class="border-t border-divider">
                                 <td :colspan="isSuperAdmin ? 9 : 8" class="px-5 py-4 text-center sm:px-6">
-                                    <p class="text-gray-500">Memuat data...</p>
+                                    <p class="text-muted">Memuat data...</p>
                                 </td>
                             </tr>
-                            <tr v-else-if="productList.length === 0"
-                                class="border-t border-gray-100 dark:border-gray-800">
+                            <tr v-else-if="productList.length === 0" class="border-t border-divider">
                                 <td :colspan="isSuperAdmin ? 9 : 8" class="px-5 py-4 text-center sm:px-6">
-                                    <p class="text-gray-500">Tidak ada data produk</p>
+                                    <p class="text-muted">Tidak ada data produk</p>
                                 </td>
                             </tr>
                             <tr v-for="(produk, index) in productList" :key="produk.id"
-                                class="border-t border-gray-100 dark:border-gray-800">
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">
+                                class="border-t border-divider row-hover">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body text-sm">
                                         {{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 font-medium text-theme-sm dark:text-white/90">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body font-medium text-sm">
                                         {{ produk.nama_produk }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ produk.barcode }}</p>
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-muted text-sm">{{ produk.barcode }}</p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body text-sm">
                                         {{ produk.stok_produk }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body text-sm">
                                         {{ formatRupiah(produk.harga_beli) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body text-sm">
                                         {{ formatRupiah(produk.harga_jual_ritel) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">
+                                <td class="px-5 py-3 sm:px-6">
+                                    <p class="text-body text-sm">
                                         {{ formatRupiah(produk.harga_jual_biasa) }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6" v-if="isSuperAdmin">
-                                    <p class="text-gray-500 text-theme-sm dark:text-gray-400">
+                                <td class="px-5 py-3 sm:px-6" v-if="isSuperAdmin">
+                                    <p class="text-muted text-sm">
                                         {{ produk.user?.toko?.nama_toko || 'N/A' }}
                                     </p>
                                 </td>
-                                <td class="px-5 py-1 sm:px-6">
+                                <td class="px-5 py-3 sm:px-6">
                                     <div class="flex gap-2">
                                         <button @click="openEditModal(produk)"
-                                            class="px-3 py-1 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition dark:bg-blue-500/15 dark:text-blue-400">
+                                            class="btn-icon-blue px-3 py-1 rounded-lg transition text-sm">
                                             Edit
                                         </button>
                                         <button @click="deleteProductConfirm(produk.id)"
-                                            class="px-3 py-1 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition dark:bg-red-500/15 dark:text-red-400">
+                                            class="btn-icon-red px-3 py-1 rounded-lg transition text-sm">
                                             Hapus
                                         </button>
                                     </div>
@@ -158,38 +150,35 @@
                     </table>
                 </div>
 
-                <!-- PAGINATION -->
-                <div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="flex items-center justify-between p-4 border-t border-divider bg-subtle">
+                    <p class="text-sm text-muted">
                         Menampilkan {{ productList.length }} dari {{ pagination.total }} data.
                     </p>
                     <div v-if="pagination.total_pages > 1" class="flex items-center space-x-2">
                         <button @click="changePage(pagination.current_page - 1)"
                             :disabled="pagination.current_page === 1"
-                            class="px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                            class="btn-pagination px-3 py-1 text-sm rounded-lg border transition">
                             Sebelumnya
                         </button>
-                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                        <span class="text-sm text-body">
                             Halaman {{ pagination.current_page }} dari {{ pagination.total_pages }}
                         </span>
                         <button @click="changePage(pagination.current_page + 1)"
                             :disabled="pagination.current_page === pagination.total_pages"
-                            class="px-3 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-600 transition">
+                            class="btn-pagination px-3 py-1 text-sm rounded-lg border transition">
                             Berikutnya
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- MODAL TAMBAH/EDIT (tetap sama seperti sebelumnya) -->
-            <div v-if="showModal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-                <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+            <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 relative">
+                    <div class="flex items-center justify-between mb-4 border-b border-divider pb-3">
+                        <h2 class="text-xl font-semibold text-title">
                             {{ isEditing ? 'Edit Produk' : 'Tambah Produk Baru' }}
                         </h2>
-                        <button @click="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <button @click="closeModal" class="btn-close">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"
@@ -200,88 +189,86 @@
 
                     <form @submit.prevent="submitForm" class="space-y-4">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Barcode<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Barcode<span class="text-danger">*</span>
                             </label>
                             <input ref="barcodeInput" v-model="formData.barcode" type="text"
                                 placeholder="Masukkan barcode" required :disabled="isEditing"
-                                class="h-11 w-full focus rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-100 dark:disabled:bg-gray-800" />
+                                class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Nama Produk<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Nama Produk<span class="text-danger">*</span>
                             </label>
                             <input v-model="formData.nama_produk" type="text" placeholder="Masukkan nama produk"
-                                required
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                                required class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                         </div>
 
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Stok Produk<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Stok Produk<span class="text-danger">*</span>
                             </label>
                             <input v-model.number="formData.stok_produk" type="number" min="0" placeholder="Stok awal"
-                                required
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                                required class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                         </div>
 
                         <div class="grid grid-cols-3 gap-4">
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Harga Beli<span class="text-red-500">*</span>
+                                <label class="mb-1.5 block text-sm font-medium text-body">
+                                    Harga Beli<span class="text-danger">*</span>
                                 </label>
                                 <input type="text" placeholder="Harga Beli" required
                                     :value="formData.harga_beli > 0 ? formatToRupiah(formData.harga_beli) : ''"
                                     @input="handlePriceInput($event, 'harga_beli')" @focus="handlePriceFocus"
                                     @blur="handlePriceBlur($event, 'harga_beli')"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                                    class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                             </div>
 
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Jual Ritel<span class="text-red-500">*</span>
+                                <label class="mb-1.5 block text-sm font-medium text-body">
+                                    Jual Ritel<span class="text-danger">*</span>
                                 </label>
                                 <input type="text" placeholder="Harga Jual Ritel" required
                                     :value="formData.harga_jual_ritel > 0 ? formatToRupiah(formData.harga_jual_ritel) : ''"
                                     @input="handlePriceInput($event, 'harga_jual_ritel')" @focus="handlePriceFocus"
                                     @blur="handlePriceBlur($event, 'harga_jual_ritel')"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                                    class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                             </div>
 
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Jual Biasa<span class="text-red-500">*</span>
+                                <label class="mb-1.5 block text-sm font-medium text-body">
+                                    Jual Biasa<span class="text-danger">*</span>
                                 </label>
                                 <input type="text" placeholder="Harga Jual Biasa" required
                                     :value="formData.harga_jual_biasa > 0 ? formatToRupiah(formData.harga_jual_biasa) : ''"
                                     @input="handlePriceInput($event, 'harga_jual_biasa')" @focus="handlePriceFocus"
                                     @blur="handlePriceBlur($event, 'harga_jual_biasa')"
-                                    class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
+                                    class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm" />
                             </div>
                         </div>
 
                         <div v-if="isSuperAdmin && !isEditing" class="pt-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Toko Tujuan<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Toko Tujuan<span class="text-danger">*</span>
                             </label>
                             <select v-model="formData.toko_id" required
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+                                class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm bg-white">
                                 <option value="" disabled>Pilih Toko</option>
                                 <option v-for="toko in tokoListDropdown" :key="toko.id" :value="toko.id">
                                     {{ toko.nama_toko }}
                                 </option>
                             </select>
-                            <p v-if="loadingToko" class="text-xs text-gray-500 mt-1">Memuat data toko...</p>
+                            <p v-if="loadingToko" class="text-xs text-muted mt-1">Memuat data toko...</p>
                         </div>
 
-                        <div class="flex gap-3 pt-4">
+                        <div class="flex gap-3 pt-4 border-t border-divider mt-4">
                             <button type="button" @click="closeModal"
-                                class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                                class="btn-cancel flex-1 px-4 py-2 rounded-lg transition">
                                 Batal
                             </button>
                             <button type="submit" :disabled="isSubmitting"
-                                class="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                                class="btn-primary flex-1 px-4 py-2 rounded-lg transition disabled:opacity-50">
                                 {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
                             </button>
                         </div>
@@ -289,16 +276,14 @@
                 </div>
             </div>
 
-            <!-- MODAL UPLOAD (tetap sama seperti sebelumnya) -->
             <div v-if="showUploadModal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-                <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                class="fixed inset-0 z-50 flex items-center justify-center modal-overlay backdrop-blur-sm">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+                    <div class="flex items-center justify-between mb-4 border-b border-divider pb-3">
+                        <h2 class="text-xl font-semibold text-title">
                             Upload Produk via Excel
                         </h2>
-                        <button @click="closeUploadModal"
-                            class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <button @click="closeUploadModal" class="btn-close">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"
@@ -309,22 +294,22 @@
 
                     <form @submit.prevent="submitUploadExcel" class="space-y-4">
                         <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Pilih File (.xlsx)<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Pilih File (.xlsx)<span class="text-danger">*</span>
                             </label>
                             <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" required
-                                class="w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                                class="input-field input-file w-full text-sm rounded-lg cursor-pointer focus:outline-none" />
+                            <p class="mt-1 text-sm text-muted">
                                 **Pastikan format header kolom sesuai dengan template.**
                             </p>
                         </div>
 
                         <div v-if="isSuperAdmin" class="pt-2">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Toko Tujuan Upload<span class="text-red-500">*</span>
+                            <label class="mb-1.5 block text-sm font-medium text-body">
+                                Toko Tujuan Upload<span class="text-danger">*</span>
                             </label>
                             <select v-model="uploadTokoId" required
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+                                class="input-field h-11 w-full rounded-lg px-4 py-2.5 text-sm bg-white">
                                 <option value="" disabled>Pilih Toko</option>
                                 <option v-for="toko in tokoListDropdown" :key="toko.id" :value="toko.id">
                                     {{ toko.nama_toko }}
@@ -333,18 +318,19 @@
                         </div>
 
                         <div v-else class="pt-2">
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Produk akan diupload ke toko Anda:
-                                <span class="font-semibold">{{ userData?.toko.nama_toko || 'Memuat...' }}</span>
+                            <p class="text-sm text-muted">Produk akan diupload ke toko Anda:
+                                <span class="font-semibold text-title">{{ userData?.toko.nama_toko || 'Memuat...'
+                                }}</span>
                             </p>
                         </div>
 
-                        <div class="flex gap-3 pt-4">
+                        <div class="flex gap-3 pt-4 border-t border-divider mt-4">
                             <button type="button" @click="closeUploadModal"
-                                class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                                class="btn-cancel flex-1 px-4 py-2 rounded-lg transition">
                                 Batal
                             </button>
                             <button type="submit" :disabled="isUploading || !fileToUpload"
-                                class="flex-1 px-4 py-2 text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                                class="btn-secondary-emerald flex-1 px-4 py-2 rounded-lg transition disabled:opacity-50">
                                 {{ isUploading ? 'Mengunggah...' : 'Upload Data' }}
                             </button>
                         </div>
@@ -354,6 +340,189 @@
         </div>
     </AdminLayout>
 </template>
+
+<style scoped>
+/* TYPOGRAPHY */
+.text-title {
+    color: #111827;
+    /* Gray 900 */
+}
+
+.text-subtitle {
+    color: #4b5563;
+    /* Gray 600 */
+}
+
+.text-body {
+    color: #1f2937;
+    /* Gray 800 */
+}
+
+.text-muted {
+    color: #6b7280;
+    /* Gray 500 */
+}
+
+.text-danger {
+    color: #dc2626;
+    /* Red 600 */
+}
+
+.th-text {
+    color: #6b7280;
+    /* Gray 500 */
+}
+
+/* BACKGROUNDS & BORDERS */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.bg-subtle {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+.border-divider {
+    border-color: #e5e7eb;
+    /* Gray 200 */
+}
+
+.divide-border> :not([hidden])~ :not([hidden]) {
+    border-color: #e5e7eb;
+}
+
+/* LAYOUT CONTAINERS */
+.card-container {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+/* TABLE */
+.table-header {
+    background-color: #f9fafb;
+}
+
+.row-hover:hover {
+    background-color: #f9fafb;
+}
+
+/* FORMS & INPUTS */
+.input-field {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    /* Gray 300 */
+    color: #111827;
+}
+
+.input-field:focus {
+    border-color: #2563eb;
+    /* Blue 600 */
+    outline: none;
+    box-shadow: 0 0 0 1px #2563eb;
+}
+
+.input-field:disabled {
+    background-color: #f3f4f6;
+    /* Gray 100 */
+    cursor: not-allowed;
+}
+
+/* Specific style for file input background */
+.input-file {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+/* BUTTONS */
+.btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary-blue {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-secondary-blue:hover {
+    background-color: #dbeafe;
+}
+
+.btn-secondary-emerald {
+    background-color: #ecfdf5;
+    color: #059669;
+}
+
+.btn-secondary-emerald:hover {
+    background-color: #d1fae5;
+}
+
+.btn-cancel {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-cancel:hover {
+    background-color: #e5e7eb;
+}
+
+/* Button Icons (Table) */
+.btn-icon-blue {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-icon-blue:hover {
+    background-color: #dbeafe;
+}
+
+.btn-icon-red {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.btn-icon-red:hover {
+    background-color: #fee2e2;
+}
+
+/* Button Pagination */
+.btn-pagination {
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    color: #374151;
+}
+
+.btn-pagination:hover:not(:disabled) {
+    background-color: #f3f4f6;
+}
+
+.btn-pagination:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Close Button (Modal) */
+.btn-close {
+    color: #6b7280;
+    /* text-gray-500 */
+    transition: color 0.2s;
+}
+
+.btn-close:hover {
+    color: #1f2937;
+    /* text-gray-800 */
+}
+
+/* UTILS */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+</style>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'

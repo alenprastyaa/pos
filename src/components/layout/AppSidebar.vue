@@ -2,9 +2,9 @@
   <aside :class="[
     'fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200',
     {
-      'w-[290px]': true,                                         // Selalu lebar penuh
-      'translate-x-0': isMobileOpen || isExpanded,               // Muncul jika salah satu true
-      '-translate-x-full': !(isMobileOpen || isExpanded),        // Sembunyi jika keduanya false
+      'w-[290px]': true,
+      'translate-x-0': isMobileOpen || isExpanded,
+      '-translate-x-full': !(isMobileOpen || isExpanded),
     },
   ]">
 
@@ -107,12 +107,14 @@
     </div>
   </aside>
 
-  <div v-if="isMobileOpen || isExpanded" @click="(isMobileOpen = false), (isExpanded = false)"
-    class="fixed inset-0 bg-black bg-opacity-50 z-99998 transition-opacity lg:hidden"></div>
+  <div v-if="isMobileOpen" @click="isMobileOpen = false"
+    class="fixed inset-0 bg-black bg-opacity-50 z-[99998] transition-opacity lg:hidden">
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+// PERBAIKAN 1: Tambahkan 'watch' di import
+import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import {
@@ -142,8 +144,22 @@ import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 const role_name = localStorage.getItem("role_name")
 const route = useRoute();
 
+// Mengambil state dari composable
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
 
+// PERBAIKAN 2: Watch Route Change
+// Fungsi ini akan berjalan setiap kali URL berubah (pindah halaman)
+watch(
+  () => route.path,
+  () => {
+    // Jika user sedang dalam tampilan mobile (isMobileOpen true), tutup sidebar
+    if (isMobileOpen.value) {
+      isMobileOpen.value = false;
+    }
+    // Opsional: Tutup submenu juga saat pindah halaman jika diinginkan
+    // openSubmenu.value = null; 
+  }
+);
 
 const menuGroups = [
   {
@@ -190,13 +206,11 @@ const menuGroups = [
           { name: "Penjualan Grosir", path: "/penjualan-grosir" },
         ],
       },
-
       {
         icon: BoxCubeIcon,
         name: "History Transaksi",
         path: "/history",
       },
-
       {
         icon: UserCircleIcon,
         name: "User Profile",
@@ -205,7 +219,6 @@ const menuGroups = [
     ],
   },
 ];
-
 
 const isActive = (path) => route.path === path;
 
