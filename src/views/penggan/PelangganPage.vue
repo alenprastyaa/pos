@@ -296,3 +296,131 @@ onMounted(() => {
     fetchPelanggan();
 });
 </script>
+
+<style scoped>
+/* DEFINISI WARNA NATIVE CSS (HEX) */
+
+/* Warna Teks */
+.text-title {
+    color: #111827;
+    /* Gray 900 */
+}
+
+.text-main {
+    color: #111827;
+    /* Gray 900 */
+}
+
+.text-body {
+    color: #374151;
+    /* Gray 700 */
+}
+
+.text-muted {
+    color: #6b7280;
+    /* Gray 500 */
+}
+
+.text-danger {
+    color: #dc2626;
+    /* Red 600 */
+}
+
+.text-success {
+    color: #16a34a;
+    /* Green 600 */
+}
+
+/* Background & Border */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.card-container {
+    background-color: #ffffff;
+    border-color: #e5e7eb;
+    /* Gray 200 */
+}
+
+.border-divider {
+    border-color: #e5e7eb;
+    /* Gray 200 */
+}
+
+.divide-divider> :not([hidden])~ :not([hidden]) {
+    border-color: #e5e7eb;
+    /* Gray 200 */
+}
+
+/* Table Styles */
+.table-header {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+.table-header th {
+    color: #6b7280;
+    /* Gray 500 */
+}
+
+.table-row-hover:hover {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #2563eb;
+    /* Blue 600 */
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    /* Blue 700 */
+}
+
+.btn-primary:disabled {
+    background-color: #9ca3af;
+    /* Gray 400 */
+    cursor: not-allowed;
+}
+
+/* Icon Buttons */
+.btn-icon-edit {
+    color: #2563eb;
+    /* Blue 600 */
+    transition: color 0.2s;
+}
+
+.btn-icon-edit:hover {
+    color: #1e3a8a;
+    /* Blue 900 */
+}
+
+.btn-icon-delete {
+    color: #dc2626;
+    /* Red 600 */
+    transition: color 0.2s;
+}
+
+.btn-icon-delete:hover {
+    color: #7f1d1d;
+    /* Red 900 */
+}
+
+/* Form Inputs */
+.input-field {
+    border: 1px solid #d1d5db;
+    /* Gray 300 */
+    color: #111827;
+    /* Gray 900 */
+    background-color: #ffffff;
+}
+
+/* Modal Overlay (Background Semi-transparent) */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+</style>
