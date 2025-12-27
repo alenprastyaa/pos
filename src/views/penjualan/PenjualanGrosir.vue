@@ -196,16 +196,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button type="button" @click.prevent="saveCurrentTransaction"
-                    :disabled="transactionItems.length === 0 || !selectedPelangganId"
-                    class="btn-pending h-12 font-medium rounded-lg flex items-center justify-center gap-2 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Simpan (Pending)
-                </button>
-
                 <button ref="submitButtonRef" type="submit" @click.prevent="submitTransaksi"
                     :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId"
                     class="md:col-span-2 h-12 btn-submit text-base font-semibold rounded-lg flex items-center justify-center gap-2 shadow-sm transition transform hover:scale-[1.01]">
@@ -218,6 +208,17 @@
                     </svg>
                     {{ isSubmitting ? 'Memproses...' : 'Proses Transaksi' }}
                 </button>
+                <button type="button" @click.prevent="saveCurrentTransaction"
+                    :disabled="transactionItems.length === 0 || !selectedPelangganId"
+                    class="btn-pending h-12 font-medium rounded-lg flex items-center justify-center gap-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Simpan (Pending)
+                </button>
+
+
             </div>
         </div>
     </AdminLayout>
