@@ -410,7 +410,7 @@ const generateReceiptHTML = (trx: Transaksi): string => {
     const kasirNameDisplay = trx.kasir_name || kasirData.value?.full_name || 'Admin';
 
     return `
-        <div style="width: 280px; font-family: monospace; font-size: 12px; padding: 10px; text-align: center; margin-left:10px">
+        <div style="width: 280px; font-family: monospace; font-size: 12px; padding: 10px; text-align: center; margin-left:20px">
             <div style="margin-bottom: 10px;">
                 <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${tokoName}</div>
                 <div style="font-size: 11px; line-height: 1.4;">
