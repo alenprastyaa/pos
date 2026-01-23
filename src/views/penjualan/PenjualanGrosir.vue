@@ -797,11 +797,11 @@ const generateReceiptHTML = (
             <div style="margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 5px;">
                 ${items.map(item => `
                     <div style="margin-bottom: 6px;">
-                        <div style="margin-bottom: 2px; font-weight: bold;">
+                        <div style="margin-bottom: 2px;">
                             ${item.nama_produk}
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 10px;">
-                            <span>${item.qty}x @ Rp ${formatCurrency(item.harga_jual_ritel)}</span>
+                            <span>${item.qty}x Rp ${formatCurrency(item.harga_jual_ritel)}</span>
                             <span>Rp ${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
                         </div>
                     </div>
