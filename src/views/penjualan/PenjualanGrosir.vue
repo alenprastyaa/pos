@@ -771,7 +771,7 @@ const generateReceiptHTML = (
             font-size: 11px; 
             color: #000; 
             width: 100%;
-            padding-left: 20px; /* PENTING: Jarak aman agar kiri tidak potong */
+            padding-left: 20px;
             padding-right: 5px;
         ">
             <div style="text-align: center; margin-bottom: 10px;">
@@ -794,23 +794,15 @@ const generateReceiptHTML = (
                 </div>
             </div>
 
-            <div style="display: flex; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 5px; font-size: 10px;">
-                <span style="flex: 1; text-align: left;">ITEM</span>
-                <span style="width: 25px; text-align: center;">Qty</span>
-                <span style="width: 55px; text-align: right;">Hrg</span>
-                <span style="width: 60px; text-align: right;">Total</span>
-            </div>
-
             <div style="margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 5px;">
                 ${items.map(item => `
-                    <div style="margin-bottom: 4px;">
-                        <div style="margin-bottom: 1px;">
+                    <div style="margin-bottom: 6px;">
+                        <div style="margin-bottom: 2px; font-weight: bold;">
                             ${item.nama_produk}
                         </div>
-                        <div style="display: flex; font-size: 10px;">
-                            <span style="flex: 1;"></span> <span style="width: 25px; text-align: center;">${item.qty}</span>
-                            <span style="width: 55px; text-align: right;">${formatCurrency(item.harga_jual_ritel)}</span>
-                            <span style="width: 60px; text-align: right;">${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                            <span>${item.qty}x @ Rp ${formatCurrency(item.harga_jual_ritel)}</span>
+                            <span>Rp ${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
                         </div>
                     </div>
                 `).join('')}
@@ -885,12 +877,11 @@ const printStruk = (
                     /* PENTING: CSS Print */
                     @media print {
                         @page {
-                            margin: 0; /* Hapus margin browser */
+                            margin: 0;
                             size: auto;
                         }
                         
                         body {
-                            /* Padding CSS mengambil alih margin fisik */
                             width: 100%;
                         }
                     }
@@ -903,7 +894,6 @@ const printStruk = (
     `);
     printWindow.document.close();
 };
-
 
 const submitTransaksi = async () => {
     if (!selectedPelangganId.value) {
