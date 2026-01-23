@@ -748,7 +748,6 @@ const removePendingTransaction = (id: number, showSuccess: boolean = true) => {
         Swal.fire('Berhasil', 'Transaksi pending telah dihapus.', 'success');
     }
 };
-
 const generateReceiptHTML = (
     trx: TransaksiResponseData['transaksi'],
     pelangganName: string,
@@ -766,87 +765,139 @@ const generateReceiptHTML = (
         return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(number);
     };
 
+    const formatDateTime = (date: string | Date) => {
+        const d = new Date(date);
+        return d.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
     return `
         <div style="
             font-family: Arial, Helvetica, sans-serif; 
             font-size: 11px; 
             color: #000; 
             width: 100%;
-            padding-left: 16px; /* PENTING: Jarak aman agar kiri tidak potong */
-            padding-right: 5px;
+            padding: 0;
+            margin: 0;
         ">
-            <div style="text-align: center; margin-bottom: 10px;">
-                <div style="font-size: 14px; margin-bottom: 5px;">${tokoName.toUpperCase()}</div>
-                <div style="font-size: 10px; line-height: 1.2;">
-                    ${tokoAlamat.replace(/\n/g, '<br>')}
+            <!-- HEADER TOKO -->
+            <div style="text-align: center; margin-bottom: 10px; padding: 0 5px;">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 3px;">
+                    ${tokoName.toUpperCase()}
+                </div>
+                <div style="font-size: 10px; line-height: 1.3; white-space: pre-wrap;">
+                    ${tokoAlamat}
                 </div>
             </div>
 
-            <div style="border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 5px;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span>ID: ${trx.id.substring(0, 8)}</span>
-                    <span>${formatDateTime(trx.createdAt)}</span>
+            <!-- GARIS PEMISAH -->
+            <div style="border-bottom: 1px solid #000; margin: 5px 0;"></div>
+
+            <!-- INFO TRANSAKSI -->
+            <div style="padding: 0 5px; margin-bottom: 5px;margin-left:10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px;">
+                    <span>No. Struk</span>
+                    <span style="font-weight: bold;">: ${trx.id.substring(0, 12)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 2px;">
-                    <span>Kasir: ${kasirFullName}</span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px;">
+                    <span>Tanggal</span>
+                    <span>: ${formatDateTime(trx.createdAt)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Plg: ${pelangganName}</span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-size: 11px;">
+                    <span>Kasir</span>
+                    <span>: ${kasirFullName}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                    <span>Pelanggan</span>
+                    <span>: ${pelangganName}</span>
                 </div>
             </div>
 
-            <div style="display: flex; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 5px; font-size: 10px;">
-                <span style="flex: 1; text-align: left;">ITEM</span>
-                <span style="width: 25px; text-align: center;">Qty</span>
-                <span style="width: 55px; text-align: right;">Hrg</span>
-                <span style="width: 60px; text-align: right;">Total</span>
+            <!-- GARIS PEMISAH -->
+            <div style="border-bottom: 1px solid #000; margin: 5px 0; margin-left:10px;"></div>
+
+            <!-- HEADER ITEM -->
+            <div style="display: flex; padding: 3px 5px; margin-bottom: 3px; font-size: 10px; font-weight: bold;margin-left:10px;">
+                <span style="flex: 1;">ITEM</span>
+                <span style="width: 30px; text-align: center;">QTY</span>
+                <span style="width: 50px; text-align: right;">HARGA</span>
+                <span style="width: 55px; text-align: right;">TOTAL</span>
             </div>
 
-            <div style="margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 5px;">
-                ${items.map(item => `
-                    <div style="margin-bottom: 4px;">
-                        <div style="margin-bottom: 1px;">
-                            ${item.nama_produk}
+            <!-- DAFTAR ITEM -->
+            <div style="padding: 0 5px; margin-bottom: 5px;">
+                ${items.map(item => {
+        const itemTotal = item.qty * item.harga_jual_ritel;
+        const itemName = item.nama_produk.length > 22
+            ? item.nama_produk.substring(0, 20) + '..'
+            : item.nama_produk;
+
+        return `
+                        <div style="margin-bottom: 4px; border-bottom: 1px dotted #ccc; padding-bottom: 2px; margin-left:10px;">
+                            <div style="font-size: 11px; margin-bottom: 2px;">
+                                ${itemName}
+                            </div>
+                            <div style="display: flex; font-size: 10px;">
+                                <span style="flex: 1;"></span>
+                                <span style="width: 30px; text-align: center;">${item.qty}x</span>
+                                <span style="width: 50px; text-align: right;">${formatCurrency(item.harga_jual_ritel)}</span>
+                                <span style="width: 55px; text-align: right; font-weight: bold;">${formatCurrency(itemTotal)}</span>
+                            </div>
                         </div>
-                        <div style="display: flex; font-size: 10px;">
-                            <span style="flex: 1;"></span> <span style="width: 25px; text-align: center;">${item.qty}</span>
-                            <span style="width: 55px; text-align: right;">${formatCurrency(item.harga_jual_ritel)}</span>
-                            <span style="width: 60px; text-align: right;">${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
-                        </div>
-                    </div>
-                `).join('')}
+                    `;
+    }).join('')}
             </div>
 
-            <div>
+            <!-- GARIS PEMISAH -->
+            <div style="border-bottom: 1px solid #000; margin: 5px 0;"></div>
+
+            <!-- TOTAL -->
+            <div style="padding: 5px; margin-bottom: 10px;margin-left:10px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px;">
-                    <span>TOTAL:</span>
-                    <span>Rp ${formatCurrency(total_harga)}</span>
+                    <span>TOTAL</span>
+                    <span style="font-weight: bold;">Rp ${formatCurrency(total_harga)}</span>
                 </div>
-
-                <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
-                    <span>Tunai:</span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px;">
+                    <span>Tunai</span>
                     <span>Rp ${formatCurrency(total_bayar)}</span>
                 </div>
                 
                 ${kembalian > 0 ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
-                        <span>Kembali:</span>
-                        <span>Rp ${formatCurrency(kembalian)}</span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; color: #0066cc;">
+                        <span>Kembali</span>
+                        <span style="font-weight: bold;">Rp ${formatCurrency(kembalian)}</span>
                     </div>
                 ` : ''}
 
                 ${sisa_hutang > 0 ? `
-                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 11px;">
-                        <span>SISA HUTANG:</span>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; padding-top: 5px; border-top: 1px solid #000; font-size: 11px; color: #cc0000; font-weight: bold;">
+                        <span>SISA HUTANG</span>
                         <span>Rp ${formatCurrency(sisa_hutang)}</span>
                     </div>
                 ` : ''}
             </div>
 
-            <div style="margin-top: 15px; text-align: center; font-size: 10px;">
-                <div>Terima Kasih</div>
-                <div style="margin-top: 2px;">Barang yang dibeli tidak dapat ditukar/dikembalikan</div>
+            <!-- GARIS PEMISAH -->
+            <div style="border-bottom: 1px solid #000; margin: 5px 0;"></div>
+
+            <!-- FOOTER -->
+            <div style="text-align: center; padding: 8px 5px; font-size: 11px;">
+                <div style="margin-bottom: 5px;">~ TERIMA KASIH ~</div>
+                <div style="font-size: 9px; line-height: 1.4;">
+                    Barang yang sudah dibeli tidak dapat<br>
+                    ditukar / dikembalikan<br>
+                    <br>
+                    Simpan struk untuk keperluan garansi
+                </div>
             </div>
+
+            <!-- SPASI BAWAH UNTUK POTONGAN KERTAS -->
+            <div style="height: 15px;"></div>
         </div>
     `;
 };
@@ -861,7 +912,7 @@ const printStruk = (
 ) => {
     const printContent = generateReceiptHTML(trx, pelangganName, items, kasirFullName, tokoName, tokoAlamat);
 
-    const printWindow = window.open("", "", "width=400,height=600");
+    const printWindow = window.open("", "", "width=380,height=700,scrollbars=no");
     if (!printWindow) {
         Swal.fire('Error', 'Gagal membuka jendela cetak. Periksa setelan pop-up browser Anda.', 'error');
         return;
@@ -872,39 +923,57 @@ const printStruk = (
         <html>
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Struk #${trx.id.substring(0, 8)}</title>
                 <style>
                     /* Reset CSS */
-                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    * { 
+                        margin: 0; 
+                        padding: 0; 
+                        box-sizing: border-box; 
+                    }
                     
+                    html, body { 
+                        width: 80mm;
+                        margin: 0;
+                        padding: 0;
+                    }
+
                     body { 
                         font-family: Arial, Helvetica, sans-serif;
                         background: #fff;
                         color: #000;
+                        font-size: 11px;
                     }
 
-                    /* PENTING: CSS Print */
+                    /* CSS Print untuk Epson TMU 220D */
                     @media print {
                         @page {
-                            margin: 0; /* Hapus margin browser */
-                            size: auto;
+                            margin: 0; 
+                            size: 80mm auto;
                         }
                         
+                        html {
+                            margin: 0;
+                            padding: 0;
+                            width: 80mm;
+                        }
+
                         body {
-                            /* Padding CSS mengambil alih margin fisik */
-                            width: 100%;
+                            width: 80mm;
+                            margin: 0;
+                            padding: 0;
                         }
                     }
                 </style>
             </head>
-            <body onload="window.print(); setTimeout(() => window.close(), 1000);">
+            <body onload="setTimeout(function() { window.print(); }, 100); setTimeout(function() { window.close(); }, 2500);">
                 ${printContent}
             </body>
         </html>
     `);
     printWindow.document.close();
 };
-
 
 const submitTransaksi = async () => {
     if (!selectedPelangganId.value) {
