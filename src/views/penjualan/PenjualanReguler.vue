@@ -23,15 +23,20 @@
                         @keydown.up.prevent="navigateSearch('up')" @keydown.enter.prevent="handleSearchEnter"
                         :disabled="role_name !== 'admin'" class="input-field primary-border" />
 
-                    <div v-if="showSearchResults && searchResults.length > 0" class="search-dropdown">
+                    <div v-if="showSearchResults && searchResults.length > 0"
+                        class="search-dropdown border rounded-md bg-white shadow-lg">
+
                         <div v-for="(product, index) in searchResults" :key="product.barcode"
                             @click="selectProductFromSearch(product)" :class="[
-                                'search-item',
-                                index === selectedSearchIndex ? 'search-item-active' : 'search-item-default'
+                                'px-3 py-2 cursor-pointer transition',
+                                index === selectedSearchIndex ? 'bg-blue-100 search-item-active' : 'search-item-default'
                             ]">
-                            <div class="product-name">{{ product.nama_produk }}</div>
-                            <div class="product-meta">{{ product.barcode }} - {{
-                                formatRupiah(product.harga_jual_biasa) }}</div>
+
+                            <div class="font-semibold text-sm">{{ product.nama_produk }}</div>
+
+                            <div class="text-xs text-gray-600">
+                                {{ product.barcode }} - {{ formatRupiah(product.harga_jual_biasa) }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -658,7 +663,6 @@ const removePendingTransaction = (id: number, showSuccess: boolean = true) => {
     pendingTransactions.value = pendingTransactions.value.filter(t => t.id !== id);
     saveToLocalStorage();
 };
-
 const generateReceiptHTML = (
     trx: TransaksiResponseData['transaksi'],
     pelangganName: string,
@@ -676,16 +680,27 @@ const generateReceiptHTML = (
         return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(number);
     };
 
+    // PERBAIKAN:
+    // 1. Font Arial (Sans-serif)
+    // 2. Padding-left 15px (Agar tidak kena margin mati printer)
+    // 3. Width 100% (Flexible)
     return `
-        <div style="width: 280px; font-family: monospace; font-size: 12px; padding: 10px; text-align: center;">
-            <div style="margin-bottom: 10px;">
-                <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${tokoName.toUpperCase()}</div>
-                <div style="font-size: 11px; line-height: 1.4;">
+        <div style="
+            font-family: Arial, Helvetica, sans-serif; 
+            font-size: 11px; 
+            width: 100%; 
+            padding-left: 15px; 
+            padding-right: 5px;
+            color: #000;
+        ">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <div style="font-size: 14px; margin-bottom: 5px;">${tokoName.toUpperCase()}</div>
+                <div style="font-size: 10px; line-height: 1.2;">
                     ${tokoAlamat.replace(/\n/g, '<br>')}
                 </div>
             </div>
 
-            <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0; margin: 5px 0;">
+            <div style="border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 5px 0; margin: 5px 0;">
                 <div style="display: flex; justify-content: space-between; font-size: 11px;">
                     <span>ID: ${trx.id.substring(0, 8)}</span>
                     <span>${formatDateTime(trx.createdAt)}</span>
@@ -696,25 +711,27 @@ const generateReceiptHTML = (
                 </div>
             </div>
 
-            <div style="border-bottom: 1px dashed #000; padding-bottom: 4px;">
+            <div style="border-bottom: 1px solid #000; padding-bottom: 5px;">
                 ${items.map(item => `
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
-                        <span style="flex: 1; text-align: left;">${item.nama_produk}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                        <span style="width: 30px; text-align: right;">${item.qty}x</span>
-                        <span style="width: 60px; text-align: right;">${formatCurrency(item.harga_jual_biasa)}</span>
-                        <span style="flex: 1; text-align: right;">${formatCurrency(item.qty * item.harga_jual_biasa)}</span>
+                    <div style="margin-top: 5px;">
+                        <div style="text-align: left; font-size: 11px; margin-bottom: 2px;">
+                            ${item.nama_produk}
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                            <span style="width: 30px; text-align: left;">${item.qty}x</span>
+                            <span style="width: 70px; text-align: right;">${formatCurrency(item.harga_jual_biasa)}</span>
+                            <span style="flex: 1; text-align: right;">${formatCurrency(item.qty * item.harga_jual_biasa)}</span>
+                        </div>
                     </div>
                 `).join('')}
             </div>
 
             <div style="margin-top: 8px;">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
                     <span>TOTAL:</span>
                     <span>Rp ${formatCurrency(total_harga)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
                     <span>Tunai:</span>
                     <span>Rp ${formatCurrency(total_bayar)}</span>
                 </div>
@@ -725,7 +742,7 @@ const generateReceiptHTML = (
                     </div>
                 ` : ''}
                 ${sisa_hutang > 0 ? `
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin-top: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
                         <span>SISA HUTANG:</span>
                         <span>Rp ${formatCurrency(sisa_hutang)}</span>
                     </div>
@@ -749,18 +766,36 @@ const printStruk = (
 ) => {
     const printContent = generateReceiptHTML(trx, pelangganName, items, kasirFullName, tokoName, tokoAlamat);
 
-    const printWindow = window.open("", "", "width=350,height=600,scrollbars=yes");
+    const printWindow = window.open("", "", "width=400,height=600,scrollbars=yes");
     if (!printWindow) return;
 
     printWindow.document.write(`
         <html>
             <head>
                 <style>
+                    /* Reset Margin Browser */
                     * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { font-family: monospace; font-size: 12px; }
+                    
+                    body { 
+                        font-family: Arial, Helvetica, sans-serif; 
+                        font-size: 11px;
+                        background: #fff;
+                    }
+
+                    /* Setting Wajib untuk Print */
+                    @media print {
+                        @page {
+                            margin: 0; /* Menghilangkan header/footer browser */
+                            size: auto;
+                        }
+                        body {
+                            padding: 5px;
+                            width: 100%;
+                        }
+                    }
                 </style>
             </head>
-            <body onload="window.print(); setTimeout(() => window.close(), 500);">
+            <body onload="window.print(); setTimeout(() => window.close(), 1000);">
                 ${printContent}
             </body>
         </html>
@@ -966,9 +1001,12 @@ onMounted(async () => {
     border: 1px solid #d1d5db;
     border-radius: 0.25rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    z-index: 50;
-    max-height: 200px;
-    overflow-y: auto;
+    z-index: 100;
+    /* Saya naikkan z-index agar menutupi tabel dibawahnya */
+
+    /* BAGIAN INI DIHAPUS atau DIKOMENTARI agar list memanjang ke bawah */
+    /* max-height: 200px; */
+    /* overflow-y: auto; */
 }
 
 .search-item {
