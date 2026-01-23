@@ -52,7 +52,7 @@
                   ]" />
                 </button>
 
-                <router-link v-else-if="item.path" :to="item.path" :class="[
+                <router-link v-else-if="item.path" :to="item.path" @click="handleMenuClick" :class="[
                   'menu-item group justify-start',
                   {
                     'menu-item-active': isActive(item.path),
@@ -74,7 +74,7 @@
                   <div v-show="isSubmenuOpen(groupIndex, index)">
                     <ul class="mt-2 space-y-1 ml-9">
                       <li v-for="subItem in item.subItems" :key="subItem.name">
-                        <router-link :to="subItem.path" :class="[
+                        <router-link :to="subItem.path" @click="handleMenuClick" :class="[
                           'menu-dropdown-item',
                           {
                             'menu-dropdown-item-active': isActive(subItem.path),
@@ -113,9 +113,9 @@
 </template>
 
 <script setup>
-// PERBAIKAN 1: Tambahkan 'watch' di import
 import { ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useSidebar } from "@/composables/useSidebar";
 
 import {
   GridIcon,
@@ -133,7 +133,6 @@ import {
   PlugInIcon,
 } from "../../icons";
 import SidebarWidget from "./SidebarWidget.vue";
-import { useSidebar } from "@/composables/useSidebar";
 import CheckIcon from "@/icons/CheckIcon.vue";
 import MailBox from "@/icons/MailBox.vue";
 import TaskIcon from "@/icons/TaskIcon.vue";
@@ -144,20 +143,20 @@ import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 const role_name = localStorage.getItem("role_name")
 const route = useRoute();
 
-// Mengambil state dari composable
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
 
-// PERBAIKAN 2: Watch Route Change
-// Fungsi ini akan berjalan setiap kali URL berubah (pindah halaman)
+const handleMenuClick = () => {
+  if (isMobileOpen.value) {
+    isMobileOpen.value = false;
+  }
+};
+
 watch(
   () => route.path,
   () => {
-    // Jika user sedang dalam tampilan mobile (isMobileOpen true), tutup sidebar
     if (isMobileOpen.value) {
       isMobileOpen.value = false;
     }
-    // Opsional: Tutup submenu juga saat pindah halaman jika diinginkan
-    // openSubmenu.value = null; 
   }
 );
 
@@ -251,7 +250,7 @@ const startTransition = (el) => {
   el.style.height = "auto";
   const height = el.scrollHeight;
   el.style.height = "0px";
-  el.offsetHeight; // force reflow
+  el.offsetHeight;
   el.style.height = height + "px";
 };
 

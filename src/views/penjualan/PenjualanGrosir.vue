@@ -18,7 +18,13 @@
                             @click="selectProductFromSearch(product)"
                             :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
                             class="px-2 py-1 cursor-pointer last:border-b-0 transition">
-                            <div style="font-size: 12px;" class="dropdown-text">{{ product.nama_produk }}</div>
+                            <div style="font-size: 12px;" class="dropdown-text">
+                                <span class="font-semibold">{{ product.nama_produk }}</span>
+                                <span class="mx-2">|</span>
+                                <span class="text-green-600 font-medium">{{ formatRupiah(product.harga_jual_ritel)
+                                    }}</span>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -757,79 +763,78 @@ const generateReceiptHTML = (
         return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(number);
     };
 
+    // Note: Inline styles updated to Sans-Serif and removed fixed width
     return `
-        <div style="width: 280px; font-family: monospace; font-size: 12px; padding: 10px; text-align: center;">
-            <div style="margin-bottom: 10px;">
+        <div style="width: 100%; font-family: Arial, Helvetica, sans-serif; font-size: 11px; padding: 0 2px;">
+            <div style="text-align: center; margin-bottom: 10px;">
                 <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${tokoName.toUpperCase()}</div>
-                <div style="font-size: 11px; line-height: 1.4;">
+                <div style="font-size: 10px; line-height: 1.2;">
                     ${tokoAlamat.replace(/\n/g, '<br>')}
                 </div>
             </div>
 
-            <div style="border-top: 2px dashed #000; border-bottom: 2px dashed #000; padding: 8px 0; margin: 8px 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-                    <span><strong>ID:</strong> ${trx.id.substring(0, 8)}</span>
-                    <span><strong>Kasir:</strong> ${kasirFullName}</span>
+            <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0; margin: 5px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span>ID: ${trx.id.substring(0, 8)}</span>
+                    <span>Kasir: ${kasirFullName}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                    <span><strong>Tanggal:</strong></span>
-                    <span>${formatDateTime(trx.createdAt)}</span>
+                <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span>Tgl: ${formatDateTime(trx.createdAt)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 3px;">
-                    <span><strong>Pelanggan:</strong></span>
-                    <span>${pelangganName}</span>
+                <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span>Plg: ${pelangganName}</span>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin: 8px 0 4px 0; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+            <div style="display: flex; font-weight: bold; font-size: 10px; margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 2px;">
                 <span style="flex: 1; text-align: left;">ITEM</span>
-                <span style="width: 30px; text-align: center;">QTY</span>
-                <span style="width: 50px; text-align: right;">HARGA</span>
-                <span style="width: 50px; text-align: right;">TOTAL</span>
+                <span style="width: 25px; text-align: center;">Qty</span>
+                <span style="width: 55px; text-align: right;">Harga</span>
+                <span style="width: 60px; text-align: right;">Total</span>
             </div>
 
-            <div>
+            <div style="margin-bottom: 8px;">
                 ${items.map(item => `
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
-                        <span style="flex: 1; text-align: left; word-break: break-word;">${item.nama_produk}</span>
-                        <span style="width: 30px; text-align: center;">${item.qty}</span>
-                        <span style="width: 50px; text-align: right;">${formatCurrency(item.harga_jual_ritel)}</span>
-                        <span style="width: 50px; text-align: right;">${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
+                    <div style="display: flex; font-size: 10px; margin-bottom: 4px;">
+                        <span style="flex: 1; text-align: left; overflow-wrap: break-word; padding-right: 2px;">
+                            ${item.nama_produk}
+                        </span>
+                        <span style="width: 25px; text-align: center; vertical-align: top;">${item.qty}</span>
+                        <span style="width: 55px; text-align: right; vertical-align: top;">${formatCurrency(item.harga_jual_ritel)}</span>
+                        <span style="width: 60px; text-align: right; vertical-align: top;">${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
                     </div>
                 `).join('')}
             </div>
 
-            <div style="border-top: 2px dashed #000; margin: 8px 0; padding-top: 8px;">
-    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
-        <span>TOTAL BELANJA:</span>
-        <span>Rp ${formatCurrency(total_harga)}</span>
-    </div>
+            <div style="border-top: 1px dashed #000; padding-top: 5px;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-bottom: 2px;">
+                    <span>TOTAL:</span>
+                    <span>Rp ${formatCurrency(total_harga)}</span>
+                </div>
 
-    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
-        <span>Tunai:</span>
-        <span>Rp ${formatCurrency(total_bayar)}</span>
-    </div>
-    
-    ${kembalian > 0 ? `
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; color: #2ecc71;">
-            <span>Kembali:</span>
-            <span>Rp ${formatCurrency(kembalian)}</span>
-        </div>
-    ` : ''}
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                    <span>Tunai:</span>
+                    <span>Rp ${formatCurrency(total_bayar)}</span>
+                </div>
+                
+                ${kembalian > 0 ? `
+                    <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                        <span>Kembali:</span>
+                        <span>Rp ${formatCurrency(kembalian)}</span>
+                    </div>
+                ` : ''}
 
-    ${sisa_hutang > 0 ? `
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; color: #e74c3c; margin-top: 5px;">
-            <span>SISA HUTANG:</span>
-            <span>Rp ${formatCurrency(sisa_hutang)}</span>
-        </div>
-    ` : ''}
-    </div>
+                ${sisa_hutang > 0 ? `
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin-top: 5px;">
+                        <span>SISA HUTANG:</span>
+                        <span>Rp ${formatCurrency(sisa_hutang)}</span>
+                    </div>
+                ` : ''}
+            </div>
 
-
-            <div style="margin-top: 10px; font-size: 11px; line-height: 1.6;">
-                <div>Terima Kasih Atas Kunjungan Anda</div>
-                <div>Periksa barang sebelum dibeli</div>
-                <div style="font-size: 10px; color: #666;">Barang yang sudah dibeli<br>tidak bisa ditukar atau dikembalikan</div>
+            <div style="margin-top: 15px; text-align: center; font-size: 10px;">
+                <div>Terima Kasih</div>
+                <div>Barang yang dibeli tidak dapat ditukar/dikembalikan</div>
             </div>
         </div>
     `;
@@ -845,7 +850,8 @@ const printStruk = (
 ) => {
     const printContent = generateReceiptHTML(trx, pelangganName, items, kasirFullName, tokoName, tokoAlamat);
 
-    const printWindow = window.open("", "", "width=350,height=700,scrollbars=yes");
+    // Buka window sedikit lebih lebar untuk preview, tapi CSS @media print yang menentukan hasil cetak
+    const printWindow = window.open("", "", "width=400,height=600");
     if (!printWindow) {
         Swal.fire('Error', 'Gagal membuka jendela cetak. Periksa setelan pop-up browser Anda.', 'error');
         return;
@@ -856,22 +862,37 @@ const printStruk = (
         <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Struk Transaksi ${trx.id.substring(0, 8)}</title>
+                <title>Struk #${trx.id.substring(0, 8)}</title>
                 <style>
+                    /* Reset CSS dasar */
                     * { margin: 0; padding: 0; box-sizing: border-box; }
+                    
                     body { 
-                        font-family: 'Courier New', monospace; 
-                        font-size: 12px;
-                        background: #f5f5f5;
-                        padding: 10px;
+                        font-family: Arial, Helvetica, sans-serif; /* Font biasa yang lebih jelas */
+                        background: #fff;
+                        color: #000;
                     }
+
+                    /* PENTING: Pengaturan khusus saat Print */
                     @media print {
-                        body { padding: 0; background: white; }
-                        @page { margin: 0; size: 80mm auto; }
+                        @page {
+                            margin: 0; /* Menghapus margin default browser agar tidak terpotong */
+                            size: auto; /* Membiarkan printer menentukan ukuran kertas */
+                        }
+                        
+                        body {
+                            padding: 5px 5px 5px 5px; /* Sedikit padding agar tidak mepet tepi kertas */
+                            width: 100%;
+                        }
+                        
+                        /* Sembunyikan header/footer browser jika memungkinkan */
+                        html, body {
+                            height: auto;
+                        }
                     }
                 </style>
             </head>
-            <body onload="window.print(); setTimeout(() => window.close(), 500);">
+            <body onload="window.print(); setTimeout(() => window.close(), 1000);">
                 ${printContent}
             </body>
         </html>
