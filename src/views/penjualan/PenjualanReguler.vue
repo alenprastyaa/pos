@@ -41,7 +41,8 @@
                     </div>
                 </div>
 
-                <select v-model="selectedPelangganId" required class="select-field">
+                <select v-model="selectedPelangganId" required class="select-field"
+                    @keydown.enter.prevent="focusToPayment">
                     <option value="" disabled>Pilih Pelanggan</option>
                     <option v-if="loadingPelanggan" disabled>Memuat...</option>
                     <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
@@ -171,7 +172,8 @@
                         Jumlah Bayar <span class="text-danger">*</span>
                     </label>
 
-                    <input :value="formatRupiahInput(uangPembayaran)" @input="handleInputUangPembayaran" type="text"
+                    <input ref="paymentInputRef" :value="formatRupiahInput(uangPembayaran)"
+                        @input="handleInputUangPembayaran" @keydown.enter.prevent="submitTransaksi" type="text"
                         inputmode="numeric" required placeholder="Rp 0" class="payment-field" />
                 </div>
 
@@ -199,7 +201,7 @@
                 </button>
 
                 <button type="submit" @click.prevent="submitTransaksi"
-                    :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId || uangPembayaran < totalBelanja"
+                    :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId || uangPembayaran < totalBelanja && kembalian >= 0"
                     class="btn-action btn-process">
                     <svg v-if="isSubmitting" class="spinner" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
@@ -290,6 +292,7 @@ const selectedPelangganId = ref('');
 const uangPembayaran = ref(0);
 const quickBarcodeInput = ref('');
 const barcodeInputRef = ref<HTMLInputElement | null>(null);
+const paymentInputRef = ref<HTMLInputElement | null>(null);
 const transactionItems = ref<CartItem[]>([]);
 
 const pendingTransactions = ref<PendingTransaction[]>([]);
@@ -478,12 +481,16 @@ const formatRupiahInput = (number: number) => {
     return 'Rp ' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-
 const handleInputUangPembayaran = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const rawValue = target.value.replace(/\D/g, '');
     uangPembayaran.value = rawValue ? parseInt(rawValue) : 0;
 };
+
+const focusToPayment = () => {
+    paymentInputRef.value?.focus();
+};
+
 const promptQuantity = async (product: any) => {
     const { value: qty, isConfirmed } = await Swal.fire({
         title: 'Masukkan Jumlah',
@@ -663,6 +670,7 @@ const removePendingTransaction = (id: number, showSuccess: boolean = true) => {
     pendingTransactions.value = pendingTransactions.value.filter(t => t.id !== id);
     saveToLocalStorage();
 };
+
 const generateReceiptHTML = (
     trx: TransaksiResponseData['transaksi'],
     pelangganName: string,
@@ -680,10 +688,6 @@ const generateReceiptHTML = (
         return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(number);
     };
 
-    // PERBAIKAN:
-    // 1. Font Arial (Sans-serif)
-    // 2. Padding-left 15px (Agar tidak kena margin mati printer)
-    // 3. Width 100% (Flexible)
     return `
         <div style="
             font-family: Arial, Helvetica, sans-serif; 
@@ -773,7 +777,6 @@ const printStruk = (
         <html>
             <head>
                 <style>
-                    /* Reset Margin Browser */
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     
                     body { 
@@ -782,10 +785,9 @@ const printStruk = (
                         background: #fff;
                     }
 
-                    /* Setting Wajib untuk Print */
                     @media print {
                         @page {
-                            margin: 0; /* Menghilangkan header/footer browser */
+                            margin: 0;
                             size: auto;
                         }
                         body {
@@ -814,17 +816,7 @@ const submitTransaksi = async () => {
         return;
     }
 
-    const confirmResult = await Swal.fire({
-        title: 'Proses Transaksi?',
-        html: `Total: <b>${formatRupiah(totalBelanja.value)}</b><br>Bayar: <b>${formatRupiah(uangPembayaran.value)}</b>`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Ya',
-        cancelButtonText: 'Batal'
-    });
-
-    if (!confirmResult.isConfirmed) return;
-
+    // Workflow langsung proses jika enter dari kolom bayar
     if (kembalian.value < 0) {
         const hutangResult = await Swal.fire({
             title: 'Kurang Bayar (Hutang)',
@@ -834,6 +826,17 @@ const submitTransaksi = async () => {
             confirmButtonText: 'Ya, Hutang'
         });
         if (!hutangResult.isConfirmed) return;
+    } else {
+        // Konfirmasi standard (bisa dihapus jika ingin lebih cepat lagi)
+        const confirmResult = await Swal.fire({
+            title: 'Proses Transaksi?',
+            html: `Total: <b>${formatRupiah(totalBelanja.value)}</b><br>Bayar: <b>${formatRupiah(uangPembayaran.value)}</b>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        });
+        if (!confirmResult.isConfirmed) return;
     }
 
     const itemsForPrint = [...transactionItems.value];
@@ -1002,11 +1005,6 @@ onMounted(async () => {
     border-radius: 0.25rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     z-index: 100;
-    /* Saya naikkan z-index agar menutupi tabel dibawahnya */
-
-    /* BAGIAN INI DIHAPUS atau DIKOMENTARI agar list memanjang ke bawah */
-    /* max-height: 200px; */
-    /* overflow-y: auto; */
 }
 
 .search-item {
