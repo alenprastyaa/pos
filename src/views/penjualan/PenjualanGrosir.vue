@@ -771,7 +771,7 @@ const generateReceiptHTML = (
             font-size: 11px; 
             color: #000; 
             width: 100%;
-            padding-left: 15px; /* PENTING: Jarak aman agar kiri tidak potong */
+            padding-left: 30px; /* PENTING: Jarak aman agar kiri tidak potong */
             padding-right: 5px;
         ">
             <div style="text-align: center; margin-bottom: 10px;">
