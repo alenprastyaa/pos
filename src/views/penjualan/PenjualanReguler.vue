@@ -693,7 +693,7 @@ const generateReceiptHTML = (
             font-family: Arial, Helvetica, sans-serif; 
             font-size: 11px; 
             width: 100%; 
-            padding-left: 15px; 
+            padding-left: 17px; 
             padding-right: 5px;
             color: #000;
         ">

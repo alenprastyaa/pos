@@ -1,54 +1,45 @@
 <template>
     <AdminLayout>
-        <div class="page-container min-h-screen py-4 px-2 space-y-4 bg-gray-100">
+        <div class="page-container min-h-screen py-2 space-y-2">
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 relative">
-                    <label class="block text-base font-bold text-black mb-2 uppercase tracking-wide">
-                        Cari Produk (Scan Barcode)
+                    <label class="block text-sm font-medium label-text mb-2">
+                        Cari Produk
                     </label>
-                    <div class="relative">
-                        <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput" type="text"
-                            placeholder="KETIK NAMA PRODUK / SCAN BARCODE..."
-                            @input="searchProducts(productSearchInput)" @keydown="handleSearchKeydown"
-                            :disabled="role_name !== 'admin'"
-                            class="w-full h-12 px-4 rounded-lg border-2 border-gray-400 focus:border-cyan-700 focus:ring-2 focus:ring-cyan-200 text-lg font-bold text-black placeholder-gray-500 transition shadow-sm" />
-
-                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
+                    <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput" type="text"
+                        style="font-size: 12px;" placeholder="Ketik nama produk..."
+                        @input="searchProducts(productSearchInput)" @keydown="handleSearchKeydown"
+                        :disabled="role_name !== 'admin'" class="input-field w-full h-8 px-4 rounded-lg transition" />
 
                     <div v-if="showSearchResults && searchResults.length > 0"
-                        class="absolute top-full left-0 right-0 mt-1 rounded-lg border-2 border-gray-800 bg-white shadow-2xl z-50 max-h-80 overflow-y-auto">
+                        class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-10 max-h-200 overflow-y-auto">
                         <div v-for="(product, index) in searchResults" :key="product.barcode"
                             @click="selectProductFromSearch(product)"
-                            :class="index === selectedSearchIndex ? 'bg-cyan-100 border-l-8 border-cyan-700' : 'hover:bg-gray-100 border-l-8 border-transparent'"
-                            class="px-4 py-3 cursor-pointer border-b border-gray-300 transition-colors">
-                            <div class="flex justify-between items-center">
-                                <div class="font-bold text-lg text-black">
+                            :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
+                            class="px-2 py-1 cursor-pointer last:border-b-0 transition">
+                            <div style="font-size: 14px;" class="dropdown-text space-y-1 border border-gray-200 p-2 ">
+                                <div class="font-semibold">
                                     {{ product.nama_produk }}
                                 </div>
-                                <div class="text-green-800 font-extrabold text-lg bg-green-100 px-2 py-1 rounded">
+                                <div class="text-green-600 font-medium">
                                     {{ formatRupiah(product.harga_jual_ritel) }}
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-base font-bold text-black mb-2 uppercase tracking-wide">
+                    <label class="block text-sm font-medium label-text mb-2">
                         Pilih Pelanggan
                     </label>
-                    <select v-model="selectedPelangganId" required
-                        class="w-full h-12 rounded-lg px-4 border-2 border-gray-400 focus:border-cyan-700 text-lg font-bold text-black bg-white shadow-sm">
-                        <option value="" disabled class="text-gray-500">-- Pilih Pelanggan --</option>
-                        <option v-if="loadingPelanggan" disabled>Memuat Data...</option>
+                    <select v-model="selectedPelangganId" required style="font-size: 12px;"
+                        class="input-field w-full h-8 rounded-lg px-4 transition">
+                        <option value="" disabled>Pilih Pelanggan...</option>
+                        <option v-if="loadingPelanggan" disabled>Memuat...</option>
                         <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
                             {{ pelanggan.nama_pelanggan }}
                         </option>
@@ -56,121 +47,100 @@
                 </div>
             </div>
 
-            <div v-if="selectedPelangganId"
-                class="p-4 rounded-lg border-l-8 shadow-sm flex justify-between items-center bg-white"
-                :class="hutangPelanggan > 0 ? 'border-red-600 bg-red-50' : 'border-green-600 bg-green-50'">
-                <span class="text-lg font-bold text-gray-800">STATUS HUTANG:</span>
-                <span class="text-2xl font-black px-4 py-1 rounded"
-                    :class="hutangPelanggan > 0 ? 'text-red-700 bg-red-100' : 'text-green-800 bg-green-100'">
-                    {{ formatRupiah(hutangPelanggan) }}
-                </span>
+            <div v-if="selectedPelangganId" class="card-section p-4 rounded-lg border">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-muted">Hutang Pelanggan</span>
+                    <span class="text-lg" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
+                        {{ formatRupiah(hutangPelanggan) }}
+                    </span>
+                </div>
             </div>
 
-            <div v-if="pendingTransactions.length > 0"
-                class="bg-yellow-50 p-4 rounded-xl border-2 border-yellow-400 space-y-3">
-                <div class="flex items-center gap-3 border-b-2 border-yellow-200 pb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-700" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p class="text-lg font-black text-gray-900 uppercase">
+            <div v-if="pendingTransactions.length > 0" class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-1 h-6 indicator-bar rounded"></div>
+                    <p class="text-sm font-bold text-title">
                         Transaksi Pending ({{ pendingTransactions.length }})
                     </p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div v-for="t in pendingTransactions" :key="t.id"
-                        class="p-4 border-2 rounded-lg cursor-pointer shadow-sm relative group"
-                        :class="t.id === currentPendingId ? 'bg-yellow-100 border-yellow-600 ring-2 ring-yellow-400' : 'bg-white border-gray-300 hover:border-blue-400'">
-                        <div class="mb-4">
-                            <p class="text-base font-bold text-black border-b border-dashed border-gray-400 pb-1 mb-1">
-                                {{ t.nama_pelanggan }}</p>
-                            <p class="text-xl font-black text-blue-800">{{ formatRupiah(t.total) }}</p>
-                            <p class="text-sm font-semibold text-gray-600 mt-1 flex items-center gap-1">
-                                <span>🕒</span> {{ t.tanggal_simpan }}
-                            </p>
+                        class="p-4 border-2 rounded-lg transition cursor-pointer pending-card"
+                        :class="t.id === currentPendingId ? 'pending-card-active' : 'pending-card-inactive'">
+                        <div class="mb-3">
+                            <p class="text-sm font-semibold text-title">{{ t.nama_pelanggan }}</p>
+                            <p class="text-lg font-bold text-warning mt-1">{{ formatRupiah(t.total) }}</p>
+                            <p class="text-xs text-muted mt-2">{{ t.tanggal_simpan }}</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 justify-end">
                             <button @click="loadTransaction(t)"
-                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded font-bold uppercase tracking-wider shadow">
-                                MUAT
+                                class="btn-primary-small text-sm px-3 py-1.5 rounded-md font-medium transition">
+                                Muat
                             </button>
                             <button @click="removePendingTransaction(t.id)"
-                                class="bg-red-100 hover:bg-red-200 text-red-700 border border-red-300 text-sm px-3 py-2 rounded font-bold shadow">
-                                HAPUS
+                                class="btn-secondary-small text-sm px-3 py-1.5 rounded-md font-medium transition">
+                                Hapus
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md border-2 border-gray-300 overflow-hidden">
+            <div class="card-section rounded-lg shadow-sm border overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gray-800 text-white">
-                            <tr>
-                                <th
-                                    class="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider border-r border-gray-600 w-12">
-                                    No</th>
-                                <th
-                                    class="px-4 py-3 text-left font-bold text-sm uppercase tracking-wider border-r border-gray-600">
-                                    Nama Produk</th>
-                                <th
-                                    class="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider border-r border-gray-600 w-32">
-                                    Qty</th>
-                                <th
-                                    class="px-4 py-3 text-right font-bold text-sm uppercase tracking-wider border-r border-gray-600 w-48">
-                                    Harga Satuan</th>
-                                <th
-                                    class="px-4 py-3 text-right font-bold text-sm uppercase tracking-wider border-r border-gray-600 w-48">
-                                    Subtotal</th>
-                                <th class="px-4 py-3 text-center font-bold text-sm uppercase tracking-wider w-16">Aksi
-                                </th>
+                        <thead>
+                            <tr class="table-header border-b">
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-left uppercase tracking-wider th-text">No</th>
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-left uppercase tracking-wider th-text">Produk</th>
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-center uppercase tracking-wider th-text">Qty</th>
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-right uppercase tracking-wider th-text">Harga</th>
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-right uppercase tracking-wider th-text">Subtotal</th>
+                                <th style="font-size: 12px;"
+                                    class="px-6 py-4 text-center uppercase tracking-wider th-text"></th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y-2 divide-gray-200">
+                        <tbody class="divide-y divide-border">
                             <tr v-if="transactionItems.length === 0">
-                                <td colspan="6" class="px-6 py-16 text-center bg-gray-50">
-                                    <div class="flex flex-col items-center justify-center opacity-50">
-                                        <svg class="w-20 h-20 text-gray-400 mb-4" fill="none" stroke="currentColor"
+                                <td colspan="6" class="px-6 py-12 text-center text-muted-light">
+                                    <div class="space-y-2">
+                                        <svg class="w-12 h-12 mx-auto opacity-40" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                         </svg>
-                                        <p class="text-xl font-bold text-gray-500 uppercase">Keranjang Kosong</p>
-                                        <p class="text-base text-gray-500">Scan barcode atau cari produk untuk memulai
-                                        </p>
+                                        <p class="text-sm">Belum ada produk ditambahkan</p>
                                     </div>
                                 </td>
                             </tr>
                             <tr v-for="(item, index) in transactionItems" :key="item.barcode"
-                                class="hover:bg-cyan-50 transition-colors"
-                                :class="index % 2 === 0 ? 'bg-white' : 'bg-gray-100'">
-                                <td
-                                    class="px-4 py-3 text-base text-black font-bold text-center border-r border-gray-200">
-                                    {{ index + 1 }}</td>
-                                <td class="px-4 py-3 border-r border-gray-200">
-                                    <div class="text-lg font-bold text-black">{{ item.nama_produk }}</div>
-                                    <div class="text-xs text-gray-600 font-mono mt-1">CODE: {{ item.barcode }}</div>
+                                class="table-row-hover transition">
+                                <td class="px-6 py-1 text-sm text-body font-medium">{{ index + 1 }}</td>
+                                <td class="px-6 py-1">
+                                    <div style="font-size: 12px;" class="text-body leading-tight">{{ item.nama_produk }}
+                                    </div>
                                 </td>
-                                <td class="px-4 py-3 text-center border-r border-gray-200">
+                                <td class="px-6 py-1 text-center">
                                     <input v-model.number="item.qty" type="number" min="1"
                                         @change="updateItem(item.barcode, item.qty)"
-                                        class="w-24 text-center border-2 border-gray-400 rounded-md px-2 py-2 text-xl font-bold text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                        class="input-qty w-20 text-center border rounded-md px-2 py-1 text-sm transition" />
                                 </td>
-                                <td
-                                    class="px-4 py-3 text-right text-lg text-gray-800 font-semibold border-r border-gray-200">
+                                <td class="px-6 py-1 text-right text-sm text-muted-dark">
                                     {{ formatRupiah(item.harga_jual_ritel) }}
                                 </td>
-                                <td
-                                    class="px-4 py-3 text-right text-xl font-black text-black border-r border-gray-200 bg-gray-50">
+                                <td class="px-6 py-1 text-right text-sm font-semibold text-body">
                                     {{ formatRupiah(item.qty * item.harga_jual_ritel) }}
                                 </td>
-                                <td class="px-4 py-3 text-center">
+                                <td class="px-6 py-1 text-center">
                                     <button type="button" @click="removeItem(item.barcode)"
-                                        class="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm border border-red-200">
-                                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor" stroke-width="2.5">
+                                        class="btn-icon-delete p-1.5 rounded-md transition">
+                                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -181,109 +151,88 @@
                     </table>
                 </div>
 
-                <div
-                    class="px-6 py-4 bg-gray-900 text-white flex justify-between items-center border-t-4 border-gray-700">
-                    <span class="text-xl font-bold uppercase tracking-wide">Total Belanja Sementara</span>
-                    <span class="text-3xl font-black text-cyan-400 tracking-wider">{{ formatRupiah(totalBelanja)
-                    }}</span>
+                <div class="px-6 py-2 bg-footer border-t flex justify-between items-center">
+                    <span class="text-base text-muted-dark">Total Belanja</span>
+                    <span class="text-xl text-primary">{{ formatRupiah(totalBelanja) }}</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                <div class="lg:col-span-1">
-                    <div
-                        class="bg-white p-6 rounded-xl border-2 border-gray-300 shadow-md h-full flex flex-col justify-center">
-                        <label class="block text-lg font-black text-black mb-3 uppercase">
-                            Jumlah Uang Diterima <span class="text-red-600">*</span>
-                        </label>
-                        <div class="relative">
-                            <span
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">Rp</span>
-                            <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
-                                @input="handlePembayaranInput" @focus="handlePembayaranFocus"
-                                @blur="handlePembayaranBlur" @keydown.enter="handlePembayaranKeydown" type="text"
-                                required placeholder="0"
-                                class="w-full h-16 pl-14 pr-4 rounded-xl border-4 border-gray-800 focus:border-cyan-600 text-3xl font-black text-right text-black shadow-inner transition tracking-widest bg-yellow-50 focus:bg-white" />
-                        </div>
-                        <p class="text-sm text-gray-500 mt-2 font-semibold italic text-right">*Tekan ENTER untuk proses
-                        </p>
+            <div class="space-y-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium label-text mb-2">
+                        Jumlah Bayar <span class="text-danger">*</span>
+                    </label>
+                    <div class="relative">
+                        <span
+                            class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted">Rp</span>
+                        <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
+                            @input="handlePembayaranInput" @focus="handlePembayaranFocus" @blur="handlePembayaranBlur"
+                            @keydown.enter="handlePembayaranKeydown" type="text" required placeholder="0"
+                            class="input-field w-full h-10 pl-12 pr-4 rounded-lg border text-sm transition" />
                     </div>
                 </div>
 
-                <div class="lg:col-span-2">
-                    <div class="bg-white p-6 border-2 border-gray-300 rounded-xl shadow-md space-y-4">
-                        <div class="flex justify-between items-end border-b-2 border-dashed border-gray-300 pb-2">
-                            <span class="text-gray-600 font-bold text-lg uppercase">Total Belanja</span>
-                            <span class="text-2xl font-black text-black">{{ formatRupiah(totalBelanja) }}</span>
-                        </div>
+                <div class="card-section p-5 border rounded-lg space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-muted">Hutang Lama:</span>
+                        <span class="font-semibold" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
+                            {{ formatRupiah(hutangPelanggan) }}
+                        </span>
+                    </div>
 
-                        <div class="flex justify-between items-end border-b-2 border-dashed border-gray-300 pb-2">
-                            <span class="text-gray-600 font-bold text-lg uppercase">Hutang Lama</span>
-                            <span class="text-2xl font-black"
-                                :class="hutangPelanggan > 0 ? 'text-red-600' : 'text-green-600'">
-                                {{ formatRupiah(hutangPelanggan) }}
-                            </span>
-                        </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-muted">Total Belanja:</span>
+                        <span class="font-semibold text-body">{{ formatRupiah(totalBelanja) }}</span>
+                    </div>
 
-                        <div class="flex justify-between items-end bg-gray-100 p-3 rounded-lg border border-gray-200">
-                            <span class="text-gray-900 font-black text-xl uppercase">Total Tagihan</span>
-                            <span class="text-3xl font-black text-orange-600">{{ formatRupiah(totalYangHarusDibayar)
-                            }}</span>
-                        </div>
+                    <div class="flex justify-between text-base border-t pt-3 border-divider"
+                        :class="totalYangHarusDibayar > 0 ? 'text-orange-custom' : 'text-body'">
+                        <span>Total yang Harus Dibayar:</span>
+                        <span>{{ formatRupiah(totalYangHarusDibayar) }}</span>
+                    </div>
 
-                        <div class="flex justify-between items-center pt-2 mt-2 border-t-4 border-gray-800">
-                            <span class="text-2xl font-black uppercase"
-                                :class="kembalian >= 0 ? 'text-green-700' : 'text-red-600'">
-                                {{ kembalian >= 0 ? 'KEMBALIAN' : 'SISA HUTANG' }}
-                            </span>
-                            <span class="text-5xl font-black tracking-tighter"
-                                :class="kembalian >= 0 ? 'text-green-700' : 'text-red-600'">
-                                {{ formatRupiah(Math.abs(kembalian)) }}
-                            </span>
-                        </div>
+                    <div class="flex justify-between text-sm border-t pt-3 border-divider">
+                        <span class="text-muted">Uang Bayar:</span>
+                        <span class="font-semibold text-body">{{ formatRupiah(uangPembayaran) }}</span>
+                    </div>
+
+                    <div class="flex justify-between text-base border-t pt-3 border-divider"
+                        :class="kembalian >= 0 ? 'text-success' : 'text-danger'">
+                        <span>{{ kembalian >= 0 ? 'Kembalian' : 'Sisa Hutang' }}</span>
+                        <span>{{ formatRupiah(Math.abs(kembalian)) }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button ref="submitButtonRef" type="submit" @click.prevent="submitTransaksi"
                     :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId"
-                    class="md:col-span-2 h-16 text-xl font-black text-white rounded-xl shadow-lg transition transform hover:-translate-y-1 flex items-center justify-center gap-3 uppercase tracking-wider border-b-4"
-                    :class="isSubmitting || totalBelanja === 0 ? 'bg-gray-400 border-gray-500 cursor-not-allowed' : 'bg-cyan-600 border-cyan-800 hover:bg-cyan-500'">
-
-                    <svg v-if="isSubmitting" class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    class="md:col-span-2 h-12 btn-submit text-base font-semibold rounded-lg flex items-center justify-center gap-2 shadow-sm transition transform hover:scale-[1.01]">
+                    <svg v-if="isSubmitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                         </path>
                     </svg>
-
-                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-
-                    {{ isSubmitting ? 'MEMPROSES...' : 'BAYAR & CETAK STRUK (ENTER)' }}
+                    {{ isSubmitting ? 'Memproses...' : 'Proses Transaksi' }}
                 </button>
-
                 <button type="button" @click.prevent="saveCurrentTransaction"
                     :disabled="transactionItems.length === 0 || !selectedPelangganId"
-                    class="h-16 text-lg font-bold text-gray-800 bg-white border-4 border-gray-800 rounded-xl hover:bg-yellow-50 flex items-center justify-center gap-2 shadow-lg transition uppercase">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    class="btn-pending h-12 font-medium rounded-lg flex items-center justify-center gap-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Simpan Pending
+                    Simpan (Pending)
                 </button>
+
+
             </div>
         </div>
     </AdminLayout>
 </template>
-
 <script setup lang="ts">
-// (LOGIC SCRIPT TIDAK ADA PERUBAHAN SIGNIFIKAN, TETAP SAMA SEPERTI SEBELUMNYA)
 import { ref, onMounted, computed, nextTick, watch } from 'vue';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -799,6 +748,7 @@ const removePendingTransaction = (id: number, showSuccess: boolean = true) => {
         Swal.fire('Berhasil', 'Transaksi pending telah dihapus.', 'success');
     }
 };
+
 const generateReceiptHTML = (
     trx: TransaksiResponseData['transaksi'],
     pelangganName: string,
@@ -822,7 +772,7 @@ const generateReceiptHTML = (
             font-size: 11px; 
             color: #000; 
             width: 100%;
-            padding-left: 22px; /* PENTING: Jarak aman agar kiri tidak potong */
+            padding-left: 16px; /* PENTING: Jarak aman agar kiri tidak potong */
             padding-right: 5px;
         ">
             <div style="text-align: center; margin-bottom: 10px;">
@@ -1184,8 +1134,249 @@ onMounted(async () => {
     barcodeInputRef.value?.focus();
 });
 </script>
-
 <style scoped>
-/* Scoped styles have been minimized as we now rely heavily on Tailwind classes 
-   for the visual overhaul. Custom overrides are kept for specificity. */
+/* --- Colors & Variables --- */
+.page-container {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+/* Typography Colors */
+.text-body {
+    color: #111827;
+}
+
+/* Gray 900 */
+.text-title {
+    color: #111827;
+}
+
+.label-text {
+    color: #374151;
+}
+
+/* Gray 700 */
+.text-muted {
+    color: #6b7280;
+}
+
+/* Gray 500 */
+.text-muted-dark {
+    color: #374151;
+}
+
+/* Gray 700 */
+.text-muted-light {
+    color: #9ca3af;
+}
+
+/* Gray 400 */
+.th-text {
+    color: #374151;
+}
+
+/* Status Colors */
+.text-primary {
+    color: #0891b2;
+}
+
+/* Cyan 600 */
+.text-danger {
+    color: #dc2626;
+}
+
+/* Red 600 */
+.text-success {
+    color: #059669;
+}
+
+/* Emerald 600 */
+.text-warning {
+    color: #d97706;
+}
+
+/* Amber 600 */
+.text-orange-custom {
+    color: #ea580c;
+}
+
+/* Orange 600 */
+
+/* Backgrounds & Borders */
+.card-section {
+    background-color: #ffffff;
+    border-color: #e5e7eb;
+    /* Gray 200 */
+}
+
+.bg-footer {
+    background-color: #f3f4f6;
+    /* Gray 100 */
+}
+
+.border-divider {
+    border-color: #e5e7eb;
+}
+
+.indicator-bar {
+    background-color: #f59e0b;
+    /* Amber 500 */
+}
+
+/* Inputs & Dropdowns */
+.input-field,
+.input-qty {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    /* Gray 300 */
+    color: #111827;
+}
+
+.input-field:focus,
+.input-qty:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: 0 0 0 2px #06b6d4;
+    /* Ring Cyan 500 */
+}
+
+.input-field:disabled {
+    background-color: #f3f4f6;
+    /* Gray 100 */
+    color: #6b7280;
+    /* Gray 500 */
+}
+
+.dropdown-container {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+.dropdown-item {
+    background-color: #ffffff;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdown-item:hover {
+    background-color: #f9fafb;
+    /* Gray 50 */
+}
+
+.dropdown-item-active {
+    background-color: #fde047;
+    /* Yellow 300 */
+    border-left: 4px solid #06b6d4;
+    /* Cyan 500 */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdown-text {
+    color: #111827;
+}
+
+/* Pending Cards */
+.pending-card {
+    background-color: #ffffff;
+}
+
+.pending-card-active {
+    border-color: #06b6d4;
+    /* Cyan 500 */
+    background-color: #fde047;
+    /* Yellow 300 */
+}
+
+.pending-card-inactive {
+    border-color: #fde68a;
+    /* Amber 200 */
+}
+
+.pending-card-inactive:hover {
+    border-color: #fbbf24;
+    /* Amber 400 */
+}
+
+/* Table */
+.table-header {
+    background-color: #f3f4f6;
+    /* Gray 100 */
+    border-color: #e5e7eb;
+}
+
+.divide-border> :not([hidden])~ :not([hidden]) {
+    border-color: #f3f4f6;
+}
+
+.table-row-hover:hover {
+    background-color: #f9fafb;
+}
+
+/* Buttons */
+.btn-primary-small {
+    background-color: #0891b2;
+    /* Cyan 600 */
+    color: white;
+}
+
+.btn-primary-small:hover {
+    background-color: #0e7490;
+    /* Cyan 700 */
+}
+
+.btn-secondary-small {
+    background-color: #d1d5db;
+    /* Gray 300 */
+    color: #111827;
+}
+
+.btn-secondary-small:hover {
+    background-color: #9ca3af;
+    /* Gray 400 */
+}
+
+.btn-icon-delete {
+    color: #9ca3af;
+    /* Gray 400 */
+}
+
+.btn-icon-delete:hover {
+    color: #dc2626;
+    /* Red 600 */
+    background-color: #fef2f2;
+    /* Red 50 */
+}
+
+.btn-pending {
+    background-color: #4b5563;
+    /* Gray 600 */
+    color: white;
+}
+
+.btn-pending:hover {
+    background-color: #374151;
+    /* Gray 700 */
+}
+
+.btn-pending:disabled {
+    background-color: #d1d5db;
+    /* Gray 300 */
+    cursor: not-allowed;
+}
+
+.btn-submit {
+    background-color: #0891b2;
+    /* Cyan 600 */
+    color: white;
+}
+
+.btn-submit:hover {
+    background-color: #0e7490;
+    /* Cyan 700 */
+}
+
+.btn-submit:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+}
 </style>
