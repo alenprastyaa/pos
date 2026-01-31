@@ -1,43 +1,41 @@
 <template>
     <AdminLayout>
-        <div class="page-container min-h-screen py-2 space-y-2">
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="page-container py-2 space-y-2 min-h-screen">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap- p-4">
                 <div class="lg:col-span-2 relative">
-                    <label class="block text-sm font-medium label-text mb-2">
+                    <label class="block text-xl  font-semibold label-text mb-2">
                         Cari Produk
                     </label>
                     <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput" type="text"
                         style="font-size: 12px;" placeholder="Ketik nama produk..."
                         @input="searchProducts(productSearchInput)" @keydown="handleSearchKeydown"
-                        :disabled="role_name !== 'admin'" class="input-field w-full h-8 px-4 rounded-lg transition" />
+                        :disabled="role_name !== 'admin'"
+                        class="input-field w-full h-12 px-4 text-xl rounded-lg transition" />
 
                     <div v-if="showSearchResults && searchResults.length > 0"
-                        class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-10 max-h-200 overflow-y-auto">
+                        class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-20 max-h-200 overflow-y-auto">
                         <div v-for="(product, index) in searchResults" :key="product.barcode"
                             @click="selectProductFromSearch(product)"
                             :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
                             class="px-2 py-1 cursor-pointer last:border-b-0 transition">
                             <div style="font-size: 14px;" class="dropdown-text space-y-1 border border-gray-200 p-2 ">
-                                <div class="font-semibold">
+                                <div class="font-semibold text-xl">
                                     {{ product.nama_produk }}
                                 </div>
-                                <div class="text-green-600 font-medium">
+                                <div class="text-green-800 text-lg font-semibold">
                                     {{ formatRupiah(product.harga_jual_ritel) }}
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium label-text mb-2">
+                    <label class="block text-xl  font-semibold label-text mb-2 ml-3">
                         Pilih Pelanggan
                     </label>
                     <select v-model="selectedPelangganId" required style="font-size: 12px;"
-                        class="input-field w-full h-8 rounded-lg px-4 transition">
+                        class="input-field w-full h-12 rounded-lg px-4 transition ml-3">
                         <option value="" disabled>Pilih Pelanggan...</option>
                         <option v-if="loadingPelanggan" disabled>Memuat...</option>
                         <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
@@ -47,16 +45,16 @@
                 </div>
             </div>
 
-            <div v-if="selectedPelangganId" class="card-section p-4 rounded-lg border">
+            <div v-if="selectedPelangganId" class="card-section p-4 rounded-lg border mx-4">
                 <div class="flex justify-between items-center">
-                    <span class="text-sm font-medium text-muted">Hutang Pelanggan</span>
+                    <span class="text-2xl font-semibold">Hutang Pelanggan</span>
                     <span class="text-lg" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
                         {{ formatRupiah(hutangPelanggan) }}
                     </span>
                 </div>
             </div>
 
-            <div v-if="pendingTransactions.length > 0" class="space-y-3">
+            <div v-if="pendingTransactions.length > 0" class="space-y-3 px-4">
                 <div class="flex items-center gap-2">
                     <div class="w-1 h-6 indicator-bar rounded"></div>
                     <p class="text-sm font-bold text-title">
@@ -86,23 +84,29 @@
                 </div>
             </div>
 
-            <div class="card-section rounded-lg shadow-sm border overflow-hidden">
+            <div class="px-6 py-2 bg-footer border-t flex justify-between items-center mx-4 rounded-t-lg">
+                <span class="text-2xl font-semibold text-muted-dark">Total Belanja</span>
+                <span class="text-3xl font-bold">{{ formatRupiah(totalBelanja) }}</span>
+            </div>
+
+            <div class="card-section rounded-lg shadow-sm border overflow-hidden p-4 mx-4">
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
                             <tr class="table-header border-b">
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-left uppercase tracking-wider th-text">No</th>
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-left uppercase tracking-wider th-text">Produk</th>
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-center uppercase tracking-wider th-text">Qty</th>
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-right uppercase tracking-wider th-text">Harga</th>
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-right uppercase tracking-wider th-text">Subtotal</th>
-                                <th style="font-size: 12px;"
-                                    class="px-6 py-4 text-center uppercase tracking-wider th-text"></th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-left uppercase tracking-wider th-text">No</th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-left uppercase tracking-wider th-text">Produk</th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-center uppercase tracking-wider th-text">Qty</th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-right uppercase tracking-wider th-text">Harga</th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-right uppercase tracking-wider th-text">Subtotal
+                                </th>
+                                <th style="font-size: 15px;"
+                                    class="px-6 text-white py-4 text-center uppercase tracking-wider th-text"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border">
@@ -114,32 +118,35 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                         </svg>
-                                        <p class="text-sm">Belum ada produk ditambahkan</p>
+                                        <p class="text-xl text-black">Belum ada produk ditambahkan</p>
                                     </div>
                                 </td>
                             </tr>
                             <tr v-for="(item, index) in transactionItems" :key="item.barcode"
-                                class="table-row-hover transition">
-                                <td class="px-6 py-1 text-sm text-body font-medium">{{ index + 1 }}</td>
-                                <td class="px-6 py-1">
-                                    <div style="font-size: 12px;" class="text-body leading-tight">{{ item.nama_produk }}
+                                class="border border-gray-800 hover:bg-gray-50 transition-colors">
+                                <td class="px-6  text-xl text-gray-800 font-bold border border-gray-800">
+                                    {{ index + 1 }}
+                                </td>
+                                <td class="px-6  border border-gray-800">
+                                    <div class="text-xl text-gray-800 font-semibold leading-tight">
+                                        {{ item.nama_produk }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-1 text-center">
+                                <td class="px-6  text-center border border-gray-800">
                                     <input v-model.number="item.qty" type="number" min="1"
                                         @change="updateItem(item.barcode, item.qty)"
-                                        class="input-qty w-20 text-center border rounded-md px-2 py-1 text-sm transition" />
+                                        class="w-20 text-center border border-gray-300 rounded-md px-2 py-1.5 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
                                 </td>
-                                <td class="px-6 py-1 text-right text-sm text-muted-dark">
+                                <td class="px-6  text-right text-xl text-gray-800 font-semibold border border-gray-800">
                                     {{ formatRupiah(item.harga_jual_ritel) }}
                                 </td>
-                                <td class="px-6 py-1 text-right text-sm font-semibold text-body">
+                                <td class="px-6  text-right text-xl font-bold text-gray-900 border border-gray-800">
                                     {{ formatRupiah(item.qty * item.harga_jual_ritel) }}
                                 </td>
-                                <td class="px-6 py-1 text-center">
+                                <td class="px-6  border border-gray-800  text-center">
                                     <button type="button" @click="removeItem(item.barcode)"
-                                        class="btn-icon-delete p-1.5 rounded-md transition">
-                                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"
+                                        class="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -150,88 +157,125 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="px-6 py-2 bg-footer border-t flex justify-between items-center">
-                    <span class="text-base text-muted-dark">Total Belanja</span>
-                    <span class="text-xl text-primary">{{ formatRupiah(totalBelanja) }}</span>
-                </div>
             </div>
 
-            <div class="space-y-4 mt-4">
-                <div>
-                    <label class="block text-sm font-medium label-text mb-2">
-                        Jumlah Bayar <span class="text-danger">*</span>
-                    </label>
-                    <div class="relative">
-                        <span
-                            class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted">Rp</span>
-                        <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
-                            @input="handlePembayaranInput" @focus="handlePembayaranFocus" @blur="handlePembayaranBlur"
-                            @keydown.enter="handlePembayaranKeydown" type="text" required placeholder="0"
-                            class="input-field w-full h-10 pl-12 pr-4 rounded-lg border text-sm transition" />
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+                <div class="max-w-7xl mx-auto p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <!-- Tombol Bayar Sekarang -->
+                        <button type="button" @click="openPaymentModal"
+                            :disabled="transactionItems.length === 0 || !selectedPelangganId"
+                            class="md:col-span-2 h-14 btn-submit text-xl font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span>BAYAR SEKARANG</span>
+                        </button>
+
+                        <!-- Tombol Simpan Pending -->
+                        <button type="button" @click.prevent="saveCurrentTransaction"
+                            :disabled="transactionItems.length === 0 || !selectedPelangganId"
+                            class="btn-pending h-14 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span>Simpan</span>
+                        </button>
                     </div>
                 </div>
-
-                <div class="card-section p-5 border rounded-lg space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-muted">Hutang Lama:</span>
-                        <span class="font-semibold" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
-                            {{ formatRupiah(hutangPelanggan) }}
-                        </span>
-                    </div>
-
-                    <div class="flex justify-between text-sm">
-                        <span class="text-muted">Total Belanja:</span>
-                        <span class="font-semibold text-body">{{ formatRupiah(totalBelanja) }}</span>
-                    </div>
-
-                    <div class="flex justify-between text-base border-t pt-3 border-divider"
-                        :class="totalYangHarusDibayar > 0 ? 'text-orange-custom' : 'text-body'">
-                        <span>Total yang Harus Dibayar:</span>
-                        <span>{{ formatRupiah(totalYangHarusDibayar) }}</span>
-                    </div>
-
-                    <div class="flex justify-between text-sm border-t pt-3 border-divider">
-                        <span class="text-muted">Uang Bayar:</span>
-                        <span class="font-semibold text-body">{{ formatRupiah(uangPembayaran) }}</span>
-                    </div>
-
-                    <div class="flex justify-between text-base border-t pt-3 border-divider"
-                        :class="kembalian >= 0 ? 'text-success' : 'text-danger'">
-                        <span>{{ kembalian >= 0 ? 'Kembalian' : 'Sisa Hutang' }}</span>
-                        <span>{{ formatRupiah(Math.abs(kembalian)) }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button ref="submitButtonRef" type="submit" @click.prevent="submitTransaksi"
-                    :disabled="isSubmitting || totalBelanja === 0 || !selectedPelangganId"
-                    class="md:col-span-2 h-12 btn-submit text-base font-semibold rounded-lg flex items-center justify-center gap-2 shadow-sm transition transform hover:scale-[1.01]">
-                    <svg v-if="isSubmitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                        </circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    {{ isSubmitting ? 'Memproses...' : 'Proses Transaksi' }}
-                </button>
-                <button type="button" @click.prevent="saveCurrentTransaction"
-                    :disabled="transactionItems.length === 0 || !selectedPelangganId"
-                    class="btn-pending h-12 font-medium rounded-lg flex items-center justify-center gap-2 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Simpan (Pending)
-                </button>
-
-
             </div>
         </div>
+
+        <div v-if="showPaymentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black bg-opacity-60" @click="closePaymentModal"></div>
+
+            <div
+                class="card-section w-full max-w-2xl rounded-lg shadow-2xl relative z-10 p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center border-b pb-3 mb-2">
+                    <h3 class="text-2xl font-bold text-title">Proses Pembayaran</h3>
+                    <button @click="closePaymentModal" class="text-gray-500 hover:text-red-500">
+                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-2xl font-medium label-text mb-2">
+                            Jumlah Bayar <span class="text-danger">*</span>
+                        </label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-semibold text-muted">Rp</span>
+                            <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
+                                @input="handlePembayaranInput" @focus="handlePembayaranFocus"
+                                @blur="handlePembayaranBlur" @keydown.enter="handlePembayaranKeydown" type="text"
+                                required placeholder="0"
+                                class="input-field w-full h-14 pl-12 pr-4 rounded-lg border transition text-3xl font-bold"
+                                autofocus />
+                        </div>
+                    </div>
+
+                    <div class="card-section p-5 border rounded-lg space-y-3 bg-gray-50">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muted">Pelanggan:</span>
+                            <span class="font-bold text-lg">{{ getPelangganName(selectedPelangganId) }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muted">Hutang Lama:</span>
+                            <span class="font-semibold" :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
+                                {{ formatRupiah(hutangPelanggan) }}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between text-sm">
+                            <span class="text-muted">Total Belanja:</span>
+                            <span class="font-semibold text-body">{{ formatRupiah(totalBelanja) }}</span>
+                        </div>
+
+                        <div class="flex justify-between text-base border-t pt-3 border-divider"
+                            :class="totalYangHarusDibayar > 0 ? 'text-orange-custom' : 'text-body'">
+                            <span class="text-muted">Total yang Harus Dibayar:</span>
+                            <span class="text-muted text-xl font-bold">{{ formatRupiah(totalYangHarusDibayar) }}</span>
+                        </div>
+
+                        <div class="flex justify-between text-sm border-t pt-3 border-divider">
+                            <span class="text-muted">Uang Bayar:</span>
+                            <span class="font-semibold text-body">{{ formatRupiah(uangPembayaran) }}</span>
+                        </div>
+
+                        <div class="flex justify-between text-2xl border-t pt-3 border-divider font-bold"
+                            :class="kembalian >= 0 ? 'text-success' : 'text-danger'">
+                            <span>{{ kembalian >= 0 ? 'Kembalian' : 'Sisa Hutang' }}</span>
+                            <span>{{ formatRupiah(Math.abs(kembalian)) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t">
+                    <button ref="submitButtonRef" type="submit" @click.prevent="submitTransaksi"
+                        :disabled="isSubmitting || totalBelanja === 0"
+                        class="w-full h-14 btn-submit text-xl font-bold rounded-lg flex items-center justify-center gap-2 shadow-lg transition transform hover:scale-[1.01]">
+                        <svg v-if="isSubmitting" class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        {{ isSubmitting ? 'Memproses...' : 'PROSES TRANSAKSI (ENTER)' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </AdminLayout>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, watch } from 'vue';
 import axios from 'axios';
@@ -244,6 +288,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const PENDING_TRANSACTIONS_KEY = 'pendingTransactions';
 const hutangPelanggan = ref(0);
 const role_name = localStorage.getItem("role_name")
+
+// === MODAL STATE ===
+const showPaymentModal = ref(false);
 
 interface Toko {
     id: string;
@@ -381,6 +428,31 @@ const handlePembayaranKeydown = (event: KeyboardEvent) => {
             submitButtonRef.value?.click();
         });
     }
+};
+
+// === FUNGSI BUKA TUTUP MODAL ===
+const openPaymentModal = () => {
+    if (!selectedPelangganId.value) {
+        Swal.fire('Peringatan', 'Mohon pilih pelanggan terlebih dahulu.', 'warning');
+        return;
+    }
+    if (transactionItems.value.length === 0) {
+        Swal.fire('Peringatan', 'Keranjang belanja masih kosong.', 'warning');
+        return;
+    }
+    showPaymentModal.value = true;
+    nextTick(() => {
+        if (pembayaranInputRef.value) {
+            pembayaranInputRef.value.focus();
+        }
+    });
+};
+
+const closePaymentModal = () => {
+    showPaymentModal.value = false;
+    nextTick(() => {
+        barcodeInputRef.value?.focus();
+    });
 };
 
 const filterText = () => {
@@ -552,14 +624,10 @@ const fetchHutangPelanggan = async (pelangganId: string) => {
     }
 };
 
-// MODIFIKASI WATCH UNTUK AUTO-FOCUS KE INPUT PEMBAYARAN
+// MODIFIKASI WATCH UNTUK AUTO-FOCUS KE INPUT PEMBAYARAN (Hanya jika modal terbuka, tapi di sini modal trigger manual)
 watch(selectedPelangganId, async (newValue) => {
     if (newValue) {
         await fetchHutangPelanggan(newValue);
-        // Setelah data hutang diambil, pindahkan fokus ke input pembayaran
-        nextTick(() => {
-            pembayaranInputRef.value?.focus();
-        });
     } else {
         hutangPelanggan.value = 0;
     }
@@ -590,6 +658,7 @@ const resetForm = () => {
     transactionItems.value = [];
     quickBarcodeInput.value = '';
     currentPendingId.value = null;
+    closePaymentModal(); // Tutup modal saat reset
     nextTick(() => {
         barcodeInputRef.value?.focus();
         productSearchInput.value = '';
@@ -914,7 +983,8 @@ const submitTransaksi = async () => {
         return;
     }
 
-
+    // KONFIRMASI (SweetAlert di sini bisa dihapus jika ingin langsung proses dari Modal, 
+    // tapi dibiarkan sebagai double-check seperti kode awal)
     const confirmResult = await Swal.fire({
         icon: 'question',
         title: 'Konfirmasi Transaksi',
@@ -981,8 +1051,6 @@ const submitTransaksi = async () => {
         const response = await axios.post<any, { data: { success: boolean, data: TransaksiResponseData, message?: string } }>(`${API_BASE_URL}/transaksi/create/ritel`, payload, {
             headers: getAuthHeader(),
         });
-
-        // CARI BAGIAN INI DALAM FUNGSI submitTransaksi (sekitar baris 700-800)
 
         if (response.data.success) {
             const dataTransaksi = response.data.data.transaksi;
@@ -1124,15 +1192,17 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
-/* --- Colors & Variables --- */
+/* --- Colors & Variables (PERSIS SEPERTI SEBELUMNYA) --- */
 .page-container {
-    background-color: #f9fafb;
+    background-color: #ffffff;
     /* Gray 50 */
 }
 
 /* Typography Colors */
 .text-body {
-    color: #111827;
+    color: #000000;
+    font-size: 20px;
+    font-weight: 500;
 }
 
 /* Gray 900 */
@@ -1146,7 +1216,9 @@ onMounted(async () => {
 
 /* Gray 700 */
 .text-muted {
-    color: #6b7280;
+    color: #000000;
+    font-size: 20px;
+    font-weight: 500;
 }
 
 /* Gray 500 */
@@ -1161,7 +1233,7 @@ onMounted(async () => {
 
 /* Gray 400 */
 .th-text {
-    color: #374151;
+    color: #f9fbff;
 }
 
 /* Status Colors */
@@ -1172,11 +1244,15 @@ onMounted(async () => {
 /* Cyan 600 */
 .text-danger {
     color: #dc2626;
+    font-size: 30px;
+    font-weight: 800;
 }
 
 /* Red 600 */
 .text-success {
     color: #059669;
+    font-size: 30px;
+    font-weight: 800;
 }
 
 /* Emerald 600 */
@@ -1216,16 +1292,16 @@ onMounted(async () => {
 .input-field,
 .input-qty {
     background-color: #ffffff;
-    border: 1px solid #d1d5db;
-    /* Gray 300 */
-    color: #111827;
+    border: 2px solid #000000;
+    font-size: 20px;
+    color: #000000;
 }
 
 .input-field:focus,
 .input-qty:focus {
     outline: none;
     border-color: transparent;
-    box-shadow: 0 0 0 2px #06b6d4;
+    box-shadow: 0 0 0 2px #0098b2;
     /* Ring Cyan 500 */
 }
 
@@ -1253,7 +1329,7 @@ onMounted(async () => {
 }
 
 .dropdown-item-active {
-    background-color: #fde047;
+    background-color: #ffed29;
     /* Yellow 300 */
     border-left: 4px solid #06b6d4;
     /* Cyan 500 */
@@ -1271,9 +1347,7 @@ onMounted(async () => {
 
 .pending-card-active {
     border-color: #06b6d4;
-    /* Cyan 500 */
     background-color: #fde047;
-    /* Yellow 300 */
 }
 
 .pending-card-inactive {
@@ -1288,7 +1362,7 @@ onMounted(async () => {
 
 /* Table */
 .table-header {
-    background-color: #f3f4f6;
+    background-color: #b90000;
     /* Gray 100 */
     border-color: #e5e7eb;
 }
@@ -1304,7 +1378,6 @@ onMounted(async () => {
 /* Buttons */
 .btn-primary-small {
     background-color: #0891b2;
-    /* Cyan 600 */
     color: white;
 }
 
