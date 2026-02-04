@@ -409,6 +409,7 @@ const generateReceiptHTML = (trx: Transaksi): string => {
     const tokoAlamat = kasirData.value?.toko.alamat || 'Alamat tidak tersedia';
     const kasirNameDisplay = trx.kasir_name || kasirData.value?.full_name || 'Admin';
 
+    // tes
     return `
         <div style="width: 280px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 10px; text-align: center; margin-left:20px">
             <div style="margin-bottom: 10px;">
