@@ -421,15 +421,15 @@ const generateReceiptHTML = (trx: Transaksi): string => {
 
             <div style="border-top: 2px dashed #000; border-bottom: 2px dashed #000; padding: 8px 0; margin: 8px 0;">
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-                    <span><strong>ID:</strong> ${trx.id.substring(0, 8)}</span>
-                    <span><strong>Kasir:</strong> ${kasirNameDisplay}</span>
+                    <span>ID: ${trx.id.substring(0, 8)}</span>
+                    <span>Kasir: ${kasirNameDisplay}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                    <span><strong>Tanggal:</strong></span>
+                    <span>Tanggal:</span>
                     <span>${formatDateTime(trx.createdAt)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 3px;">
-                    <span><strong>Pelanggan:</strong></span>
+                    <span>Pelanggan: </span>
                     <span>${getPelangganName(trx.pelanggan_id)}</span>
                 </div>
             </div>
@@ -455,7 +455,7 @@ const generateReceiptHTML = (trx: Transaksi): string => {
             <div style="border-top: 2px dashed #000; margin: 8px 0; padding-top: 8px;">
                 
                 <!-- TOTAL BELANJA -->
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
                     <span>TOTAL BELANJA:</span>
                     <span>Rp ${formatRupiah(total_harga)}</span>
                 </div>
@@ -470,7 +470,7 @@ const generateReceiptHTML = (trx: Transaksi): string => {
 
                 <!-- KEMBALIAN -->
                 ${kembalian > 0 ? `
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; color: #2ecc71;">
+                    <div style="display: flex; justify-content: space-between;  font-size: 11px; color: #2ecc71;">
                         <span>Kembali:</span>
                         <span>Rp ${formatRupiah(kembalian)}</span>
                     </div>
@@ -478,7 +478,7 @@ const generateReceiptHTML = (trx: Transaksi): string => {
 
                 <!-- HUTANG -->
                 ${hutang > 0 ? `
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; color: #e74c3c;">
+                    <div style="display: flex; justify-content: space-between;  font-size: 11px; color: #e74c3c;">
                         <span>Hutang:</span>
                         <span>Rp ${formatRupiah(hutang)}</span>
                     </div>
