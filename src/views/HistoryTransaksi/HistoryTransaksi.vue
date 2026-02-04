@@ -409,76 +409,75 @@ const generateReceiptHTML = (trx: Transaksi): string => {
     const tokoAlamat = kasirData.value?.toko.alamat || 'Alamat tidak tersedia';
     const kasirNameDisplay = trx.kasir_name || kasirData.value?.full_name || 'Admin';
 
-    // tes
+    // Perbaikan utama ada di style container utama:
+    // 1. letter-spacing: 0.5px (merenggangkan huruf)
+    // 2. line-height: 1.5 (merenggangkan baris)
     return `
-        <div style="width: 280px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 10px; text-align: center; margin-left:20px">
-            <div style="margin-bottom: 10px;">
-                <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">${tokoName}</div>
-                <div style="font-size: 11px; line-height: 1.4;">
+        <div style="width: 280px; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 0.5px; line-height: 1.4; padding: 10px; text-align: center; margin-left: 20px; color: #000;">
+            
+            <div style="margin-bottom: 12px;">
+                <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px; letter-spacing: 1px;">${tokoName}</div>
+                <div style="font-size: 11px; line-height: 1.5;">
                     ${tokoAlamat.replace(/\n/g, '<br>')}
                 </div>
             </div>
 
-            <div style="border-top: 2px dashed #000; border-bottom: 2px dashed #000; padding: 8px 0; margin: 8px 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
+            <div style="border-top: 1px dashed #333; border-bottom: 1px dashed #333; padding: 10px 0; margin: 10px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                     <span>ID: ${trx.id.substring(0, 8)}</span>
                     <span>Kasir: ${kasirNameDisplay}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px;">
-                    <span>Tanggal:</span>
-                    <span>${formatDateTime(trx.createdAt)}</span>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span>Tgl: ${formatDateTime(trx.createdAt)}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 3px;">
-                    <span>Pelanggan: </span>
-                    <span>${getPelangganName(trx.pelanggan_id)}</span>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                    <span>Plg: ${getPelangganName(trx.pelanggan_id)}</span>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin: 8px 0 4px 0; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px; margin: 10px 0 5px 0; border-bottom: 1px dashed #333; padding-bottom: 5px;">
                 <span style="flex: 1; text-align: left;">ITEM</span>
                 <span style="width: 30px; text-align: center;">QTY</span>
-                <span style="width: 50px; text-align: right;">HARGA</span>
-                <span style="width: 50px; text-align: right;">TOTAL</span>
+                <span style="width: 60px; text-align: right;">HARGA</span>
+                <span style="width: 60px; text-align: right;">TOTAL</span>
             </div>
 
-            <div>
+            <div style="margin-bottom: 10px;">
                 ${trx.transaksi_details.map(detail => `
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
-                        <span style="flex: 1; text-align: left; word-break: break-word;">${detail.produk?.nama_produk || 'Unknown'}</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; align-items: flex-start;">
+                        <span style="flex: 1; text-align: left; word-break: break-all; padding-right: 5px; line-height: 1.3;">
+                            ${detail.produk?.nama_produk || 'Unknown'}
+                        </span>
                         <span style="width: 30px; text-align: center;">${detail.qty}</span>
-                        <span style="width: 50px; text-align: right;">${formatRupiah(parseFloat(detail.harga))}</span>
-                        <span style="width: 50px; text-align: right;">${formatRupiah(parseFloat(detail.subtotal))}</span>
+                        <span style="width: 60px; text-align: right;">${formatRupiah(parseFloat(detail.harga))}</span>
+                        <span style="width: 60px; text-align: right;">${formatRupiah(parseFloat(detail.subtotal))}</span>
                     </div>
                 `).join('')}
             </div>
 
-            <div style="border-top: 2px dashed #000; margin: 8px 0; padding-top: 8px;">
+            <div style="border-top: 1px dashed #333; margin: 10px 0; padding-top: 10px;">
                 
-                <!-- TOTAL BELANJA -->
-                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                    <span>TOTAL BELANJA:</span>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 6px;">
+                    <span>TOTAL:</span>
                     <span>Rp ${formatRupiah(total_harga)}</span>
                 </div>
 
-                <!-- TUNAI -->
                 ${total_bayar > 0 ? `
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                         <span>Tunai:</span>
                         <span>Rp ${formatRupiah(total_bayar)}</span>
                     </div>
                 ` : ''}
 
-                <!-- KEMBALIAN -->
                 ${kembalian > 0 ? `
-                    <div style="display: flex; justify-content: space-between;  font-size: 11px; color: #2ecc71;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                         <span>Kembali:</span>
                         <span>Rp ${formatRupiah(kembalian)}</span>
                     </div>
                 ` : ''}
 
-                <!-- HUTANG -->
                 ${hutang > 0 ? `
-                    <div style="display: flex; justify-content: space-between;  font-size: 11px; color: #e74c3c;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold;">
                         <span>Hutang:</span>
                         <span>Rp ${formatRupiah(hutang)}</span>
                     </div>
@@ -486,15 +485,14 @@ const generateReceiptHTML = (trx: Transaksi): string => {
 
             </div>
 
-            <div style="margin-top: 10px; font-size: 11px; line-height: 1.6;">
-                <div>Terima Kasih Atas Kunjungan Anda</div>
+            <div style="margin-top: 15px; font-size: 10px; line-height: 1.6; color: #444;">
+                <div style="margin-bottom: 5px;">Terima Kasih Atas Kunjungan Anda</div>
                 <div>Periksa barang sebelum dibeli</div>
-                <div style="font-size: 10px; color: #666;">Barang yang sudah dibeli<br>tidak bisa ditukar atau dikembalikan</div>
+                <div>Barang yang sudah dibeli<br>tidak bisa ditukar/dikembalikan</div>
             </div>
         </div>
     `;
 };
-
 
 
 const printStruk = (trx: Transaksi) => {
