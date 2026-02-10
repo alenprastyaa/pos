@@ -23,15 +23,12 @@
                             <div v-for="(product, index) in searchResults" :key="product.barcode"
                                 @click="selectProductFromSearch(product)"
                                 :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
-                                class="px-4 py-3 cursor-pointer last:border-b-0 transition border-b border-gray-100">
-                                <div class="dropdown-text">
+                                class="px-4 py-1 cursor-pointer last:border-b-0 transition border-b border-gray-100">
+                                <div class="dropdown-text flex justify-between">
                                     <div class="font-bold text-lg text-gray-800">
                                         {{ product.nama_produk }}
                                     </div>
-                                    <div class="flex justify-between mt-1">
-                                        <span class="text-sm text-gray-500">{{
-                                            formatRupiah(product.harga_jual_reguler)
-                                        }}</span>
+                                    <div class=" mt-1">
                                         <span class="text-green-600 font-bold text-md">
                                             {{ formatRupiah(product.harga_jual_reguler) }}
                                         </span>
@@ -908,7 +905,7 @@ onMounted(() => {
 }
 
 .dropdown-item-active {
-    background-color: #00f2ff;
+    background-color: #7df9ff;
     border-left: 4px solid #06b6d4;
 }
 

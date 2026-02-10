@@ -164,7 +164,9 @@
                     </table>
                 </div>
             </div>
-
+            <div class="mt-40">
+                --
+            </div>
             <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
                 <div class="max-w-7xl mx-auto p-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -246,7 +248,7 @@
                             <span class="text-muted">Total yang Harus Dibayar:</span>
                             <span class="text-muted text-xl font-bold">{{
                                 formatRupiah(totalYangHarusDibayar)
-                                }}</span>
+                            }}</span>
                         </div>
 
                         <div class="flex justify-between text-sm border-t pt-3 border-divider">
