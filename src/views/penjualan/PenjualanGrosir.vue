@@ -1,27 +1,29 @@
 <template>
     <AdminLayout>
         <div class="page-container py-2 space-y-2 min-h-screen">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap- p-4">
-                <div class="lg:col-span-2 relative">
+            <div class="grid grid-cols-3 lg:grid-cols-2 p-4">
+                <div class="relative">
                     <label class="block text-xl font-semibold label-text mb-2"> Cari Produk </label>
                     <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput" type="text"
                         style="font-size: 12px" placeholder="Ketik nama produk..."
                         @input="searchProducts(productSearchInput)" @keydown="handleSearchKeydown"
                         :disabled="role_name !== 'admin'"
-                        class="input-field w-full h-12 px-4 text-xl rounded-lg transition" />
+                        class="input-field w-2xl h-12 px-4 text-xl rounded-lg transition" />
 
                     <div v-if="showSearchResults && searchResults.length > 0"
-                        class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-20 max-h-200 overflow-y-auto">
+                        class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-20 max-h-200 overflow-y-auto w-2xl">
                         <div v-for="(product, index) in searchResults" :key="product.barcode"
                             @click="selectProductFromSearch(product)"
                             :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
                             class="px-2 py-1 cursor-pointer last:border-b-0 transition">
                             <div style="font-size: 14px" class="dropdown-text space-y-1 border border-gray-200 p-2">
-                                <div class="font-semibold text-xl">
-                                    {{ product.nama_produk }}
-                                </div>
-                                <div class="text-green-800 text-lg font-semibold">
-                                    {{ formatRupiah(product.harga_jual_ritel) }}
+                                <div class="flex justify-between">
+                                    <div class="font-semibold text-xl">
+                                        {{ product.nama_produk }}
+                                    </div>
+                                    <div class="text-green-800 text-lg font-semibold">
+                                        {{ formatRupiah(product.harga_jual_ritel) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
