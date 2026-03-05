@@ -1,27 +1,5 @@
-// import { ref } from 'vue'
-
-// export function useSidebar() {
-//   const isMobileOpen = ref(false)
-//   const isDesktopOpen = ref(true)
-
-//   const toggleSidebar = () => {
-//     isDesktopOpen.value = !isDesktopOpen.value
-//   }
-
-//   const toggleMobileSidebar = () => {
-//     isMobileOpen.value = !isMobileOpen.value
-//   }
-
-//   return {
-//     isMobileOpen,
-//     isDesktopOpen,
-//     toggleSidebar,
-//     toggleMobileSidebar,
-//   }
-// }
-
 import { ref, computed, onMounted, onUnmounted, provide, inject } from 'vue'
-import type { Ref } from 'vue' //
+import type { Ref } from 'vue'
 
 interface SidebarContextType {
   isExpanded: Ref<boolean>
@@ -31,6 +9,7 @@ interface SidebarContextType {
   openSubmenu: Ref<string | null>
   toggleSidebar: () => void
   toggleMobileSidebar: () => void
+  closeSidebar: () => void
   setIsHovered: (isHovered: boolean) => void
   setActiveItem: (item: string | null) => void
   toggleSubmenu: (item: string) => void
@@ -75,6 +54,11 @@ export function useSidebarProvider() {
     isMobileOpen.value = !isMobileOpen.value
   }
 
+  const closeSidebar = () => {
+    isMobileOpen.value = false
+    isExpanded.value = false
+  }
+
   const setIsHovered = (value: boolean) => {
     isHovered.value = value
   }
@@ -95,6 +79,7 @@ export function useSidebarProvider() {
     openSubmenu,
     toggleSidebar,
     toggleMobileSidebar,
+    closeSidebar,
     setIsHovered,
     setActiveItem,
     toggleSubmenu,

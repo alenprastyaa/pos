@@ -9,7 +9,7 @@
   ]">
 
     <div class="py-8 flex justify-start">
-      <router-link to="/">
+      <router-link to="/" @click="handleMenuClick">
         <p class="dark:text-white mt-3 text-2xl font-bold">
           TOKO HAKIMAH
         </p>
@@ -107,14 +107,14 @@
     </div>
   </aside>
 
-  <div v-if="isMobileOpen" @click="isMobileOpen = false"
+  <div v-if="isMobileOpen" @click="handleMenuClick"
     class="fixed inset-0 bg-black bg-opacity-50 z-[99998] transition-opacity lg:hidden">
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useSidebar } from "@/composables/useSidebar";
 
 import {
@@ -140,25 +140,19 @@ import PlusIcon from "@/icons/PlusIcon.vue";
 import DraftIcon from "@/icons/DraftIcon.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
 
-const role_name = localStorage.getItem("role_name")
+const role_name = localStorage.getItem("role_name");
 const route = useRoute();
+const router = useRouter();
 
-const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar();
+const { isExpanded, isMobileOpen, isHovered, openSubmenu, closeSidebar } = useSidebar();
 
 const handleMenuClick = () => {
-  if (isMobileOpen.value) {
-    isMobileOpen.value = false;
-  }
+  closeSidebar();
 };
 
-watch(
-  () => route.path,
-  () => {
-    if (isMobileOpen.value) {
-      isMobileOpen.value = false;
-    }
-  }
-);
+router.afterEach(() => {
+  closeSidebar();
+});
 
 const menuGroups = [
   {
