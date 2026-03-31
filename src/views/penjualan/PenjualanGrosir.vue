@@ -250,7 +250,7 @@
                             <span class="text-muted">Total yang Harus Dibayar:</span>
                             <span class="text-muted text-xl font-bold">{{
                                 formatRupiah(totalYangHarusDibayar)
-                            }}</span>
+                                }}</span>
                         </div>
 
                         <div class="flex justify-between text-sm border-t pt-3 border-divider">
@@ -529,7 +529,7 @@ const selectProductFromSearch = async (product: CartItem) => {
             icon: 'success',
             title: 'Berhasil',
             text: `${qty} ${product.nama_produk} ditambahkan`,
-            timer: 1500,
+            timer: 100,
             showConfirmButton: false,
         })
     }
