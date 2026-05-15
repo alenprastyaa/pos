@@ -921,23 +921,22 @@ const downloadProductsExcel = async () => {
     try {
         const response = await axios.get(`${API_BASE_URL}/produk/download/excel`, {
             headers: getAuthHeader(),
+            responseType: 'blob',
         });
 
-        if (response.data.success && response.data.data?.path) {
-            const url = response.data.data.path;
-            const originalName = response.data.data.originalName || 'products.xlsx';
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `produk_${Date.now()}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
 
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', originalName);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            Swal.fire('Berhasil', 'File Excel berhasil dibuat dan akan diunduh.', 'success');
-        } else {
-            throw new Error('Respons tidak valid atau path download tidak ditemukan.');
-        }
+        Swal.fire('Berhasil', 'File Excel berhasil dibuat dan akan diunduh.', 'success');
     } catch (error: any) {
         console.error('Download error:', error);
         Swal.fire('Error', error.response?.data?.message || 'Gagal mendownload file Excel produk.', 'error');
