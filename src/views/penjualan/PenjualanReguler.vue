@@ -71,7 +71,7 @@
                         </select>
 
                         <div v-if="selectedPelangganId" class="hutang-badge mt-3 px-4 py-2 rounded-xl flex justify-between items-center">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Hutang</span>
+                            <span class="text-sm font-semibold text-gray-700">Hutang</span>
                             <span class="text-base font-extrabold"
                                 :class="hutangPelanggan > 0 ? 'hutang-danger' : 'hutang-safe'">
                                 {{ formatRupiah(hutangPelanggan) }}
@@ -86,7 +86,7 @@
                 <div class="pending-section rounded-2xl p-4">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="pending-dot w-2 h-2 rounded-full animate-pulse"></div>
-                        <p class="text-sm font-bold text-amber-700 dark:text-amber-400">
+                        <p class="text-sm font-bold text-amber-700">
                             Transaksi Pending ({{ pendingTransactions.length }})
                         </p>
                     </div>
@@ -94,9 +94,9 @@
                         <div v-for="t in pendingTransactions" :key="t.id"
                             class="pending-card rounded-xl p-3 cursor-pointer transition-all"
                             :class="t.id === currentPendingId ? 'pending-card-active' : 'pending-card-inactive'">
-                            <p class="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">{{ t.nama_pelanggan }}</p>
-                            <p class="text-sm font-extrabold text-amber-600 dark:text-amber-400 mt-0.5">{{ formatRupiah(t.total) }}</p>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 mb-2">{{ t.tanggal_simpan }}</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ t.nama_pelanggan }}</p>
+                            <p class="text-sm font-extrabold text-amber-600 mt-0.5">{{ formatRupiah(t.total) }}</p>
+                            <p class="text-xs text-gray-600 mt-0.5 mb-2">{{ t.tanggal_simpan }}</p>
                             <div class="flex gap-2">
                                 <button @click="loadTransaction(t)"
                                     class="btn-load flex-1 text-xs py-1.5 rounded-lg font-semibold transition-all">
@@ -154,24 +154,24 @@
                                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                         </div>
-                                        <p class="text-gray-600 dark:text-gray-400 font-semibold">Keranjang masih kosong</p>
-                                        <p class="text-gray-500 dark:text-gray-500 text-sm">Scan barcode atau cari produk untuk memulai</p>
+                                        <p class="text-gray-600 font-semibold">Keranjang masih kosong</p>
+                                        <p class="text-gray-500 text-sm">Scan barcode atau cari produk untuk memulai</p>
                                     </div>
                                 </td>
                             </tr>
                             <tr v-for="(item, index) in transactionItems" :key="item.barcode"
                                 class="cart-row transition-colors">
-                                <td class="px-4 py-3 text-sm font-bold text-gray-500 dark:text-gray-500">{{ index + 1 }}</td>
+                                <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ index + 1 }}</td>
                                 <td class="px-4 py-3">
-                                    <div class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ item.nama_produk }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-500 font-mono">{{ item.barcode }}</div>
+                                    <div class="text-sm font-bold text-gray-900">{{ item.nama_produk }}</div>
+                                    <div class="text-xs text-gray-500 font-mono">{{ item.barcode }}</div>
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <input v-model.number="item.qty" type="number" min="1"
                                         @change="updateItem(item.barcode, item.qty)"
                                         class="qty-input w-20 text-center rounded-lg py-1.5 text-sm font-bold" />
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
                                     {{ formatRupiah(item.harga_jual_reguler) }}
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
@@ -235,8 +235,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-extrabold text-gray-800 dark:text-gray-100">Proses Pembayaran</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400">Masukkan nominal pembayaran</p>
+                            <h3 class="text-lg font-extrabold text-gray-800">Proses Pembayaran</h3>
+                            <p class="text-xs text-gray-600">Masukkan nominal pembayaran</p>
                         </div>
                     </div>
                     <button @click="closePaymentModal" class="close-btn p-2 rounded-xl transition-all">
@@ -250,7 +250,7 @@
                 <div class="p-6 space-y-5">
                     <!-- Input Pembayaran -->
                     <div class="payment-input-wrap rounded-2xl p-4">
-                        <label class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 block">
+                        <label class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 block">
                             Uang Diterima
                         </label>
                         <div class="relative">
@@ -266,24 +266,24 @@
 
                     <!-- Rincian -->
                     <div class="summary-box rounded-2xl p-4 space-y-2.5">
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Total Belanja</span>
-                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(totalBelanja) }}</span>
+                            <span class="font-bold text-gray-900">{{ formatRupiah(totalBelanja) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Hutang Lama</span>
-                            <span class="font-bold" :class="hutangPelanggan > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
+                            <span class="font-bold" :class="hutangPelanggan > 0 ? 'text-red-600' : 'text-emerald-600'">
                                 {{ formatRupiah(hutangPelanggan) }}
                             </span>
                         </div>
                         <div class="divider my-1"></div>
-                        <div class="flex justify-between text-base font-bold text-gray-900 dark:text-gray-100">
+                        <div class="flex justify-between text-base font-bold text-gray-900">
                             <span>Total Harus Dibayar</span>
                             <span>{{ formatRupiah(totalYangHarusDibayar) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Uang Masuk</span>
-                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(uangPembayaran) }}</span>
+                            <span class="font-bold text-gray-900">{{ formatRupiah(uangPembayaran) }}</span>
                         </div>
                         <!-- Kembalian / Kurang Bayar -->
                         <div class="kembalian-box rounded-xl p-3 mt-1"
@@ -1393,41 +1393,4 @@ onMounted(() => {
     background: #3b1a1a;
 }
 
-/* Payment Input */
-:global(.dark) .payment-input-wrap {
-    background: #0f172a;
-    border-color: #334155;
-}
-:global(.dark) .payment-input {
-    background: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
-}
-:global(.dark) .payment-input:focus {
-    border-color: #06b6d4;
-}
-
-/* Summary Box */
-:global(.dark) .summary-box {
-    background: #0f172a;
-    border-color: #334155;
-}
-:global(.dark) .divider {
-    background: linear-gradient(90deg, transparent, #334155, transparent);
-}
-:global(.dark) .kembalian-positive {
-    background: linear-gradient(135deg, #052e16, #064e3b);
-    border-color: #065f46;
-    color: #6ee7b7;
-}
-:global(.dark) .kembalian-negative {
-    background: linear-gradient(135deg, #1f0708, #3b1a1a);
-    border-color: #7f1d1d;
-    color: #fca5a5;
-}
-
-/* Modal Footer */
-:global(.dark) .modal-footer {
-    background: #1e293b;
-}
 </style>

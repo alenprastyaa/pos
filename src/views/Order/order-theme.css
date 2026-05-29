@@ -1,0 +1,317 @@
+.page-container {
+    background: linear-gradient(160deg, #fff1f2 0%, #f8fafc 60%, #fdf4ff 100%);
+}
+
+.top-panel { background: transparent; }
+
+.input-card {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(190,18,60,0.06);
+    border: 1px solid rgba(226,232,240,0.8);
+    transition: box-shadow 0.2s;
+}
+
+.input-card:focus-within {
+    box-shadow: 0 4px 24px rgba(190,18,60,0.12);
+    border-color: rgba(190,18,60,0.25);
+}
+
+.input-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5c0a14;
+}
+
+.pos-input {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    color: #0f172a;
+    font-size: 0.875rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.pos-input:focus {
+    background: white;
+    border-color: #be123c;
+    box-shadow: 0 0 0 3px rgba(190,18,60,0.12);
+}
+
+.pos-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.search-dropdown {
+    background: white;
+    border: 1px solid #e2e8f0;
+    top: 100%;
+}
+
+.search-item {
+    background: white;
+}
+
+.search-item:hover {
+    background: #fff1f2;
+}
+
+.search-item-active {
+    background: #be123c;
+    border-left: 4px solid #9f1239;
+}
+
+.search-item-active span {
+    color: white !important;
+}
+
+.search-item-active .price-tag {
+    background: rgba(255, 255, 255, 0.25);
+    color: white !important;
+}
+
+.search-item .price-tag {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.cart-table {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+}
+
+.table-head { background: linear-gradient(90deg, #881337, #be123c); }
+.cart-row { border-bottom: 1px solid #f1f5f9; }
+.cart-row:last-child { border-bottom: none; }
+.cart-row:hover { background: #fff5f6; }
+
+.empty-cart-icon { background: #f1f5f9; }
+
+.qty-input {
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.qty-input:focus {
+    border-color: #be123c;
+    box-shadow: 0 0 0 3px rgba(190,18,60,0.1);
+    background: white;
+}
+
+.subtotal-text { color: #9f1239; }
+
+.del-btn {
+    color: #64748b;
+    transition: all 0.15s;
+    background: #f1f5f9;
+}
+
+.del-btn:hover {
+    color: #b91c1c;
+    background: #fee2e2;
+    transform: scale(1.05);
+}
+
+.total-bar {
+    background: linear-gradient(135deg, #4c0519 0%, #881337 50%, #be123c 100%);
+    border-bottom: none;
+}
+
+.total-icon { background: rgba(255,255,255,0.15); }
+
+.total-amount {
+    color: white;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.btn-bayar,
+.btn-confirm,
+.btn-load {
+    background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(190,18,60,0.4);
+    letter-spacing: 0.03em;
+}
+
+.btn-bayar:hover:not(:disabled),
+.btn-confirm:hover:not(:disabled),
+.btn-load:hover:not(:disabled) {
+    background: linear-gradient(135deg, #9f1239 0%, #881337 100%);
+    box-shadow: 0 6px 28px rgba(190,18,60,0.5);
+    transform: translateY(-1px);
+}
+
+.btn-bayar:active:not(:disabled),
+.btn-confirm:active:not(:disabled),
+.btn-load:active:not(:disabled) { transform: translateY(0); }
+
+.btn-del {
+    background: #f1f5f9;
+    color: #374151;
+    font-weight: 600;
+}
+
+.btn-del:hover:not(:disabled) {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.my-order-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-refresh {
+    background: #fff1f2;
+    color: #9f1239;
+    border: 1px solid #fecdd3;
+}
+
+.btn-refresh:hover {
+    background: #ffe4e6;
+    border-color: #fda4af;
+}
+
+.day-chip {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.day-chip:hover {
+    background: #fff1f2;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+.day-chip-active {
+    background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+    color: white;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 20px rgba(190,18,60,0.28);
+}
+
+.day-chip-summary {
+    background: #fff1f2;
+    color: #9f1239;
+    border: 1px solid #fecdd3;
+}
+
+.day-count-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    background: #fff1f2;
+    color: #9f1239;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.day-summary-grid {
+    min-width: 220px;
+}
+
+.day-summary-pill {
+    min-width: 72px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.7rem 0.8rem;
+}
+
+.pagination-btn {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #fff1f2;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+.pagination-btn-active {
+    background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+    color: white;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 20px rgba(190,18,60,0.28);
+}
+
+.qty-modal-backdrop {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.qty-modal-card {
+    background: white;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.qty-modal-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #fff1f2 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.qty-modal-icon {
+    background: linear-gradient(135deg, #be123c, #9f1239);
+}
+
+.qty-close-btn {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.qty-close-btn:hover {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.qty-input-wrap {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+}
+
+.qty-modal-input {
+    background: white;
+    border: 2px solid #e2e8f0;
+    outline: none;
+    color: #0f172a;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.qty-modal-input:focus {
+    border-color: #be123c;
+    box-shadow: 0 0 0 4px rgba(190,18,60,0.1);
+}
+
+.qty-summary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.review-modal-card {
+    background: white;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.review-box {
+    background: white;
+    border: 1px solid #e2e8f0;
+}
+
+.review-summary {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+}

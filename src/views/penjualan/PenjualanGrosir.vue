@@ -14,14 +14,12 @@
                             </svg>
                             Cari Produk
                         </label>
-                        <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput"
-                            type="text" placeholder="Ketik nama produk..."
-                            @input="searchProducts(productSearchInput)" @keydown="handleSearchKeydown"
-                            :disabled="role_name !== 'admin'"
+                        <input @keypress="preventNumber" ref="barcodeInputRef" v-model="productSearchInput" type="text"
+                            placeholder="Ketik nama produk..." @input="searchProducts(productSearchInput)"
+                            @keydown="handleSearchKeydown" :disabled="role_name !== 'admin'"
                             class="pos-input w-full h-11 px-4 rounded-xl" />
 
-                        <div v-if="showSearchResults && searchResults.length > 0"
-                            ref="searchDropdownRef"
+                        <div v-if="showSearchResults && searchResults.length > 0" ref="searchDropdownRef"
                             class="search-dropdown absolute left-4 right-4 mt-1 rounded-xl shadow-2xl z-20 max-h-72 overflow-y-auto">
                             <div v-for="(product, index) in searchResults" :key="product.barcode"
                                 @click="selectProductFromSearch(product)"
@@ -29,7 +27,8 @@
                                 class="px-4 py-2.5 cursor-pointer transition-all border-b border-gray-50 last:border-0">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-sm text-gray-800">{{ product.nama_produk }}</span>
-                                    <span class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
+                                    <span
+                                        class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
                                         {{ formatRupiah(product.harga_jual_ritel) }}
                                     </span>
                                 </div>
@@ -47,8 +46,7 @@
                             Pilih Pelanggan
                         </label>
                         <select ref="pelangganSelectRef" v-model="selectedPelangganId" required
-                            @keydown.enter.prevent="focusToPayButton"
-                            class="pos-input w-full h-11 rounded-xl px-4">
+                            @keydown.enter.prevent="focusToPayButton" class="pos-input w-full h-11 rounded-xl px-4">
                             <option value="" disabled>Pilih Pelanggan...</option>
                             <option v-if="loadingPelanggan" disabled>Memuat...</option>
                             <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
@@ -56,8 +54,9 @@
                             </option>
                         </select>
 
-                        <div v-if="selectedPelangganId" class="hutang-badge mt-3 px-4 py-2 rounded-xl flex justify-between items-center">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Hutang</span>
+                        <div v-if="selectedPelangganId"
+                            class="hutang-badge mt-3 px-4 py-2 rounded-xl flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-700">Hutang</span>
                             <span class="text-base font-extrabold"
                                 :class="hutangPelanggan > 0 ? 'hutang-danger' : 'hutang-safe'">
                                 {{ formatRupiah(hutangPelanggan) }}
@@ -72,7 +71,7 @@
                 <div class="pending-section rounded-2xl p-4">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="pending-dot w-2 h-2 rounded-full animate-pulse"></div>
-                        <p class="text-sm font-bold text-amber-700 dark:text-amber-400">
+                        <p class="text-sm font-bold text-amber-700">
                             Transaksi Pending ({{ pendingTransactions.length }})
                         </p>
                     </div>
@@ -80,9 +79,11 @@
                         <div v-for="t in pendingTransactions" :key="t.id"
                             class="pending-card rounded-xl p-3 cursor-pointer transition-all"
                             :class="t.id === currentPendingId ? 'pending-card-active' : 'pending-card-inactive'">
-                            <p class="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">{{ t.nama_pelanggan }}</p>
-                            <p class="text-sm font-extrabold text-amber-600 dark:text-amber-400 mt-0.5">{{ formatRupiah(t.total) }}</p>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 mb-2">{{ t.tanggal_simpan }}</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ t.nama_pelanggan
+                            }}</p>
+                            <p class="text-sm font-extrabold text-amber-600 mt-0.5">{{
+                                formatRupiah(t.total) }}</p>
+                            <p class="text-xs text-gray-600 mt-0.5 mb-2">{{ t.tanggal_simpan }}</p>
                             <div class="flex gap-2">
                                 <button @click="loadTransaction(t)"
                                     class="btn-load flex-1 text-xs py-1.5 rounded-lg font-semibold transition-all">
@@ -121,42 +122,61 @@
                     <table class="w-full">
                         <thead>
                             <tr class="table-head">
-                                <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-10">No</th>
-                                <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
-                                <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Qty</th>
-                                <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
-                                <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
-                                <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-16">Hapus</th>
+                                <th
+                                    class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-10">
+                                    No</th>
+                                <th
+                                    class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">
+                                    Produk</th>
+                                <th
+                                    class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">
+                                    Qty</th>
+                                <th
+                                    class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">
+                                    Harga</th>
+                                <th
+                                    class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">
+                                    Subtotal</th>
+                                <th
+                                    class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-16">
+                                    Hapus</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="transactionItems.length === 0">
                                 <td colspan="6" class="px-6 py-16 text-center">
                                     <div class="flex flex-col items-center justify-center space-y-3">
-                                        <div class="empty-cart-icon w-20 h-20 rounded-full flex items-center justify-center">
-                                            <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div
+                                            class="empty-cart-icon w-20 h-20 rounded-full flex items-center justify-center">
+                                            <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                             </svg>
                                         </div>
-                                        <p class="text-gray-600 dark:text-gray-400 font-semibold">Keranjang masih kosong</p>
-                                        <p class="text-gray-500 dark:text-gray-500 text-sm">Cari produk untuk memulai transaksi</p>
+                                        <p class="text-gray-600 font-semibold">Keranjang masih kosong
+                                        </p>
+                                        <p class="text-gray-500 text-sm">Cari produk untuk memulai
+                                            transaksi</p>
                                     </div>
                                 </td>
                             </tr>
                             <tr v-for="(item, index) in transactionItems" :key="item.barcode"
                                 class="cart-row transition-colors">
-                                <td class="px-4 py-3 text-sm font-bold text-gray-500 dark:text-gray-500">{{ index + 1 }}</td>
+                                <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ index + 1 }}
+                                </td>
                                 <td class="px-4 py-3">
-                                    <div class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ item.nama_produk }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-500 font-mono">{{ item.barcode }}</div>
+                                    <div class="text-sm font-bold text-gray-900">{{ item.nama_produk
+                                    }}</div>
+                                    <div class="text-xs text-gray-500 font-mono">{{ item.barcode }}
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <input v-model.number="item.qty" type="number" min="1"
                                         @change="updateItem(item.barcode, item.qty)"
                                         class="qty-input w-20 text-center rounded-lg py-1.5 text-sm font-bold" />
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
                                     {{ formatRupiah(item.harga_jual_ritel) }}
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
@@ -220,8 +240,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-extrabold text-gray-800 dark:text-gray-100">Proses Pembayaran</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400">Masukkan nominal pembayaran</p>
+                            <h3 class="text-lg font-extrabold text-gray-800">Proses Pembayaran</h3>
+                            <p class="text-xs text-gray-600">Masukkan nominal pembayaran</p>
                         </div>
                     </div>
                     <button @click="closePaymentModal" class="close-btn p-2 rounded-xl transition-all">
@@ -235,11 +255,13 @@
                 <div class="p-6 space-y-5">
                     <!-- Input Pembayaran -->
                     <div class="payment-input-wrap rounded-2xl p-4">
-                        <label class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 block">
+                        <label
+                            class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 block">
                             Uang Diterima
                         </label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-rose-500">Rp</span>
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-rose-500">Rp</span>
                             <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
                                 @input="handlePembayaranInput" @focus="handlePembayaranFocus"
                                 @blur="handlePembayaranBlur" @keydown.enter="handlePembayaranKeydown" type="text"
@@ -251,28 +273,32 @@
 
                     <!-- Rincian -->
                     <div class="summary-box rounded-2xl p-4 space-y-2.5">
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Pelanggan</span>
-                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ getPelangganName(selectedPelangganId) }}</span>
+                            <span class="font-bold text-gray-900">{{
+                                getPelangganName(selectedPelangganId) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Total Belanja</span>
-                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(totalBelanja) }}</span>
+                            <span class="font-bold text-gray-900">{{ formatRupiah(totalBelanja)
+                            }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Hutang Lama</span>
-                            <span class="font-bold" :class="hutangPelanggan > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
+                            <span class="font-bold"
+                                :class="hutangPelanggan > 0 ? 'text-red-600' : 'text-emerald-600'">
                                 {{ formatRupiah(hutangPelanggan) }}
                             </span>
                         </div>
                         <div class="divider my-1"></div>
-                        <div class="flex justify-between text-base font-bold text-gray-900 dark:text-gray-100">
+                        <div class="flex justify-between text-base font-bold text-gray-900">
                             <span>Total Harus Dibayar</span>
                             <span>{{ formatRupiah(totalYangHarusDibayar) }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                        <div class="flex justify-between text-sm text-gray-700">
                             <span>Uang Masuk</span>
-                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(uangPembayaran) }}</span>
+                            <span class="font-bold text-gray-900">{{ formatRupiah(uangPembayaran)
+                            }}</span>
                         </div>
                         <!-- Kembalian / Kurang Bayar -->
                         <div class="kembalian-box rounded-xl p-3 mt-1"
@@ -293,13 +319,15 @@
                         :disabled="isSubmitting || totalBelanja === 0"
                         class="w-full h-14 btn-confirm rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all disabled:opacity-40">
                         <svg v-if="isSubmitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
                             <path class="opacity-75" fill="currentColor"
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
                         <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M5 13l4 4L19 7" />
                         </svg>
                         {{ isSubmitting ? 'MEMPROSES...' : 'PROSES TRANSAKSI (ENTER)' }}
                     </button>
@@ -1204,17 +1232,20 @@ onMounted(async () => {
 }
 
 /* ===== TOP PANEL ===== */
-.top-panel { background: transparent; }
+.top-panel {
+    background: transparent;
+}
 
 .input-card {
     background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(190,18,60,0.06);
-    border: 1px solid rgba(226,232,240,0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(190, 18, 60, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     transition: box-shadow 0.2s;
 }
+
 .input-card:focus-within {
-    box-shadow: 0 4px 24px rgba(190,18,60,0.12);
-    border-color: rgba(190,18,60,0.25);
+    box-shadow: 0 4px 24px rgba(190, 18, 60, 0.12);
+    border-color: rgba(190, 18, 60, 0.25);
 }
 
 .input-label {
@@ -1237,12 +1268,17 @@ onMounted(async () => {
     appearance: none;
     -webkit-appearance: none;
 }
+
 .pos-input:focus {
     background: white;
     border-color: #be123c;
-    box-shadow: 0 0 0 3px rgba(190,18,60,0.12);
+    box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.12);
 }
-.pos-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pos-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 
 /* ===== SEARCH DROPDOWN ===== */
 .search-dropdown {
@@ -1250,65 +1286,114 @@ onMounted(async () => {
     border: 1px solid #e2e8f0;
     top: 100%;
 }
-.search-item { background: white; }
-.search-item:hover { background: #fff1f2; }
+
+.search-item {
+    background: white;
+}
+
+.search-item:hover {
+    background: #fff1f2;
+}
+
 .search-item-active {
     background: #be123c;
     border-left: 4px solid #9f1239;
 }
-.search-item-active span { color: white !important; }
-.search-item-active .price-tag {
-    background: rgba(255,255,255,0.25);
+
+.search-item-active span {
     color: white !important;
 }
+
+.search-item-active .price-tag {
+    background: rgba(255, 255, 255, 0.25);
+    color: white !important;
+}
+
 .search-item .price-tag {
     background: #d1fae5;
     color: #065f46;
 }
 
 /* ===== HUTANG BADGE ===== */
-.hutang-badge { background: #f8fafc; border: 1px solid #e2e8f0; }
-.hutang-danger { color: #dc2626; }
-.hutang-safe   { color: #16a34a; }
+.hutang-badge {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.hutang-danger {
+    color: #dc2626;
+}
+
+.hutang-safe {
+    color: #16a34a;
+}
 
 /* ===== PENDING SECTION ===== */
 .pending-section {
     background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
     border: 1px solid #fde68a;
 }
-.pending-dot { background: #f59e0b; }
+
+.pending-dot {
+    background: #f59e0b;
+}
+
 .pending-card {
     background: white;
     border: 1.5px solid #e2e8f0;
     transition: all 0.2s;
 }
-.pending-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+.pending-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
 .pending-card-active {
     border-color: #be123c;
     background: #fff1f2;
-    box-shadow: 0 0 0 2px rgba(190,18,60,0.15);
+    box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.15);
 }
-.pending-card-inactive { border-color: #e2e8f0; }
+
+.pending-card-inactive {
+    border-color: #e2e8f0;
+}
 
 .btn-load {
     background: linear-gradient(135deg, #be123c, #9f1239);
     color: white;
-    box-shadow: 0 2px 8px rgba(190,18,60,0.3);
+    box-shadow: 0 2px 8px rgba(190, 18, 60, 0.3);
 }
-.btn-load:hover { filter: brightness(1.08); }
-.btn-del { background: #f1f5f9; color: #374151; font-weight: 600; }
-.btn-del:hover { background: #fee2e2; color: #b91c1c; }
+
+.btn-load:hover {
+    filter: brightness(1.08);
+}
+
+.btn-del {
+    background: #f1f5f9;
+    color: #374151;
+    font-weight: 600;
+}
+
+.btn-del:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
 
 /* ===== TOTAL BAR ===== */
 .total-bar {
     background: linear-gradient(135deg, #4c0519 0%, #881337 50%, #be123c 100%);
     border-bottom: none;
 }
-.total-icon { background: rgba(255,255,255,0.15); }
+
+.total-icon {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 .total-amount {
     color: white;
     letter-spacing: -0.02em;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* ===== CART TABLE ===== */
@@ -1317,11 +1402,26 @@ onMounted(async () => {
     border: 1px solid #e2e8f0;
     border-top: none;
 }
-.table-head { background: linear-gradient(90deg, #881337, #be123c); }
-.cart-row { border-bottom: 1px solid #f1f5f9; }
-.cart-row:last-child { border-bottom: none; }
-.cart-row:hover { background: #fff5f6; }
-.empty-cart-icon { background: #f1f5f9; }
+
+.table-head {
+    background: linear-gradient(90deg, #881337, #be123c);
+}
+
+.cart-row {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.cart-row:last-child {
+    border-bottom: none;
+}
+
+.cart-row:hover {
+    background: #fff5f6;
+}
+
+.empty-cart-icon {
+    background: #f1f5f9;
+}
 
 .qty-input {
     border: 1.5px solid #e2e8f0;
@@ -1330,39 +1430,58 @@ onMounted(async () => {
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
+
 .qty-input:focus {
     border-color: #be123c;
-    box-shadow: 0 0 0 3px rgba(190,18,60,0.1);
+    box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.1);
     background: white;
 }
-.subtotal-text { color: #9f1239; }
 
-.del-btn { color: #64748b; transition: all 0.15s; }
-.del-btn:hover { color: #b91c1c; background: #fee2e2; transform: scale(1.1); }
+.subtotal-text {
+    color: #9f1239;
+}
+
+.del-btn {
+    color: #64748b;
+    transition: all 0.15s;
+}
+
+.del-btn:hover {
+    color: #b91c1c;
+    background: #fee2e2;
+    transform: scale(1.1);
+}
 
 /* ===== ACTION BAR ===== */
 .action-bar {
     background: white;
     border-top: 1px solid #e2e8f0;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
 }
+
 .btn-bayar {
     background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
     color: white;
-    box-shadow: 0 4px 20px rgba(190,18,60,0.4);
+    box-shadow: 0 4px 20px rgba(190, 18, 60, 0.4);
     letter-spacing: 0.03em;
 }
+
 .btn-bayar:hover:not(:disabled) {
     background: linear-gradient(135deg, #9f1239 0%, #881337 100%);
-    box-shadow: 0 6px 28px rgba(190,18,60,0.5);
+    box-shadow: 0 6px 28px rgba(190, 18, 60, 0.5);
     transform: translateY(-1px);
 }
-.btn-bayar:active:not(:disabled) { transform: translateY(0); }
+
+.btn-bayar:active:not(:disabled) {
+    transform: translateY(0);
+}
+
 .btn-pending-action {
     background: white;
     color: #1e293b;
     border: 1.5px solid #cbd5e1;
 }
+
 .btn-pending-action:hover:not(:disabled) {
     border-color: #be123c;
     color: #be123c;
@@ -1371,20 +1490,40 @@ onMounted(async () => {
 
 /* ===== MODAL ===== */
 .modal-backdrop {
-    background: rgba(15,23,42,0.7);
+    background: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(4px);
 }
-.modal-card { background: white; border: 1px solid rgba(226,232,240,0.8); }
+
+.modal-card {
+    background: white;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
 .modal-header {
     background: linear-gradient(135deg, #f8fafc 0%, #fff1f2 100%);
     border-bottom: 1px solid #e2e8f0;
 }
-.modal-icon { background: linear-gradient(135deg, #be123c, #9f1239); }
-.close-btn { color: #475569; background: #f1f5f9; }
-.close-btn:hover { color: #b91c1c; background: #fee2e2; }
+
+.modal-icon {
+    background: linear-gradient(135deg, #be123c, #9f1239);
+}
+
+.close-btn {
+    color: #475569;
+    background: #f1f5f9;
+}
+
+.close-btn:hover {
+    color: #b91c1c;
+    background: #fee2e2;
+}
 
 /* ===== PAYMENT INPUT ===== */
-.payment-input-wrap { background: #f8fafc; border: 1.5px solid #e2e8f0; }
+.payment-input-wrap {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+}
+
 .payment-input {
     background: white;
     border: 2px solid #e2e8f0;
@@ -1392,23 +1531,33 @@ onMounted(async () => {
     color: #0f172a;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
+
 .payment-input:focus {
     border-color: #be123c;
-    box-shadow: 0 0 0 4px rgba(190,18,60,0.1);
+    box-shadow: 0 0 0 4px rgba(190, 18, 60, 0.1);
 }
 
 /* ===== SUMMARY BOX ===== */
-.summary-box { background: #f8fafc; border: 1px solid #e2e8f0; }
+.summary-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
 .divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
 }
-.kembalian-box { transition: all 0.3s; }
+
+.kembalian-box {
+    transition: all 0.3s;
+}
+
 .kembalian-positive {
     background: linear-gradient(135deg, #ecfdf5, #d1fae5);
     border: 1.5px solid #6ee7b7;
     color: #065f46;
 }
+
 .kembalian-negative {
     background: linear-gradient(135deg, #fff1f2, #fee2e2);
     border: 1.5px solid #fca5a5;
@@ -1416,19 +1565,26 @@ onMounted(async () => {
 }
 
 /* ===== CONFIRM BUTTON ===== */
-.modal-footer { background: white; }
+.modal-footer {
+    background: white;
+}
+
 .btn-confirm {
     background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
     color: white;
-    box-shadow: 0 4px 20px rgba(190,18,60,0.35);
+    box-shadow: 0 4px 20px rgba(190, 18, 60, 0.35);
     letter-spacing: 0.03em;
 }
+
 .btn-confirm:hover:not(:disabled) {
     background: linear-gradient(135deg, #9f1239 0%, #881337 100%);
-    box-shadow: 0 6px 28px rgba(190,18,60,0.45);
+    box-shadow: 0 6px 28px rgba(190, 18, 60, 0.45);
     transform: translateY(-1px);
 }
-.btn-confirm:active:not(:disabled) { transform: translateY(0); }
+
+.btn-confirm:active:not(:disabled) {
+    transform: translateY(0);
+}
 
 /* ============================================================
    DARK MODE OVERRIDES
@@ -1437,84 +1593,180 @@ onMounted(async () => {
 :global(.dark) .page-container {
     background: linear-gradient(160deg, #1a0008 0%, #111827 60%, #150a1a 100%);
 }
+
 :global(.dark) .input-card {
     background: #1e293b;
     border-color: #334155;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
 }
+
 :global(.dark) .input-card:focus-within {
-    border-color: rgba(190,18,60,0.4);
-    box-shadow: 0 4px 24px rgba(190,18,60,0.1);
+    border-color: rgba(190, 18, 60, 0.4);
+    box-shadow: 0 4px 24px rgba(190, 18, 60, 0.1);
 }
-:global(.dark) .input-label { color: #fda4af; }
-:global(.dark) .pos-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-:global(.dark) .pos-input:focus { background: #0f172a; border-color: #be123c; }
-:global(.dark) .pos-input option { background: #1e293b; color: #f1f5f9; }
 
-:global(.dark) .search-dropdown { background: #1e293b; border-color: #334155; }
-:global(.dark) .search-item { background: #1e293b; }
-:global(.dark) .search-item:hover { background: #2d1a1e; }
-:global(.dark) .search-item span { color: #e2e8f0; }
-:global(.dark) .search-item-active { background: #be123c; border-left-color: #f43f5e; }
-:global(.dark) .search-item .price-tag { background: #064e3b; color: #6ee7b7; }
+:global(.dark) .input-label {
+    color: #fda4af;
+}
 
-:global(.dark) .hutang-badge { background: #0f172a; border-color: #334155; }
+:global(.dark) .pos-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+:global(.dark) .pos-input:focus {
+    background: #0f172a;
+    border-color: #be123c;
+}
+
+:global(.dark) .pos-input option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+:global(.dark) .search-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+:global(.dark) .search-item {
+    background: #1e293b;
+}
+
+:global(.dark) .search-item:hover {
+    background: #2d1a1e;
+}
+
+:global(.dark) .search-item span {
+    color: #e2e8f0;
+}
+
+:global(.dark) .search-item-active {
+    background: #be123c;
+    border-left-color: #f43f5e;
+}
+
+:global(.dark) .search-item .price-tag {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+
+:global(.dark) .hutang-badge {
+    background: #0f172a;
+    border-color: #334155;
+}
 
 :global(.dark) .pending-section {
     background: linear-gradient(135deg, #1c1506 0%, #27190a 100%);
     border-color: #78350f;
 }
-:global(.dark) .pending-card { background: #1e293b; border-color: #334155; }
-:global(.dark) .pending-card-active { background: #2d0510; border-color: #be123c; }
-:global(.dark) .btn-del { background: #263548; color: #94a3b8; }
-:global(.dark) .btn-del:hover { background: #3b1a1a; color: #f87171; }
+
+:global(.dark) .pending-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+:global(.dark) .pending-card-active {
+    background: #2d0510;
+    border-color: #be123c;
+}
+
+:global(.dark) .btn-del {
+    background: #263548;
+    color: #94a3b8;
+}
+
+:global(.dark) .btn-del:hover {
+    background: #3b1a1a;
+    color: #f87171;
+}
 
 :global(.dark) .total-bar {
     background: linear-gradient(135deg, #2d0510 0%, #4c0519 50%, #7f1d1d 100%);
 }
 
-:global(.dark) .cart-table { background: #1e293b; border-color: #334155; }
-:global(.dark) .table-head { background: linear-gradient(90deg, #4c0519, #881337); }
-:global(.dark) .cart-row { border-bottom-color: #334155; }
-:global(.dark) .cart-row:hover { background: #2d0510; }
-:global(.dark) .empty-cart-icon { background: #263548; }
-:global(.dark) .qty-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-:global(.dark) .qty-input:focus { background: #0f172a; border-color: #be123c; }
-:global(.dark) .subtotal-text { color: #fb7185; }
-:global(.dark) .del-btn { color: #64748b; }
-:global(.dark) .del-btn:hover { color: #f87171; background: #3b1a1a; }
+:global(.dark) .cart-table {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+:global(.dark) .table-head {
+    background: linear-gradient(90deg, #4c0519, #881337);
+}
+
+:global(.dark) .cart-row {
+    border-bottom-color: #334155;
+}
+
+:global(.dark) .cart-row:hover {
+    background: #2d0510;
+}
+
+:global(.dark) .empty-cart-icon {
+    background: #263548;
+}
+
+:global(.dark) .qty-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+:global(.dark) .qty-input:focus {
+    background: #0f172a;
+    border-color: #be123c;
+}
+
+:global(.dark) .subtotal-text {
+    color: #fb7185;
+}
+
+:global(.dark) .del-btn {
+    color: #64748b;
+}
+
+:global(.dark) .del-btn:hover {
+    color: #f87171;
+    background: #3b1a1a;
+}
 
 :global(.dark) .action-bar {
     background: #1e293b;
     border-top-color: #334155;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
-}
-:global(.dark) .btn-pending-action { background: #263548; color: #e2e8f0; border-color: #334155; }
-:global(.dark) .btn-pending-action:hover:not(:disabled) {
-    border-color: #be123c; color: #fb7185; background: #2d0510;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
 }
 
-:global(.dark) .modal-card { background: #1e293b; border-color: #334155; }
+:global(.dark) .btn-pending-action {
+    background: #263548;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+
+:global(.dark) .btn-pending-action:hover:not(:disabled) {
+    border-color: #be123c;
+    color: #fb7185;
+    background: #2d0510;
+}
+
+:global(.dark) .modal-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
 :global(.dark) .modal-header {
     background: linear-gradient(135deg, #1e293b 0%, #2d0510 100%);
     border-bottom-color: #334155;
 }
-:global(.dark) .close-btn { color: #64748b; background: #263548; }
-:global(.dark) .close-btn:hover { color: #f87171; background: #3b1a1a; }
 
-:global(.dark) .payment-input-wrap { background: #0f172a; border-color: #334155; }
-:global(.dark) .payment-input { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-:global(.dark) .payment-input:focus { border-color: #be123c; }
+:global(.dark) .close-btn {
+    color: #64748b;
+    background: #263548;
+}
 
-:global(.dark) .summary-box { background: #0f172a; border-color: #334155; }
-:global(.dark) .divider { background: linear-gradient(90deg, transparent, #334155, transparent); }
-:global(.dark) .kembalian-positive {
-    background: linear-gradient(135deg, #052e16, #064e3b);
-    border-color: #065f46; color: #6ee7b7;
+:global(.dark) .close-btn:hover {
+    color: #f87171;
+    background: #3b1a1a;
 }
-:global(.dark) .kembalian-negative {
-    background: linear-gradient(135deg, #1f0708, #3b1a1a);
-    border-color: #7f1d1d; color: #fca5a5;
-}
-:global(.dark) .modal-footer { background: #1e293b; }
+
 </style>

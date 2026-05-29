@@ -84,6 +84,10 @@
                           {{ subItem.name }}
 
                           <span class="flex items-center gap-1 ml-auto">
+                            <span v-if="subItem.badge > 0" :class="[
+                              'menu-dropdown-badge',
+                              isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
+                            ]">{{ subItem.badge > 99 ? '99+' : subItem.badge }}</span>
                             <span v-if="subItem.new" :class="[
                               'menu-dropdown-badge',
                               isActive(subItem.path) ? 'menu-dropdown-badge-active' : 'menu-dropdown-badge-inactive'
@@ -139,8 +143,10 @@ import TaskIcon from "@/icons/TaskIcon.vue";
 import PlusIcon from "@/icons/PlusIcon.vue";
 import DraftIcon from "@/icons/DraftIcon.vue";
 import BoxCubeIcon from "@/icons/BoxCubeIcon.vue";
+import { incomingOrderCount } from "@/composables/useRealtimeNotifications";
 
 const role_name = localStorage.getItem("role_name");
+const normalizedRole = computed(() => (role_name ?? "").toLowerCase());
 const route = useRoute();
 const router = useRouter();
 
@@ -154,64 +160,119 @@ router.afterEach(() => {
   closeSidebar();
 });
 
-const menuGroups = [
+const superAdminMenuItems = [
   {
-    title: "Menu",
-    items: [
-      {
-        icon: GridIcon,
-        name: "Dashboard",
-        path: "/",
-      },
-      ...(role_name === "superadmin"
-        ? [
-          {
-            icon: CalenderIcon,
-            name: "Toko",
-            path: "/toko",
-          }
-        ]
-        : []),
-      ...(role_name === "superadmin"
-        ? [
-          {
-            icon: UserCircleIcon,
-            name: "User",
-            path: "/user",
-          }
-        ]
-        : []),
-      {
-        icon: UserCircleIcon,
-        name: "Pelanggan",
-        path: "/pelanggan",
-      },
-      {
-        icon: MailBox,
-        name: "Produk",
-        path: "/produk",
-      },
-      {
-        icon: TaskIcon,
-        name: "Penjualan",
-        subItems: [
-          { name: "Penjualan Eceran", path: "/penjualan-eceran" },
-          { name: "Penjualan Grosir", path: "/penjualan-grosir" },
-        ],
-      },
-      {
-        icon: BoxCubeIcon,
-        name: "History Transaksi",
-        path: "/history",
-      },
-      {
-        icon: UserCircleIcon,
-        name: "User Profile",
-        path: "/profile",
-      },
-    ],
+    icon: GridIcon,
+    name: "Dashboard",
+    path: "/",
+  },
+  {
+    icon: CalenderIcon,
+    name: "Toko",
+    path: "/toko",
+  },
+  {
+    icon: UserCircleIcon,
+    name: "User",
+    path: "/user",
   },
 ];
+
+const adminMenuItems = () => [
+  {
+    icon: GridIcon,
+    name: "Dashboard",
+    path: "/",
+  },
+  {
+    icon: BoxCubeIcon,
+    name: "Order",
+    subItems: [
+      { name: "Order", path: "/order" },
+      { name: "Order Masuk", path: "/order-masuk", badge: incomingOrderCount.value },
+    ],
+  },
+  {
+    icon: UserCircleIcon,
+    name: "Pelanggan",
+    path: "/pelanggan",
+  },
+  {
+    icon: MailBox,
+    name: "Produk",
+    path: "/produk",
+  },
+  {
+    icon: TaskIcon,
+    name: "Penjualan",
+    subItems: [
+      { name: "Penjualan Eceran", path: "/penjualan-eceran" },
+      { name: "Penjualan Grosir", path: "/penjualan-grosir" },
+    ],
+  },
+  {
+    icon: BoxCubeIcon,
+    name: "History Transaksi",
+    path: "/history",
+  },
+  {
+    icon: UserCircleIcon,
+    name: "User Profile",
+    path: "/profile",
+  },
+];
+
+const defaultMenuItems = () => [
+  {
+    icon: GridIcon,
+    name: "Dashboard",
+    path: "/",
+  },
+  {
+    icon: UserCircleIcon,
+    name: "Pelanggan",
+    path: "/pelanggan",
+  },
+  {
+    icon: MailBox,
+    name: "Produk",
+    path: "/produk",
+  },
+  {
+    icon: TaskIcon,
+    name: "Penjualan",
+    subItems: [
+      { name: "Penjualan Eceran", path: "/penjualan-eceran" },
+      { name: "Penjualan Grosir", path: "/penjualan-grosir" },
+    ],
+  },
+  {
+    icon: BoxCubeIcon,
+    name: "History Transaksi",
+    path: "/history",
+  },
+  {
+    icon: UserCircleIcon,
+    name: "User Profile",
+    path: "/profile",
+  },
+];
+
+const menuGroups = computed(() => {
+  const items =
+    normalizedRole.value === "superadmin"
+      ? superAdminMenuItems
+      : normalizedRole.value === "admin"
+        ? adminMenuItems()
+        : defaultMenuItems();
+
+  return [
+    {
+      title: "Menu",
+      items,
+    },
+  ];
+});
 
 const isActive = (path) => route.path === path;
 
@@ -221,7 +282,7 @@ const toggleSubmenu = (groupIndex, itemIndex) => {
 };
 
 const isAnySubmenuRouteActive = computed(() => {
-  return menuGroups.some((group) =>
+  return menuGroups.value.some((group) =>
     group.items.some(
       (item) =>
         item.subItems && item.subItems.some((subItem) => isActive(subItem.path))
@@ -234,7 +295,7 @@ const isSubmenuOpen = (groupIndex, itemIndex) => {
   return (
     openSubmenu.value === key ||
     (isAnySubmenuRouteActive.value &&
-      menuGroups[groupIndex].items[itemIndex].subItems?.some((subItem) =>
+      menuGroups.value[groupIndex].items[itemIndex].subItems?.some((subItem) =>
         isActive(subItem.path)
       ))
   );

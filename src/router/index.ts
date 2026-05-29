@@ -31,6 +31,22 @@ const router = createRouter({
       },
     },
     {
+      path: '/order',
+      name: 'Order',
+      component: () => import('../views/Order/OrderPage.vue'),
+      meta: {
+        title: 'Order Antar Toko',
+      },
+    },
+    {
+      path: '/order-masuk',
+      name: 'Order Masuk',
+      component: () => import('../views/Order/OrderMasukPage.vue'),
+      meta: {
+        title: 'Order Masuk',
+      },
+    },
+    {
       path: '/user',
       name: 'User',
       component: () => import('../views/User/DataUser.vue'),

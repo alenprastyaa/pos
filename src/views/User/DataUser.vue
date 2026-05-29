@@ -1,81 +1,167 @@
 <template>
     <AdminLayout>
         <div class="space-y-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        Data User
-                    </h1>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Kelola data pengguna sistem
-                    </p>
+            <section
+                class="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] sm:p-8">
+                <div class="absolute inset-0 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-violet-500/10 dark:via-gray-900 dark:to-fuchsia-500/10"></div>
+                <div class="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-2xl">
+                        <span
+                            class="inline-flex items-center rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">
+                            Manajemen User
+                        </span>
+                        <h1 class="mt-4 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+                            Data User
+                        </h1>
+                        <p class="mt-2 max-w-xl text-sm leading-6 text-gray-600 dark:text-gray-400">
+                            Kelola akun pengguna, role, status, dan penugasan toko dengan tampilan yang lebih ringkas.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <div class="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/70">
+                            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total user</p>
+                            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ totalUsers }}</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-sm backdrop-blur dark:border-gray-700 dark:bg-gray-900/70">
+                            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Active</p>
+                            <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ activeUsers }}</p>
+                        </div>
+                        <button @click="openCreateModal" :disabled="!isSuperAdmin"
+                            :class="[
+                                'inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-lg transition',
+                                isSuperAdmin
+                                    ? 'bg-violet-600 text-white shadow-violet-600/20 hover:-translate-y-0.5 hover:bg-violet-700'
+                                    : 'cursor-not-allowed bg-gray-300 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                            ]">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            Tambah User
+                        </button>
+                    </div>
                 </div>
-                <button @click="openCreateModal" :disabled="!isSuperAdmin"
-                    :class="{ 'opacity-50 cursor-not-allowed': !isSuperAdmin }"
-                    class="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    Tambah User
-                </button>
+            </section>
+
+            <div class="grid gap-4 sm:grid-cols-3">
+                <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Super Admin</p>
+                    <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ superAdminUsers }}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Role dengan akses penuh</p>
+                </div>
+                <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Admin</p>
+                    <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ adminUsers }}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Biasanya terhubung ke toko</p>
+                </div>
+                <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Staff</p>
+                    <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ staffUsers }}</p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Akun operasional harian</p>
+                </div>
             </div>
 
             <div
-                class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+                class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-800">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Daftar Pengguna</h2>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Pengguna yang terdaftar di sistem POS.
+                            </p>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Tersedia {{ totalUsers }} data
+                        </p>
+                    </div>
+                </div>
+
                 <div class="max-w-full overflow-x-auto custom-scrollbar">
                     <table class="min-w-full">
-                        <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <th class="px-5 py-3 text-left sm:px-6">
+                        <thead class="bg-gray-50/80 dark:bg-gray-900/50">
+                            <tr class="border-b border-gray-200 dark:border-gray-800">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">No</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
-                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nama Lengkap
-                                    </p>
+                                <th class="px-5 py-4 text-left sm:px-6">
+                                    <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Nama Lengkap</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Email</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Role</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Toko</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Dibuat</p>
                                 </th>
-                                <th class="px-5 py-3 text-left sm:px-6">
+                                <th class="px-5 py-4 text-left sm:px-6">
                                     <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Aksi</p>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <tr v-if="loading" class="border-t border-gray-100 dark:border-gray-800">
-                                <td colspan="8" class="px-5 py-4 text-center sm:px-6">
-                                    <p class="text-gray-500">Memuat data...</p>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                            <tr v-if="loading">
+                                <td colspan="8" class="px-5 py-12 text-center sm:px-6">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-violet-600 border-t-transparent"></div>
+                                        <p class="text-gray-500">Memuat data...</p>
+                                    </div>
                                 </td>
                             </tr>
-                            <tr v-else-if="userList.length === 0" class="border-t border-gray-100 dark:border-gray-800">
-                                <td colspan="8" class="px-5 py-4 text-center sm:px-6">
-                                    <p class="text-gray-500">Tidak ada data user</p>
+                            <tr v-else-if="userList.length === 0">
+                                <td colspan="8" class="px-5 py-12 text-center sm:px-6">
+                                    <div class="mx-auto max-w-sm">
+                                        <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 13a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm8 8v-1a7 7 0 0 0-14 0v1"
+                                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Belum ada user</h3>
+                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                            Tambahkan akun baru untuk mulai mengelola akses pengguna.
+                                        </p>
+                                        <button @click="openCreateModal" :disabled="!isSuperAdmin"
+                                            :class="[
+                                                'mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition',
+                                                isSuperAdmin
+                                                    ? 'bg-violet-600 text-white hover:bg-violet-700'
+                                                    : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+                                            ]">
+                                            Tambah User
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr v-for="(user, index) in userList" :key="user.id"
-                                class="border-t border-gray-100 dark:border-gray-800">
+                                class="group transition hover:bg-gray-50/80 dark:hover:bg-white/[0.03]">
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="text-gray-800 text-theme-sm dark:text-white/90">{{ index + 1 }}</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ index + 1 }}</p>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="text-gray-800 font-medium text-theme-sm dark:text-white/90">{{
-                                        user.full_name
-                                        }}</p>
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-100 text-sm font-semibold text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">
+                                            {{ getInitials(user.full_name) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-900 text-theme-sm dark:text-white">{{ user.full_name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ user.id.slice(0, 8) }}</p>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ user.email }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
                                     <span :class="getRoleClass(user.role_name)">
@@ -83,8 +169,7 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ user.toko_name || '-'
-                                        }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.toko_name || '-' }}</p>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
                                     <span :class="getStatusClass(user.status)">
@@ -92,22 +177,28 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{
-                                        formatDate(user.created_at)
-                                        }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(user.created_at) }}</p>
                                 </td>
                                 <td class="px-5 py-4 sm:px-6">
-                                    <div class="flex gap-2">
+                                    <div class="flex flex-wrap gap-2">
                                         <button :disabled="!isSuperAdmin"
-                                            :class="isSuperAdmin ? 'text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-500/15 dark:text-blue-400' : 'text-gray-400 bg-gray-100 opacity-50 cursor-not-allowed'"
-                                            @click="isSuperAdmin ? openEditModal(user) : null"
-                                            class="px-3 py-1 rounded-lg transition">
+                                            :class="[
+                                                'rounded-xl px-3 py-2 text-sm font-medium transition',
+                                                isSuperAdmin
+                                                    ? 'bg-violet-50 text-violet-700 hover:bg-violet-100 dark:bg-violet-500/15 dark:text-violet-300 dark:hover:bg-violet-500/25'
+                                                    : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                                            ]"
+                                            @click="isSuperAdmin ? openEditModal(user) : null">
                                             Edit
                                         </button>
                                         <button :disabled="!isSuperAdmin"
-                                            :class="isSuperAdmin ? 'text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-400' : 'text-gray-400 bg-gray-100 opacity-50 cursor-not-allowed'"
-                                            @click="isSuperAdmin ? deleteUserConfirm(user.id) : null"
-                                            class="px-3 py-1 rounded-lg transition">
+                                            :class="[
+                                                'rounded-xl px-3 py-2 text-sm font-medium transition',
+                                                isSuperAdmin
+                                                    ? 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-300 dark:hover:bg-red-500/25'
+                                                    : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                                            ]"
+                                            @click="isSuperAdmin ? deleteUserConfirm(user.id) : null">
                                             Hapus
                                         </button>
                                     </div>
@@ -119,14 +210,22 @@
             </div>
 
             <div v-if="showModal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-                <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                            {{ isEditing ? 'Edit User' : 'Tambah User Baru' }}
-                        </h2>
-                        <button @click="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4 backdrop-blur-sm">
+                <div class="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-900">
+                    <div class="flex items-start justify-between border-b border-gray-200 px-6 py-5 dark:border-gray-800">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-600 dark:text-violet-300">
+                                Form User
+                            </p>
+                            <h2 class="mt-1 text-xl font-semibold text-gray-900 dark:text-white">
+                                {{ isEditing ? 'Edit User' : 'Tambah User Baru' }}
+                            </h2>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Atur identitas akun, role, dan toko yang terhubung.
+                            </p>
+                        </div>
+                        <button @click="closeModal" class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" />
@@ -134,74 +233,79 @@
                         </button>
                     </div>
 
-                    <form @submit.prevent="submitForm" class="space-y-4">
-                        <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Nama Lengkap<span class="text-red-500">*</span>
-                            </label>
-                            <input v-model="formData.full_name" type="text" placeholder="Masukkan nama lengkap" required
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    <form @submit.prevent="submitForm" class="space-y-5 px-6 py-6">
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Nama Lengkap<span class="text-red-500">*</span>
+                                </label>
+                                <input v-model="formData.full_name" type="text" placeholder="Masukkan nama lengkap" required
+                                    class="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-violet-700" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Email<span class="text-red-500">*</span>
+                                </label>
+                                <input v-model="formData.email" type="email" placeholder="Masukkan email" required
+                                    class="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-violet-700" />
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Email<span class="text-red-500">*</span>
-                            </label>
-                            <input v-model="formData.email" type="email" placeholder="Masukkan email" required
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Password<span class="text-red-500" v-if="!isEditing">*</span>
+                                    <span class="text-gray-400" v-if="isEditing">(Kosongkan jika tidak diubah)</span>
+                                </label>
+                                <input v-model="formData.password" type="password" placeholder="Masukkan password"
+                                    :required="!isEditing"
+                                    class="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm placeholder:text-gray-400 focus:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-violet-700" />
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Role<span class="text-red-500">*</span>
+                                </label>
+                                <select v-model="formData.role_name" required
+                                    class="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white/90 dark:focus:border-violet-700">
+                                    <option value="" disabled>Pilih Role</option>
+                                    <option value="superadmin">Super Admin</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="staff">Staff</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Password<span class="text-red-500" v-if="!isEditing">*</span>
-                                <span class="text-gray-400" v-if="isEditing">(Kosongkan jika tidak diubah)</span>
-                            </label>
-                            <input v-model="formData.password" type="password" placeholder="Masukkan password"
-                                :required="!isEditing"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                        </div>
-
-                        <div>
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Role<span class="text-red-500">*</span>
-                            </label>
-                            <select v-model="formData.role_name" required
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-                                <option value="" disabled>Pilih Role</option>
-                                <option value="superadmin">Super Admin</option>
-                                <option value="admin">Admin</option>
-                                <option value="staff">Staff</option>
-                            </select>
-                        </div>
-
-                        <div v-if="formData.role_name === 'admin' || formData.role_name === 'staff'">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        <div v-if="formData.role_name === 'admin' || formData.role_name === 'staff'"
+                            class="rounded-2xl border border-dashed border-violet-200 bg-violet-50/60 p-4 dark:border-violet-500/20 dark:bg-violet-500/10">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Toko<span class="text-red-500">*</span>
                             </label>
                             <select v-model="formData.toko_id" required
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                                class="h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm focus:border-violet-300 focus:outline-none focus:ring-4 focus:ring-violet-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white/90 dark:focus:border-violet-700">
                                 <option value="" disabled>Pilih Toko</option>
                                 <option v-for="toko in tokoListDropdown" :key="toko.id" :value="toko.id">
                                     {{ toko.nama_toko }}
                                 </option>
                             </select>
-                            <p v-if="loadingToko" class="text-xs text-gray-500 mt-1">Memuat data toko...</p>
+                            <p v-if="loadingToko" class="mt-2 text-xs text-gray-500">Memuat data toko...</p>
                         </div>
 
-                        <div v-else-if="formData.role_name === 'superadmin'">
-                            <p class="text-sm text-gray-500 dark:text-gray-400">
-                                *User **Super Admin** tidak memerlukan **Toko ID**.
+                        <div v-else-if="formData.role_name === 'superadmin'"
+                            class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                            <p class="text-sm leading-6 text-gray-500 dark:text-gray-400">
+                                Super Admin tidak memerlukan Toko ID.
                             </p>
                         </div>
 
-
-                        <div class="flex gap-3 pt-4">
+                        <div class="flex gap-3 pt-2">
                             <button type="button" @click="closeModal"
-                                class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                                class="flex-1 rounded-2xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                                 Batal
                             </button>
                             <button type="submit" :disabled="isSubmitting"
-                                class="flex-1 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                                class="flex-1 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60">
                                 {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
                             </button>
                         </div>
@@ -245,7 +349,9 @@ interface UserFormData {
     toko_id: string | null
 }
 
-const currentUserRole = ref<'superadmin' | 'admin'>('superadmin')
+const currentUserRole = ref<'superadmin' | 'admin' | 'staff'>(
+    (localStorage.getItem('role_name') as 'superadmin' | 'admin' | 'staff') || 'superadmin'
+)
 const isSuperAdmin = computed(() => currentUserRole.value === 'superadmin')
 
 const userList = ref<User[]>([])
@@ -264,6 +370,12 @@ const initialFormData: UserFormData = {
     toko_id: null,
 }
 const formData = ref<UserFormData>({ ...initialFormData })
+
+const totalUsers = computed(() => userList.value.length)
+const activeUsers = computed(() => userList.value.filter((user) => user.status === 'active').length)
+const superAdminUsers = computed(() => userList.value.filter((user) => user.role_name === 'superadmin').length)
+const adminUsers = computed(() => userList.value.filter((user) => user.role_name === 'admin').length)
+const staffUsers = computed(() => userList.value.filter((user) => user.role_name === 'staff').length)
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('authToken')
@@ -305,6 +417,15 @@ const getStatusClass = (status: string) => {
         default:
             return 'inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10'
     }
+}
+
+const getInitials = (name: string) => {
+    return name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || '')
+        .join('')
 }
 
 const fetchToko = async () => {
