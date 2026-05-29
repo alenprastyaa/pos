@@ -1,61 +1,79 @@
 <template>
     <AdminLayout>
-        <div class="page-container py-2 space-y-2 min-h-screen">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-                <div class="lg:col-span-2 space-y-4">
-                    <div>
-                        <label class="block text-xl font-semibold label-text mb-2"> Scan Barcode </label>
+        <div class="page-container min-h-screen">
+
+            <!-- Top Input Panel -->
+            <div class="top-panel px-5 pt-4 pb-3">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- Barcode -->
+                    <div class="input-card p-4 rounded-2xl">
+                        <label class="input-label flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                            Scan Barcode
+                        </label>
                         <input ref="barcodeInputRef" v-model="quickBarcodeInput" type="text"
                             @keyup.enter="handleBarcodeScan" :disabled="role_name !== 'admin'"
                             placeholder="Scan barcode di sini..."
-                            class="input-field w-full h-12 px-4 text-xl rounded-lg transition" />
+                            class="pos-input w-full h-11 px-4 rounded-xl" />
                     </div>
 
-                    <div class="relative">
-                        <label class="block text-xl font-semibold label-text mb-2"> Cari Produk Manual </label>
-                        <input v-model="productSearchInput" type="text" style="font-size: 14px"
+                    <!-- Cari Produk -->
+                    <div class="input-card p-4 rounded-2xl relative">
+                        <label class="input-label flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Cari Produk Manual
+                        </label>
+                        <input v-model="productSearchInput" type="text"
                             placeholder="Ketik nama produk..." @input="searchProducts(productSearchInput)"
                             @keydown="handleSearchKeydown" :disabled="role_name !== 'admin'"
-                            class="input-field w-full h-12 px-4 text-xl rounded-lg transition" />
+                            class="pos-input w-full h-11 px-4 rounded-xl" />
 
                         <div v-if="showSearchResults && searchResults.length > 0"
-                            class="dropdown-container absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl z-20 max-h-screen overflow-y-auto">
+                            ref="searchDropdownRef"
+                            class="search-dropdown absolute left-4 right-4 mt-1 rounded-xl shadow-2xl z-20 max-h-72 overflow-y-auto">
                             <div v-for="(product, index) in searchResults" :key="product.barcode"
                                 @click="selectProductFromSearch(product)"
-                                :class="index === selectedSearchIndex ? 'dropdown-item-active' : 'dropdown-item'"
-                                class="px-4 py-1 cursor-pointer last:border-b-0 transition border-b border-gray-100">
-                                <div class="dropdown-text flex justify-between">
-                                    <div class="font-bold text-lg text-gray-800">
-                                        {{ product.nama_produk }}
-                                    </div>
-                                    <div class=" mt-1">
-                                        <span class="text-green-600 font-bold text-md">
-                                            {{ formatRupiah(product.harga_jual_reguler) }}
-                                        </span>
-                                    </div>
+                                :class="index === selectedSearchIndex ? 'search-item-active' : 'search-item'"
+                                class="px-4 py-2.5 cursor-pointer transition-all border-b border-gray-50 last:border-0">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-semibold text-sm text-gray-800">{{ product.nama_produk }}</span>
+                                    <span class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
+                                        {{ formatRupiah(product.harga_jual_reguler) }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-xl font-semibold label-text mb-2 ml-1"> Pilih Pelanggan </label>
-                    <select ref="pelangganSelectRef" v-model="selectedPelangganId" required style="font-size: 14px"
-                        @keydown.enter.prevent="focusToPayButton"
-                        class="input-field w-full h-12 rounded-lg px-4 transition">
-                        <option value="" disabled>Pilih Pelanggan...</option>
-                        <option v-if="loadingPelanggan" disabled>Memuat...</option>
-                        <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
-                            {{ pelanggan.nama_pelanggan }}
-                        </option>
-                    </select>
+                    <!-- Pilih Pelanggan -->
+                    <div class="input-card p-4 rounded-2xl">
+                        <label class="input-label flex items-center gap-2 mb-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Pilih Pelanggan
+                        </label>
+                        <select ref="pelangganSelectRef" v-model="selectedPelangganId" required
+                            @keydown.enter.prevent="focusToPayButton"
+                            class="pos-input w-full h-11 rounded-xl px-4">
+                            <option value="" disabled>Pilih Pelanggan...</option>
+                            <option v-if="loadingPelanggan" disabled>Memuat...</option>
+                            <option v-for="pelanggan in pelangganList" :key="pelanggan.id" :value="pelanggan.id">
+                                {{ pelanggan.nama_pelanggan }}
+                            </option>
+                        </select>
 
-                    <div v-if="selectedPelangganId" class="mt-4 card-section p-4 rounded-lg border">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-semibold text-gray-600">Hutang:</span>
-                            <span class="text-xl font-bold"
-                                :class="hutangPelanggan > 0 ? 'text-danger' : 'text-success'">
+                        <div v-if="selectedPelangganId" class="hutang-badge mt-3 px-4 py-2 rounded-xl flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Hutang</span>
+                            <span class="text-base font-extrabold"
+                                :class="hutangPelanggan > 0 ? 'hutang-danger' : 'hutang-safe'">
                                 {{ formatRupiah(hutangPelanggan) }}
                             </span>
                         </div>
@@ -63,89 +81,106 @@
                 </div>
             </div>
 
-            <div v-if="pendingTransactions.length > 0" class="space-y-3 px-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-1 h-6 indicator-bar rounded"></div>
-                    <p class="text-sm font-bold text-title">
-                        Transaksi Pending ({{ pendingTransactions.length }})
-                    </p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div v-for="t in pendingTransactions" :key="t.id"
-                        class="p-3 border rounded-lg transition cursor-pointer pending-card hover:shadow-md"
-                        :class="t.id === currentPendingId ? 'pending-card-active' : 'pending-card-inactive'">
-                        <div class="mb-2">
-                            <p class="text-sm font-bold text-gray-800 truncate">{{ t.nama_pelanggan }}</p>
-                            <p class="text-md font-bold text-orange-600 mt-1">{{ formatRupiah(t.total) }}</p>
-                            <p class="text-xs text-gray-500 mt-1">{{ t.tanggal_simpan }}</p>
-                        </div>
-                        <div class="flex gap-2 justify-end">
-                            <button @click="loadTransaction(t)"
-                                class="btn-primary-small text-xs px-3 py-1.5 rounded font-medium transition">
-                                Muat
-                            </button>
-                            <button @click="removePendingTransaction(t.id)"
-                                class="btn-secondary-small text-xs px-3 py-1.5 rounded font-medium transition">
-                                Hapus
-                            </button>
+            <!-- Pending Transactions -->
+            <div v-if="pendingTransactions.length > 0" class="px-5 py-2">
+                <div class="pending-section rounded-2xl p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="pending-dot w-2 h-2 rounded-full animate-pulse"></div>
+                        <p class="text-sm font-bold text-amber-700 dark:text-amber-400">
+                            Transaksi Pending ({{ pendingTransactions.length }})
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div v-for="t in pendingTransactions" :key="t.id"
+                            class="pending-card rounded-xl p-3 cursor-pointer transition-all"
+                            :class="t.id === currentPendingId ? 'pending-card-active' : 'pending-card-inactive'">
+                            <p class="text-sm font-bold text-gray-800 dark:text-gray-100 truncate">{{ t.nama_pelanggan }}</p>
+                            <p class="text-sm font-extrabold text-amber-600 dark:text-amber-400 mt-0.5">{{ formatRupiah(t.total) }}</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 mb-2">{{ t.tanggal_simpan }}</p>
+                            <div class="flex gap-2">
+                                <button @click="loadTransaction(t)"
+                                    class="btn-load flex-1 text-xs py-1.5 rounded-lg font-semibold transition-all">
+                                    Muat
+                                </button>
+                                <button @click="removePendingTransaction(t.id)"
+                                    class="btn-del flex-1 text-xs py-1.5 rounded-lg font-semibold transition-all">
+                                    Hapus
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 py-4 bg-footer border-t flex justify-between items-center mx-4 rounded-t-lg mt-4">
-                <span class="text-2xl font-semibold text-gray-600">Total Belanja</span>
-                <span class="text-4xl font-bold text-gray-900">{{ formatRupiah(totalBelanja) }}</span>
+            <!-- Total Bar -->
+            <div class="total-bar mx-5 mt-2 px-6 py-4 rounded-t-2xl flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="total-icon w-10 h-10 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-cyan-100 uppercase tracking-wider">Total Belanja</p>
+                        <p class="text-xs text-cyan-200">{{ transactionItems.length }} item</p>
+                    </div>
+                </div>
+                <span class="total-amount text-4xl font-black">{{ formatRupiah(totalBelanja) }}</span>
             </div>
 
-            <div class="card-section rounded-b-lg shadow-sm border overflow-hidden p-0 mx-4 mb-24">
+            <!-- Cart Table -->
+            <div class="cart-table mx-5 mb-28 rounded-b-2xl overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
-                            <tr class="table-header border-b">
-                                <th class="px-4 py-3 text-left text-white font-semibold">No</th>
-                                <th class="px-4 py-3 text-left text-white font-semibold">Produk</th>
-                                <th class="px-4 py-3 text-center text-white font-semibold">Qty</th>
-                                <th class="px-4 py-3 text-right text-white font-semibold">Harga</th>
-                                <th class="px-4 py-3 text-right text-white font-semibold">Subtotal</th>
-                                <th class="px-4 py-3 text-center text-white font-semibold">Aksi</th>
+                            <tr class="table-head">
+                                <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-10">No</th>
+                                <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
+                                <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Qty</th>
+                                <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
+                                <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
+                                <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-16">Hapus</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody>
                             <tr v-if="transactionItems.length === 0">
-                                <td colspan="6" class="px-6 py-12 text-center text-gray-400">
-                                    <div class="flex flex-col items-center justify-center space-y-2">
-                                        <svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <p class="text-lg">Keranjang kosong</p>
+                                <td colspan="6" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center space-y-3">
+                                        <div class="empty-cart-icon w-20 h-20 rounded-full flex items-center justify-center">
+                                            <svg class="w-10 h-10 opacity-40" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-gray-600 dark:text-gray-400 font-semibold">Keranjang masih kosong</p>
+                                        <p class="text-gray-500 dark:text-gray-500 text-sm">Scan barcode atau cari produk untuk memulai</p>
                                     </div>
                                 </td>
                             </tr>
                             <tr v-for="(item, index) in transactionItems" :key="item.barcode"
-                                class="hover:bg-blue-50 transition-colors">
-                                <td class="px-4 py-3 text-lg font-bold text-gray-700">{{ index + 1 }}</td>
+                                class="cart-row transition-colors">
+                                <td class="px-4 py-3 text-sm font-bold text-gray-500 dark:text-gray-500">{{ index + 1 }}</td>
                                 <td class="px-4 py-3">
-                                    <div class="text-lg font-semibold text-gray-800">{{ item.nama_produk }}</div>
-                                    <div class="text-xs text-gray-500">{{ item.barcode }}</div>
+                                    <div class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ item.nama_produk }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-500 font-mono">{{ item.barcode }}</div>
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <input v-model.number="item.qty" type="number" min="1"
                                         @change="updateItem(item.barcode, item.qty)"
-                                        class="w-20 text-center border-2 border-gray-300 rounded-md py-1 text-lg font-bold focus:border-cyan-500 focus:outline-none" />
+                                        class="qty-input w-20 text-center rounded-lg py-1.5 text-sm font-bold" />
                                 </td>
-                                <td class="px-4 py-3 text-right text-lg font-medium text-gray-700">
+                                <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
                                     {{ formatRupiah(item.harga_jual_reguler) }}
                                 </td>
-                                <td class="px-4 py-3 text-right text-lg font-bold text-gray-900">
+                                <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
                                     {{ formatRupiah(item.qty * item.harga_jual_reguler) }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <button type="button" @click="removeItem(item.barcode)"
-                                        class="p-2 text-red-500 hover:bg-red-100 rounded-full transition-colors">
-                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <button type="button" @click="confirmRemoveItem(item)"
+                                        class="del-btn p-2 rounded-xl transition-all">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -157,24 +192,24 @@
                 </div>
             </div>
 
-            <div
-                class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-30">
-                <div class="max-w-7xl mx-auto p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Bottom Action Bar -->
+            <div class="action-bar fixed bottom-0 left-0 right-0 z-30">
+                <div class="max-w-7xl mx-auto px-5 py-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <button type="button" ref="bayarBtnRef" @click="openPaymentModal"
                             :disabled="transactionItems.length === 0 || !selectedPelangganId"
-                            class="md:col-span-2 h-14 btn-submit text-xl font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="md:col-span-2 h-14 btn-bayar rounded-2xl text-lg font-extrabold flex items-center justify-center gap-3 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                     d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
-                            <span>BAYAR SEKARANG </span>
+                            <span>BAYAR SEKARANG</span>
                         </button>
 
                         <button type="button" @click.prevent="saveCurrentTransaction"
                             :disabled="transactionItems.length === 0 || !selectedPelangganId"
-                            class="btn-pending h-14 text-lg font-semibold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="h-14 btn-pending-action rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                             </svg>
@@ -185,78 +220,97 @@
             </div>
         </div>
 
+        <!-- Payment Modal -->
         <div v-if="showPaymentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="closePaymentModal"></div>
+            <div class="modal-backdrop absolute inset-0 transition-opacity" @click="closePaymentModal"></div>
 
-            <div
-                class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative z-10 overflow-hidden transform transition-all scale-100">
-                <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-gray-800">Pembayaran</h3>
-                    <button @click="closePaymentModal" class="text-gray-400 hover:text-red-500 transition-colors">
-                        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="modal-card w-full max-w-lg rounded-3xl shadow-2xl relative z-10 overflow-hidden">
+                <!-- Modal Header -->
+                <div class="modal-header px-6 py-5 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="modal-icon w-10 h-10 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-gray-800 dark:text-gray-100">Proses Pembayaran</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">Masukkan nominal pembayaran</p>
+                        </div>
+                    </div>
+                    <button @click="closePaymentModal" class="close-btn p-2 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                <div class="p-6 space-y-6">
-                    <div>
-                        <label class="block text-lg font-medium text-gray-700 mb-2">
-                            Uang Diterima <span class="text-red-500">*</span>
+                <div class="p-6 space-y-5">
+                    <!-- Input Pembayaran -->
+                    <div class="payment-input-wrap rounded-2xl p-4">
+                        <label class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 block">
+                            Uang Diterima
                         </label>
                         <div class="relative">
-                            <span
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">Rp</span>
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-cyan-500">Rp</span>
                             <input ref="pembayaranInputRef" :value="uangPembayaranDisplay || uangPembayaran || ''"
                                 @input="handlePembayaranInput" @focus="handlePembayaranFocus"
                                 @blur="handlePembayaranBlur" @keydown.enter="handlePembayaranKeydown" type="text"
                                 required placeholder="0"
-                                class="w-full h-16 pl-14 pr-4 rounded-xl border-2 border-gray-300 focus:border-cyan-500 focus:ring-0 text-4xl font-bold text-gray-900 transition-colors"
+                                class="payment-input w-full h-16 pl-14 pr-4 rounded-xl text-4xl font-black text-gray-900"
                                 autofocus />
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-3">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Total Belanja:</span>
-                            <span class="font-bold text-gray-900">{{ formatRupiah(totalBelanja) }}</span>
+                    <!-- Rincian -->
+                    <div class="summary-box rounded-2xl p-4 space-y-2.5">
+                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                            <span>Total Belanja</span>
+                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(totalBelanja) }}</span>
                         </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Hutang Lama:</span>
-                            <span class="font-bold" :class="hutangPelanggan > 0 ? 'text-red-600' : 'text-green-600'">
+                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                            <span>Hutang Lama</span>
+                            <span class="font-bold" :class="hutangPelanggan > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
                                 {{ formatRupiah(hutangPelanggan) }}
                             </span>
                         </div>
-                        <div class="h-px bg-gray-300 my-2"></div>
-                        <div class="flex justify-between text-xl font-bold text-gray-800">
-                            <span>Total Harus Dibayar:</span>
+                        <div class="divider my-1"></div>
+                        <div class="flex justify-between text-base font-bold text-gray-900 dark:text-gray-100">
+                            <span>Total Harus Dibayar</span>
                             <span>{{ formatRupiah(totalYangHarusDibayar) }}</span>
                         </div>
-                        <div class="flex justify-between text-lg text-gray-700">
-                            <span>Uang Masuk:</span>
-                            <span>{{ formatRupiah(uangPembayaran) }}</span>
+                        <div class="flex justify-between text-sm text-gray-700 dark:text-gray-400">
+                            <span>Uang Masuk</span>
+                            <span class="font-bold text-gray-900 dark:text-gray-100">{{ formatRupiah(uangPembayaran) }}</span>
                         </div>
-                        <div class="bg-white p-3 rounded-lg border border-gray-200 mt-2">
-                            <div class="flex justify-between text-2xl font-extrabold"
-                                :class="kembalian >= 0 ? 'text-green-600' : 'text-red-600'">
-                                <span>{{ kembalian >= 0 ? 'KEMBALIAN' : 'KURANG BAYAR' }}</span>
-                                <span>{{ formatRupiah(Math.abs(kembalian)) }}</span>
+                        <!-- Kembalian / Kurang Bayar -->
+                        <div class="kembalian-box rounded-xl p-3 mt-1"
+                            :class="kembalian >= 0 ? 'kembalian-positive' : 'kembalian-negative'">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-bold uppercase tracking-wider">
+                                    {{ kembalian >= 0 ? 'Kembalian' : 'Kurang Bayar' }}
+                                </span>
+                                <span class="text-2xl font-black">{{ formatRupiah(Math.abs(kembalian)) }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="px-6 py-4 bg-gray-50 border-t">
+                <!-- Modal Footer -->
+                <div class="modal-footer px-6 pb-6">
                     <button ref="submitButtonRef" type="submit" @click.prevent="submitTransaksi"
                         :disabled="isSubmitting || totalBelanja === 0"
-                        class="w-full h-14 btn-submit text-xl font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all disabled:opacity-50">
-                        <svg v-if="isSubmitting" class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                            </circle>
+                        class="w-full h-14 btn-confirm rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all disabled:opacity-40">
+                        <svg v-if="isSubmitting" class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor"
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
+                        </svg>
+                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                         </svg>
                         {{ isSubmitting ? 'MEMPROSES...' : 'SELESAIKAN TRANSAKSI (ENTER)' }}
                     </button>
@@ -284,7 +338,8 @@ const kasirData = ref<any>(null)
 
 // Transaksi Data
 const transactionItems = ref<any[]>([])
-const selectedPelangganId = ref('')
+const DEFAULT_PELANGGAN_ID = '02525cd7-3459-4093-bf68-60859ef43600'
+const selectedPelangganId = ref(DEFAULT_PELANGGAN_ID)
 const pelangganList = ref<any[]>([])
 const loadingPelanggan = ref(false)
 const hutangPelanggan = ref(0)
@@ -309,6 +364,7 @@ const barcodeInputRef = ref<HTMLInputElement | null>(null)
 const pembayaranInputRef = ref<HTMLInputElement | null>(null)
 const submitButtonRef = ref<HTMLButtonElement | null>(null)
 const bayarBtnRef = ref<HTMLButtonElement | null>(null)
+const searchDropdownRef = ref<HTMLElement | null>(null)
 
 // --- Computed Properties ---
 const totalBelanja = computed(() => {
@@ -472,6 +528,15 @@ const searchProducts = async (term: string) => {
     }
 }
 
+const scrollActiveItemIntoView = () => {
+    nextTick(() => {
+        const dropdown = searchDropdownRef.value
+        if (!dropdown) return
+        const active = dropdown.querySelector('.search-item-active') as HTMLElement | null
+        if (active) active.scrollIntoView({ block: 'nearest' })
+    })
+}
+
 const handleSearchKeydown = (e: KeyboardEvent) => {
     if (!showSearchResults.value) return
     if (e.key === 'ArrowDown') {
@@ -480,9 +545,11 @@ const handleSearchKeydown = (e: KeyboardEvent) => {
             selectedSearchIndex.value + 1,
             searchResults.value.length - 1,
         )
+        scrollActiveItemIntoView()
     } else if (e.key === 'ArrowUp') {
         e.preventDefault()
         selectedSearchIndex.value = Math.max(selectedSearchIndex.value - 1, -1)
+        scrollActiveItemIntoView()
     } else if (e.key === 'Enter' && selectedSearchIndex.value >= 0) {
         e.preventDefault()
         selectProductFromSearch(searchResults.value[selectedSearchIndex.value])
@@ -549,6 +616,21 @@ const updateItem = (barcode: string, newQty: number) => {
 
 const removeItem = (barcode: string) => {
     transactionItems.value = transactionItems.value.filter((i) => i.barcode !== barcode)
+}
+
+const confirmRemoveItem = async (item: any) => {
+    const result = await Swal.fire({
+        title: 'Hapus Barang?',
+        text: item.nama_produk,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#be123c',
+        cancelButtonColor: '#64748b',
+        reverseButtons: true,
+    })
+    if (result.isConfirmed) removeItem(item.barcode)
 }
 
 // --- Payment & Modal Logic ---
@@ -706,7 +788,7 @@ const submitTransaksi = async () => {
 }
 
 const resetForm = () => {
-    selectedPelangganId.value = ''
+    selectedPelangganId.value = DEFAULT_PELANGGAN_ID
     transactionItems.value = []
     uangPembayaran.value = 0
     uangPembayaranDisplay.value = ''
@@ -831,11 +913,10 @@ const printStruk = (
         </body>
     </html>`;
 
-    const popup = window.open('', '', 'width=400,height=600');
-    if (popup) {
-        popup.document.write(html);
-        popup.document.close();
-    }
+    const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'width=400,height=600')
+    setTimeout(() => URL.revokeObjectURL(url), 30000)
 };
 
 // --- Lifecycle ---
@@ -848,134 +929,505 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Main Layout Colors */
+/* ===== BASE ===== */
 .page-container {
-    background-color: #f8fafc;
+    background: linear-gradient(160deg, #f0f4ff 0%, #f8fafc 60%, #ecfdf5 100%);
 }
 
-/* Text Colors */
-.text-title {
-    color: #1e293b;
+/* ===== TOP PANEL ===== */
+.top-panel {
+    background: transparent;
 }
 
-.label-text {
-    color: #334155;
+.input-card {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(6,182,212,0.06);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: box-shadow 0.2s;
+}
+.input-card:focus-within {
+    box-shadow: 0 4px 24px rgba(6,182,212,0.14);
+    border-color: rgba(6,182,212,0.3);
 }
 
-.text-danger {
-    color: #dc2626;
+.input-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1e3a5f;
 }
 
-.text-success {
-    color: #16a34a;
-}
-
-/* Cards & Sections */
-.card-section {
-    background-color: white;
-    border-color: #e2e8f0;
-}
-
-.bg-footer {
-    background-color: #f1f5f9;
-}
-
-/* Inputs */
-.input-field {
-    background-color: white;
-    border: 2px solid #cbd5e1;
+/* ===== INPUTS ===== */
+.pos-input {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
     color: #0f172a;
-}
-
-.input-field:focus {
+    font-size: 0.875rem;
+    font-weight: 600;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.pos-input:focus {
+    background: white;
     border-color: #06b6d4;
-    /* Cyan-500 */
-    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 0 3px rgba(6,182,212,0.15);
+}
+.pos-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-/* Dropdown */
-.dropdown-container {
+/* ===== SEARCH DROPDOWN ===== */
+.search-dropdown {
     background: white;
     border: 1px solid #e2e8f0;
+    top: 100%;
 }
 
-.dropdown-item:hover {
-    background-color: #f0f9ff;
+.search-item {
+    background: white;
+}
+.search-item:hover {
+    background: #f0f9ff;
+}
+.search-item-active {
+    background: #0891b2;
+    border-left: 4px solid #0e7490;
+}
+.search-item-active span {
+    color: white !important;
+}
+.search-item-active .price-tag {
+    background: rgba(255, 255, 255, 0.25);
+    color: white !important;
 }
 
-.dropdown-item-active {
-    background-color: #7df9ff;
-    border-left: 4px solid #06b6d4;
+.price-tag {
+    background: #d1fae5;
+    color: #065f46;
 }
 
-/* Pending Cards */
-.indicator-bar {
-    background-color: #f59e0b;
+/* ===== HUTANG BADGE ===== */
+.hutang-badge {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
 }
+.hutang-danger { color: #dc2626; }
+.hutang-safe   { color: #16a34a; }
+
+/* ===== PENDING SECTION ===== */
+.pending-section {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fde68a;
+}
+.pending-dot { background: #f59e0b; }
 
 .pending-card {
     background: white;
-    border-color: #e2e8f0;
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.2s;
 }
-
-.pending-card:hover {
-    border-color: #06b6d4;
-}
-
+.pending-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
 .pending-card-active {
     border-color: #06b6d4;
-    background-color: #ecfeff;
+    background: #ecfeff;
+    box-shadow: 0 0 0 2px rgba(6,182,212,0.2);
 }
+.pending-card-inactive { border-color: #e2e8f0; }
 
-/* Table */
-.table-header {
-    background-color: #0e7490;
-    /* Cyan-700 - Grosir Style Darker */
-}
-
-/* Buttons (Grosir Style: Cyan Base) */
-.btn-submit {
-    background-color: #0891b2;
-    /* Cyan-600 */
+.btn-load {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
     color: white;
+    box-shadow: 0 2px 8px rgba(8,145,178,0.3);
+}
+.btn-load:hover { filter: brightness(1.08); }
+
+.btn-del {
+    background: #f1f5f9;
+    color: #374151;
+    font-weight: 600;
+}
+.btn-del:hover { background: #fee2e2; color: #b91c1c; }
+
+/* ===== TOTAL BAR ===== */
+.total-bar {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0e7490 50%, #0891b2 100%);
+    border-bottom: none;
 }
 
-.btn-submit:hover:not(:disabled) {
-    background-color: #0e7490;
+.total-icon {
+    background: rgba(255,255,255,0.15);
 }
 
-.btn-submit:disabled {
-    background-color: #cbd5e1;
+.total-amount {
+    color: white;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== CART TABLE ===== */
+.cart-table {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+}
+
+.table-head {
+    background: linear-gradient(90deg, #0e7490, #0891b2);
+}
+
+.cart-row {
+    border-bottom: 1px solid #f1f5f9;
+}
+.cart-row:last-child { border-bottom: none; }
+.cart-row:hover { background: #f8fdff; }
+
+.empty-cart-icon {
+    background: #f1f5f9;
+}
+
+.qty-input {
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.qty-input:focus {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 3px rgba(6,182,212,0.12);
+    background: white;
+}
+
+.subtotal-text { color: #0369a1; }
+
+.del-btn {
+    color: #64748b;
+    transition: all 0.15s;
+}
+.del-btn:hover {
+    color: #b91c1c;
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+/* ===== ACTION BAR ===== */
+.action-bar {
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
+}
+
+.btn-bayar {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(8,145,178,0.4);
+    letter-spacing: 0.03em;
+}
+.btn-bayar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+    box-shadow: 0 6px 28px rgba(8,145,178,0.5);
+    transform: translateY(-1px);
+}
+.btn-bayar:active:not(:disabled) { transform: translateY(0); }
+
+.btn-pending-action {
+    background: white;
+    color: #1e293b;
+    border: 1.5px solid #cbd5e1;
+}
+.btn-pending-action:hover:not(:disabled) {
+    border-color: #0891b2;
+    color: #0369a1;
+    background: #f0f9ff;
+}
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.modal-card {
+    background: white;
+    border: 1px solid rgba(226,232,240,0.8);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-icon {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+}
+
+.close-btn {
+    color: #475569;
+    background: #f1f5f9;
+}
+.close-btn:hover { color: #b91c1c; background: #fee2e2; }
+
+/* ===== PAYMENT INPUT ===== */
+.payment-input-wrap {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+}
+
+.payment-input {
+    background: white;
+    border: 2px solid #e2e8f0;
+    outline: none;
+    color: #0f172a;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.payment-input:focus {
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 4px rgba(6,182,212,0.12);
+}
+
+/* ===== SUMMARY BOX ===== */
+.summary-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+}
+
+.kembalian-box { transition: all 0.3s; }
+.kembalian-positive {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1.5px solid #6ee7b7;
+    color: #065f46;
+}
+.kembalian-negative {
+    background: linear-gradient(135deg, #fff1f2, #fee2e2);
+    border: 1.5px solid #fca5a5;
+    color: #991b1b;
+}
+
+/* ===== CONFIRM BUTTON ===== */
+.modal-footer { background: white; }
+
+.btn-confirm {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(8,145,178,0.35);
+    letter-spacing: 0.03em;
+}
+.btn-confirm:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+    box-shadow: 0 6px 28px rgba(8,145,178,0.45);
+    transform: translateY(-1px);
+}
+.btn-confirm:active:not(:disabled) { transform: translateY(0); }
+
+/* ============================================================
+   DARK MODE OVERRIDES
+   ============================================================ */
+
+:global(.dark) .page-container {
+    background: linear-gradient(160deg, #0f172a 0%, #111827 60%, #0c1a14 100%);
+}
+
+/* Input Cards */
+:global(.dark) .input-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+}
+:global(.dark) .input-card:focus-within {
+    border-color: rgba(6,182,212,0.5);
+    box-shadow: 0 4px 24px rgba(6,182,212,0.12);
+}
+:global(.dark) .input-label {
+    color: #7dd3fc;
+}
+
+/* Inputs */
+:global(.dark) .pos-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+:global(.dark) .pos-input:focus {
+    background: #0f172a;
+    border-color: #06b6d4;
+}
+:global(.dark) .pos-input option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+/* Search Dropdown */
+:global(.dark) .search-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+}
+:global(.dark) .search-item {
+    background: #1e293b;
+}
+:global(.dark) .search-item:hover {
+    background: #263548;
+}
+:global(.dark) .search-item span {
+    color: #e2e8f0;
+}
+:global(.dark) .search-item-active {
+    background: #0891b2;
+    border-left-color: #22d3ee;
+}
+:global(.dark) .search-item .price-tag {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+
+/* Hutang Badge */
+:global(.dark) .hutang-badge {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+/* Pending Section */
+:global(.dark) .pending-section {
+    background: linear-gradient(135deg, #1c1506 0%, #27190a 100%);
+    border-color: #78350f;
+}
+:global(.dark) .pending-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+:global(.dark) .pending-card-active {
+    background: #0c2233;
+    border-color: #06b6d4;
+}
+:global(.dark) .btn-del {
+    background: #263548;
+    color: #94a3b8;
+}
+:global(.dark) .btn-del:hover {
+    background: #3b1a1a;
+    color: #f87171;
+}
+
+/* Total Bar — tetap gelap sudah ok, tambah sedikit lebih pekat */
+:global(.dark) .total-bar {
+    background: linear-gradient(135deg, #0c2a3e 0%, #0c4a6e 50%, #075985 100%);
+}
+
+/* Cart Table */
+:global(.dark) .cart-table {
+    background: #1e293b;
+    border-color: #334155;
+}
+:global(.dark) .table-head {
+    background: linear-gradient(90deg, #0c4a6e, #0369a1);
+}
+:global(.dark) .cart-row {
+    border-bottom-color: #334155;
+}
+:global(.dark) .cart-row:hover {
+    background: #263548;
+}
+:global(.dark) .empty-cart-icon {
+    background: #263548;
+}
+:global(.dark) .qty-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+:global(.dark) .qty-input:focus {
+    background: #0f172a;
+    border-color: #06b6d4;
+}
+:global(.dark) .subtotal-text {
+    color: #38bdf8;
+}
+:global(.dark) .del-btn {
     color: #64748b;
 }
-
-.btn-pending {
-    background-color: white;
-    color: #475569;
-    border: 2px solid #cbd5e1;
+:global(.dark) .del-btn:hover {
+    color: #f87171;
+    background: #3b1a1a;
 }
 
-.btn-pending:hover:not(:disabled) {
-    border-color: #64748b;
-    background-color: #f8fafc;
+/* Action Bar */
+:global(.dark) .action-bar {
+    background: #1e293b;
+    border-top-color: #334155;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+}
+:global(.dark) .btn-pending-action {
+    background: #263548;
+    color: #e2e8f0;
+    border-color: #334155;
+}
+:global(.dark) .btn-pending-action:hover:not(:disabled) {
+    border-color: #06b6d4;
+    color: #38bdf8;
+    background: #0c2233;
 }
 
-.btn-primary-small {
-    background-color: #06b6d4;
-    color: white;
+/* Modal */
+:global(.dark) .modal-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+:global(.dark) .modal-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0c2233 100%);
+    border-bottom-color: #334155;
+}
+:global(.dark) .close-btn {
+    color: #64748b;
+    background: #263548;
+}
+:global(.dark) .close-btn:hover {
+    color: #f87171;
+    background: #3b1a1a;
 }
 
-.btn-primary-small:hover {
-    background-color: #0891b2;
+/* Payment Input */
+:global(.dark) .payment-input-wrap {
+    background: #0f172a;
+    border-color: #334155;
+}
+:global(.dark) .payment-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+:global(.dark) .payment-input:focus {
+    border-color: #06b6d4;
 }
 
-.btn-secondary-small {
-    background-color: #e2e8f0;
-    color: #475569;
+/* Summary Box */
+:global(.dark) .summary-box {
+    background: #0f172a;
+    border-color: #334155;
+}
+:global(.dark) .divider {
+    background: linear-gradient(90deg, transparent, #334155, transparent);
+}
+:global(.dark) .kembalian-positive {
+    background: linear-gradient(135deg, #052e16, #064e3b);
+    border-color: #065f46;
+    color: #6ee7b7;
+}
+:global(.dark) .kembalian-negative {
+    background: linear-gradient(135deg, #1f0708, #3b1a1a);
+    border-color: #7f1d1d;
+    color: #fca5a5;
 }
 
-.btn-secondary-small:hover {
-    background-color: #cbd5e1;
+/* Modal Footer */
+:global(.dark) .modal-footer {
+    background: #1e293b;
 }
 </style>

@@ -1,320 +1,303 @@
 <template>
   <AdminLayout>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <main class="py-6">
+    <div class="dashboard-wrap min-h-screen px-5 py-6">
 
-        <div v-if="isLoading" class="text-center py-20">
-          <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none"
-            viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-            </path>
+      <!-- Loading -->
+      <div v-if="isLoading" class="flex flex-col items-center justify-center py-32 gap-4">
+        <div class="spinner"></div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Memuat data dashboard...</p>
+      </div>
+
+      <!-- Error -->
+      <div v-else-if="error" class="error-card rounded-2xl p-6 text-center max-w-lg mx-auto mt-16">
+        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <p class="mt-4 text-gray-600 dark:text-gray-300">Memuat data dashboard...</p>
         </div>
+        <p class="font-bold text-gray-800 dark:text-gray-100 text-base">Gagal Memuat Data</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ error }}</p>
+      </div>
 
-        <div v-else-if="error"
-          class="text-center py-20 text-red-600 dark:text-red-400 border border-red-300 dark:border-red-700 p-6 rounded-lg bg-red-50 dark:bg-red-900/10">
-          <p class="font-semibold text-lg">Gagal Memuat Data</p>
-          <p class="mt-2">{{ error }}</p>
-          <p class="text-sm mt-1">Pastikan Anda sudah login dan token <strong>"authToken"</strong> tersedia di
-            LocalStorage.</p>
-        </div>
+      <div v-else class="space-y-5">
 
-        <div v-else>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm hover:shadow-md transition">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Penjualan Hari Ini</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">Rp {{
-                    formatCurrency(dashboardData?.data?.summary?.totalPenjualanHariIni) }}</p>
-                </div>
-                <div class="rounded-full p-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                      d="M12 14a3 3 0 0 1 3-3h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4a3 3 0 0 1-3-3Zm3-1a1 1 0 1 0 0 2h4v-2h-4Z"
-                      clip-rule="evenodd" />
-                    <path fill-rule="evenodd"
-                      d="M12.293 3.293a1 1 0 0 1 1.414 0L16.414 6h-2.828l-1.293-1.293a1 1 0 0 1 0-1.414ZM12.414 6 9.707 3.293a1 1 0 0 0-1.414 0L5.586 6h6.828ZM4.586 7l-.056.055A2 2 0 0 0 3 9v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2h-4a5 5 0 0 1 0-10h4a2 2 0 0 0-1.53-1.945L17.414 7H4.586Z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <p class="text-xs text-green-600 dark:text-green-400">↑ 12% dari kemarin</p>
+        <!-- ── KPI CARDS ── -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+          <!-- Penjualan Hari Ini -->
+          <div class="kpi-card rounded-2xl p-5 flex items-center gap-4">
+            <div class="kpi-icon kpi-cyan">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
             </div>
-
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm hover:shadow-md transition">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Transaksi Hari Ini</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{
-                    dashboardData?.data?.summary?.totalTransaksiHariIni
-                  }}
-                  </p>
-                </div>
-                <div class="rounded-full p-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M4 19v2c0 .5523.44772 1 1 1h14c.5523 0 1-.4477 1-1v-2H4Z" />
-                    <path fill="currentColor" fill-rule="evenodd"
-                      d="M9 3c0-.55228.44772-1 1-1h8c.5523 0 1 .44772 1 1v3c0 .55228-.4477 1-1 1h-2v1h2c.5096 0 .9376.38314.9939.88957L19.8951 17H4.10498l.90116-8.11043C5.06241 8.38314 5.49047 8 6.00002 8H12V7h-2c-.55228 0-1-.44772-1-1V3Zm1.01 8H8.00002v2.01H10.01V11Zm.99 0h2.01v2.01H11V11Zm5.01 0H14v2.01h2.01V11Zm-8.00998 3H10.01v2.01H8.00002V14ZM13.01 14H11v2.01h2.01V14Zm.99 0h2.01v2.01H14V14ZM11 4h6v1h-6V4Z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <p class="text-xs text-blue-600 dark:text-blue-400">{{ dashboardData?.data?.summary?.totalPelanggan }}
-                pelanggan</p>
-            </div>
-
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm hover:shadow-md transition">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Stok Unit</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{
-                    dashboardData?.data?.summary?.totalStok }}</p>
-                </div>
-                <div class="rounded-full p-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                      d="M12 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm-2.952.462c-.483.19-.868.432-1.19.71-.363.315-.638.677-.831.93l-.106.14c-.21.268-.36.418-.574.527C6.125 6.883 5.74 7 5 7a1 1 0 0 0 0 2c.364 0 .696-.022 1-.067v.41l-1.864 4.2a1.774 1.774 0 0 0 .821 2.255c.255.133.538.202.825.202h2.436a1.786 1.786 0 0 0 1.768-1.558 1.774 1.774 0 0 0-.122-.899L8 9.343V8.028c.2-.188.36-.38.495-.553.062-.079.118-.15.168-.217.185-.24.311-.406.503-.571a1.89 1.89 0 0 1 .24-.177A3.01 3.01 0 0 0 11 7.829V20H5.5a1 1 0 1 0 0 2h13a1 1 0 1 0 0-2H13V7.83a3.01 3.01 0 0 0 1.63-1.387c.206.091.373.19.514.29.31.219.532.465.811.78l.025.027.02.023v1.78l-1.864 4.2a1.774 1.774 0 0 0 .821 2.255c.255.133.538.202.825.202h2.436a1.785 1.785 0 0 0 1.768-1.558 1.773 1.773 0 0 0-.122-.899L18 9.343v-.452c.302.072.633.109 1 .109a1 1 0 1 0 0-2c-.48 0-.731-.098-.899-.2-.2-.12-.363-.293-.651-.617l-.024-.026c-.267-.3-.622-.7-1.127-1.057a5.152 5.152 0 0 0-1.355-.678 3.001 3.001 0 0 0-5.896.04Z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <p class="text-xs text-orange-600 dark:text-orange-400">{{ dashboardData?.data?.summary?.totalProduk }}
-                produk</p>
-            </div>
-
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm hover:shadow-md transition">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Piutang</p>
-                  <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">Rp {{
-                    formatCurrency(dashboardData?.data?.summary?.totalPiutang) }}</p>
-                </div>
-                <div class="rounded-full p-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 17.345a4.76 4.76 0 0 0 2.558 1.618c2.274.589 4.512-.446 4.999-2.31.487-1.866-1.273-3.9-3.546-4.49-2.273-.59-4.034-2.623-3.547-4.488.486-1.865 2.724-2.899 4.998-2.31.982.236 1.87.793 2.538 1.592m-3.879 12.171V21m0-18v2.2" />
-                  </svg>
-                </div>
-              </div>
-              <p
-                :class="['text-xs', dashboardData?.data?.summary?.totalPiutang > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400']">
-                Status: {{ dashboardData?.data?.summary?.totalPiutang > 0 ? 'Ada Piutang' : 'Lancar' }}
+            <div class="flex-1 min-w-0">
+              <p class="kpi-label">Penjualan Hari Ini</p>
+              <p class="kpi-value">Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanHariIni) }}</p>
+              <p class="kpi-sub text-emerald-600 dark:text-emerald-400">
+                <span class="inline-flex items-center gap-0.5">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"/></svg>
+                  Hari ini
+                </span>
               </p>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            <div
-              class="lg:col-span-2 overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm">
-              <div class="mb-4">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Grafik Penjualan</h3>
-              </div>
-              <div v-if="!chartLoading && chartSeries.length > 0 && chartSeries[0].data.length > 0" class="w-full">
-                <apexchart type="line" height="300" :options="chartOptions" :series="chartSeries"></apexchart>
-              </div>
-              <div v-else class="text-center py-10 text-gray-400">
-                <p>Tidak ada data penjualan untuk grafik.</p>
-              </div>
+          <!-- Total Transaksi -->
+          <div class="kpi-card rounded-2xl p-5 flex items-center gap-4">
+            <div class="kpi-icon kpi-violet">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
             </div>
-
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm">
-              <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 mb-4">
-                Ringkasan Bulan Ini
-              </h3>
-              <div class="space-y-3">
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Total Stok</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    {{ dashboardData?.data?.summary?.totalStok }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Total Produk</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    {{ dashboardData?.data?.summary?.totalProduk }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Penjualan Hari Ini</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanHariIni) }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Transaksi Hari Ini</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    {{ dashboardData?.data?.summary?.totalTransaksiHariIni }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Penjualan Bulan Ini</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanBulanIni) }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Penjualan Tahun Ini</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanTahunIni) }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center py-1 border-b border-gray-200 dark:border-gray-700">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Total Piutang</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPiutang) }}
-                  </span>
-                </div>
-                <div class="flex justify-between items-center pt-1">
-                  <span class="text-gray-600 dark:text-gray-400 text-xs">Total Pelanggan</span>
-                  <span class="font-semibold text-gray-900 dark:text-white text-sm">
-                    {{ dashboardData?.data?.summary?.totalPelanggan }}
-                  </span>
-                </div>
-              </div>
+            <div class="flex-1 min-w-0">
+              <p class="kpi-label">Transaksi Hari Ini</p>
+              <p class="kpi-value">{{ dashboardData?.data?.summary?.totalTransaksiHariIni ?? 0 }}</p>
+              <p class="kpi-sub text-violet-600 dark:text-violet-400">
+                {{ dashboardData?.data?.summary?.totalPelanggan }} pelanggan
+              </p>
             </div>
           </div>
 
-          <div
-            class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm mb-6">
-            <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <!-- Total Stok -->
+          <div class="kpi-card rounded-2xl p-5 flex items-center gap-4">
+            <div class="kpi-icon kpi-amber">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="kpi-label">Total Stok Unit</p>
+              <p class="kpi-value">{{ dashboardData?.data?.summary?.totalStok ?? 0 }}</p>
+              <p class="kpi-sub text-amber-600 dark:text-amber-400">
+                {{ dashboardData?.data?.summary?.totalProduk }} produk
+              </p>
+            </div>
+          </div>
+
+          <!-- Total Piutang -->
+          <div class="kpi-card rounded-2xl p-5 flex items-center gap-4">
+            <div class="kpi-icon" :class="dashboardData?.data?.summary?.totalPiutang > 0 ? 'kpi-red' : 'kpi-green'">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="kpi-label">Total Piutang</p>
+              <p class="kpi-value">Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPiutang) }}</p>
+              <p class="kpi-sub" :class="dashboardData?.data?.summary?.totalPiutang > 0 ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'">
+                {{ dashboardData?.data?.summary?.totalPiutang > 0 ? '⚠ Ada piutang' : '✓ Lancar' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CHART + RINGKASAN ── -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          <!-- Chart -->
+          <div class="dash-card lg:col-span-2 rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-4">
               <div>
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90">Transaksi Terbaru</h3>
+                <h3 class="section-title">Grafik Penjualan</h3>
+                <p class="section-sub">30 hari terakhir</p>
               </div>
-              <div class="flex items-center gap-2">
-
-              </div>
+              <div class="chart-badge px-3 py-1 rounded-full text-xs font-semibold">Live</div>
             </div>
-
-            <div class="max-w-full overflow-x-auto custom-scrollbar">
-              <table class="min-w-full">
-                <thead>
-                  <tr class="border-t border-gray-100 dark:border-gray-800">
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">ID Transaksi</p>
-                    </th>
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">Pelanggan</p>
-                    </th>
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">Total Harga</p>
-                    </th>
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">Bayar</p>
-                    </th>
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">Kembalian</p>
-                    </th>
-                    <th class="py-2 text-left">
-                      <p class="font-medium text-gray-500 text-xs dark:text-gray-400">Waktu</p>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="transaksi in dashboardData?.data?.dataAktivitas?.transaksiTerakhir" :key="transaksi.id"
-                    class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="font-medium text-gray-800 text-sm dark:text-white/90">{{ transaksi.id.substring(0, 8)
-                      }}...
-                      </p>
-                    </td>
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="text-gray-500 text-sm dark:text-gray-400">{{ transaksi.pelanggan.nama_pelanggan }}</p>
-                    </td>
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="text-gray-900 dark:text-white font-semibold text-sm">Rp {{
-                        formatCurrency(transaksi.total_harga) }}</p>
-                    </td>
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="text-gray-500 text-sm dark:text-gray-400">Rp {{ formatCurrency(transaksi.total_bayar) }}
-                      </p>
-                    </td>
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="text-green-600 dark:text-green-400 font-semibold text-sm">Rp {{
-                        formatCurrency(transaksi.total_kembalian) }}
-                      </p>
-                    </td>
-                    <td class="py-2 whitespace-nowrap">
-                      <p class="text-gray-500 text-sm dark:text-gray-400">{{ formatTime(transaksi.createdAt) }}</p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div v-if="!chartLoading && chartSeries.length > 0 && chartSeries[0].data.length > 0">
+              <apexchart type="line" height="280" :options="chartOptions" :series="chartSeries"></apexchart>
+            </div>
+            <div v-else class="flex flex-col items-center justify-center py-16 gap-3">
+              <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <p class="text-sm text-gray-400">Belum ada data grafik</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm">
-              <div class="mb-4">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                      d="M4 4a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2v14a1 1 0 1 1 0 2H5a1 1 0 1 1 0-2V5a1 1 0 0 1-1-1Zm5 2a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H9Zm5 0a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-1Zm-5 4a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H9Zm5 0a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1h-1Zm-3 4a2 2 0 0 0-2 2v3h2v-3h2v3h2v-3a2 2 0 0 0-2-2h-2Z"
-                      clip-rule="evenodd" />
-                  </svg>
-                  Stok Rendah
-                </h3>
-              </div>
-              <div v-if="dashboardData?.data?.dataAktivitas?.produkStokRendah?.length > 0" class="space-y-3">
-                <div v-for="produk in dashboardData?.data?.dataAktivitas?.produkStokRendah" :key="produk.id"
-                  class="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-800">
-                  <div>
-                    <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ produk.nama_produk }}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Stok tersisa</p>
-                  </div>
-                  <span
-                    class="inline-flex items-center justify-center bg-red-600 text-white font-bold rounded-full w-8 h-8 text-sm">{{
-                      produk.stok_produk }}</span>
-                </div>
-              </div>
-              <div v-else class="text-center py-5 text-gray-500 dark:text-gray-400">Semua stok produk terlihat aman!
-              </div>
-            </div>
 
-            <div
-              class="overflow-hidden rounded-xl border border-gray-200 bg-white px-4 pb-3 pt-3 dark:border-gray-800 dark:bg-white/[0.03] sm:px-5 shadow-sm">
-              <div class="mb-4">
-                <h3 class="text-base font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
-                  <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                    <path fill-rule="evenodd"
-                      d="M8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H6Zm7.25-2.095c.478-.86.75-1.85.75-2.905a5.973 5.973 0 0 0-.75-2.906 4 4 0 1 1 0 5.811ZM15.466 20c.34-.588.535-1.271.535-2v-1a5.978 5.978 0 0 0-1.528-4H18a4 4 0 0 1 4 4v1a2 2 0 0 1-2 2h-4.535Z"
-                      clip-rule="evenodd" />
-                  </svg>
-                  Pelanggan Terbaru
-                </h3>
+          <!-- Ringkasan -->
+          <div class="dash-card rounded-2xl p-5">
+            <h3 class="section-title mb-1">Ringkasan</h3>
+            <p class="section-sub mb-4">Statistik keseluruhan</p>
+            <div class="space-y-1">
+              <div class="summary-row">
+                <span class="summary-label">Stok</span>
+                <span class="summary-value">{{ dashboardData?.data?.summary?.totalStok }}</span>
               </div>
-              <div v-if="dashboardData?.data?.dataAktivitas?.pelangganTerbaru?.length > 0" class="space-y-3">
-                <div v-for="pelanggan in dashboardData?.data?.dataAktivitas?.pelangganTerbaru" :key="pelanggan.id"
-                  class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-800 transition">
-                  <div>
-                    <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ pelanggan.nama_pelanggan }}</p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ pelanggan.alamat }}</p>
-                  </div>
-                  <span
-                    class="inline-flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold rounded-full w-8 h-8 text-xs">{{
-                      pelanggan.nama_pelanggan.charAt(0) }}</span>
-                </div>
+              <div class="summary-row">
+                <span class="summary-label">Produk</span>
+                <span class="summary-value">{{ dashboardData?.data?.summary?.totalProduk }}</span>
               </div>
-              <div v-else class="text-center py-5 text-gray-500 dark:text-gray-400">Tidak ada data pelanggan terbaru.
+              <div class="summary-divider"></div>
+              <div class="summary-row">
+                <span class="summary-label">Penjualan Hari Ini</span>
+                <span class="summary-value text-cyan-600 dark:text-cyan-400">Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanHariIni) }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Transaksi Hari Ini</span>
+                <span class="summary-value">{{ dashboardData?.data?.summary?.totalTransaksiHariIni }}</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-row">
+                <span class="summary-label">Penjualan Bulan Ini</span>
+                <span class="summary-value font-bold text-gray-900 dark:text-white">Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanBulanIni) }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Penjualan Tahun Ini</span>
+                <span class="summary-value font-bold text-gray-900 dark:text-white">Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPenjualanTahunIni) }}</span>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="summary-row">
+                <span class="summary-label">Piutang</span>
+                <span class="summary-value" :class="dashboardData?.data?.summary?.totalPiutang > 0 ? 'text-red-500' : 'text-emerald-500'">
+                  Rp {{ formatCurrency(dashboardData?.data?.summary?.totalPiutang) }}
+                </span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Total Pelanggan</span>
+                <span class="summary-value">{{ dashboardData?.data?.summary?.totalPelanggan }}</span>
               </div>
             </div>
           </div>
         </div>
-      </main>
+
+        <!-- ── TRANSAKSI TERBARU ── -->
+        <div class="dash-card rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="section-title">Transaksi Terbaru</h3>
+              <p class="section-sub">Aktivitas kasir hari ini</p>
+            </div>
+            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          </div>
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full">
+              <thead>
+                <tr class="trx-head">
+                  <th class="trx-th text-left">ID</th>
+                  <th class="trx-th text-left">Pelanggan</th>
+                  <th class="trx-th text-right">Total</th>
+                  <th class="trx-th text-right">Bayar</th>
+                  <th class="trx-th text-right">Kembalian</th>
+                  <th class="trx-th text-right">Waktu</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="t in dashboardData?.data?.dataAktivitas?.transaksiTerakhir" :key="t.id"
+                  class="trx-row">
+                  <td class="trx-td">
+                    <span class="id-badge">{{ t.id.substring(0, 8) }}</span>
+                  </td>
+                  <td class="trx-td">
+                    <div class="flex items-center gap-2">
+                      <div class="avatar-xs">{{ t.pelanggan.nama_pelanggan.charAt(0) }}</div>
+                      <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ t.pelanggan.nama_pelanggan }}</span>
+                    </div>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">Rp {{ formatCurrency(t.total_harga) }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Rp {{ formatCurrency(t.total_bayar) }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="kembalian-pill" :class="t.total_kembalian > 0 ? 'pill-green' : 'pill-gray'">
+                      Rp {{ formatCurrency(t.total_kembalian) }}
+                    </span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ formatTime(t.createdAt) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── STOK RENDAH + PELANGGAN TERBARU ── -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          <!-- Stok Rendah -->
+          <div class="dash-card rounded-2xl p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="section-title">Stok Rendah</h3>
+                <p class="section-sub">Perlu segera diisi ulang</p>
+              </div>
+            </div>
+            <div v-if="dashboardData?.data?.dataAktivitas?.produkStokRendah?.length > 0" class="space-y-2">
+              <div v-for="produk in dashboardData?.data?.dataAktivitas?.produkStokRendah" :key="produk.id"
+                class="stock-row rounded-xl p-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="stock-icon">
+                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ produk.nama_produk }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Stok tersisa</p>
+                  </div>
+                </div>
+                <div class="stock-count-badge">{{ produk.stok_produk }}</div>
+              </div>
+            </div>
+            <div v-else class="flex flex-col items-center py-8 gap-2">
+              <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Semua stok aman</p>
+            </div>
+          </div>
+
+          <!-- Pelanggan Terbaru -->
+          <div class="dash-card rounded-2xl p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="section-title">Pelanggan Terbaru</h3>
+                <p class="section-sub">Bergabung baru-baru ini</p>
+              </div>
+            </div>
+            <div v-if="dashboardData?.data?.dataAktivitas?.pelangganTerbaru?.length > 0" class="space-y-2">
+              <div v-for="pelanggan in dashboardData?.data?.dataAktivitas?.pelangganTerbaru" :key="pelanggan.id"
+                class="pelanggan-row rounded-xl p-3 flex items-center gap-3 transition-all">
+                <div class="avatar-md">{{ pelanggan.nama_pelanggan.charAt(0) }}</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ pelanggan.nama_pelanggan }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ pelanggan.alamat || '—' }}</p>
+                </div>
+                <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+            <div v-else class="text-center py-8">
+              <p class="text-sm text-gray-400">Tidak ada pelanggan terbaru</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </AdminLayout>
 </template>
@@ -483,21 +466,247 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Style tetap sama */
-.custom-scrollbar::-webkit-scrollbar {
-  height: 6px;
+/* ── Base ── */
+.dashboard-wrap {
+  background: linear-gradient(160deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+}
+.dark .dashboard-wrap {
+  background: linear-gradient(160deg, #0f172a 0%, #111827 60%, #0c1a0f 100%);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+/* ── Loading Spinner ── */
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0891b2;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.dark .spinner { border-color: #334155; border-top-color: #22d3ee; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error Card ── */
+.error-card {
+  background: white;
+  border: 1px solid #fee2e2;
+}
+.dark .error-card { background: #1e293b; border-color: #7f1d1d; }
+
+/* ── Dash Card (base card) ── */
+.dash-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+.dark .dash-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.dash-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.dark .dash-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+
+/* ── Section headers ── */
+.section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.dark .section-title { color: #f1f5f9; }
+.section-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+/* ── Chart badge ── */
+.chart-badge {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+.dark .chart-badge { background: #064e3b; color: #6ee7b7; border-color: #065f46; }
+
+/* ── KPI Cards ── */
+.kpi-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+  transition: all 0.2s;
+}
+.dark .kpi-card { background: #1e293b; border-color: #334155; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.dark .kpi-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+.kpi-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-cyan  { background: linear-gradient(135deg, #0891b2, #0e7490); color: white; box-shadow: 0 4px 12px rgba(8,145,178,0.35); }
+.kpi-violet{ background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; box-shadow: 0 4px 12px rgba(124,58,237,0.35); }
+.kpi-amber { background: linear-gradient(135deg, #d97706, #b45309); color: white; box-shadow: 0 4px 12px rgba(217,119,6,0.35); }
+.kpi-red   { background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; box-shadow: 0 4px 12px rgba(220,38,38,0.35); }
+.kpi-green { background: linear-gradient(135deg, #16a34a, #15803d); color: white; box-shadow: 0 4px 12px rgba(22,163,74,0.35); }
+
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+}
+.dark .kpi-label { color: #94a3b8; }
+.kpi-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  margin-top: 3px;
+  letter-spacing: -0.02em;
+}
+.dark .kpi-value { color: #f1f5f9; }
+.kpi-sub {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ── Ringkasan ── */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+.summary-label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.dark .summary-label { color: #94a3b8; }
+.summary-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+}
+.dark .summary-value { color: #cbd5e1; }
+.summary-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+  margin: 4px 0;
+}
+.dark .summary-divider { background: linear-gradient(90deg, transparent, #334155, transparent); }
+
+/* ── Transaction Table ── */
+.trx-head { border-bottom: 1px solid #f1f5f9; }
+.dark .trx-head { border-bottom-color: #334155; }
+.trx-th {
+  padding: 8px 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+.trx-row {
+  border-bottom: 1px solid #f8fafc;
+  transition: background 0.15s;
+}
+.dark .trx-row { border-bottom-color: #1e293b; }
+.trx-row:last-child { border-bottom: none; }
+.trx-row:hover { background: #f8fafc; }
+.dark .trx-row:hover { background: #263548; }
+.trx-td { padding: 10px 12px; white-space: nowrap; }
+
+.id-badge {
+  display: inline-block;
   background: #f1f5f9;
+  color: #475569;
+  font-size: 0.72rem;
+  font-family: monospace;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.dark .id-badge { background: #334155; color: #94a3b8; }
+
+.avatar-xs {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0891b2, #0e7490);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+.kembalian-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.pill-green { background: #d1fae5; color: #065f46; }
+.dark .pill-green { background: #064e3b; color: #6ee7b7; }
+.pill-gray  { background: #f1f5f9; color: #64748b; }
+.dark .pill-gray  { background: #334155; color: #94a3b8; }
+
+/* ── Stock Row ── */
+.stock-row {
+  background: #fff5f5;
+  border: 1px solid #fee2e2;
+}
+.dark .stock-row { background: #1f0708; border-color: #7f1d1d; }
+
+.stock-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #fee2e2;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dark .stock-icon { background: #3b1a1a; }
+
+.stock-count-badge {
+  min-width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.35);
+  flex-shrink: 0;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+/* ── Pelanggan Row ── */
+.pelanggan-row {
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
 }
+.dark .pelanggan-row { border-color: #334155; }
+.pelanggan-row:hover { background: #f8fafc; border-color: #e2e8f0; }
+.dark .pelanggan-row:hover { background: #263548; border-color: #475569; }
+
+.avatar-md {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Scrollbar ── */
+.custom-scrollbar::-webkit-scrollbar { height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
 </style>
