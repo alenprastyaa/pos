@@ -176,6 +176,11 @@ const superAdminMenuItems = [
     name: "User",
     path: "/user",
   },
+  {
+    icon: MailBox,
+    name: "Produk",
+    path: "/produk",
+  },
 ];
 
 const adminMenuItems = () => [

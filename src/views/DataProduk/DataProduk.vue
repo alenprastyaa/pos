@@ -7,7 +7,7 @@
                     <p class="text-subtitle"> Kelola inventaris produk dan harga di semua toko. </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button @click="downloadProductsExcel"
+                    <button v-if="isSuperAdmin" @click="downloadProductsExcel"
                         class="btn-secondary-blue flex items-center gap-2 px-4 py-2 rounded-lg transition"
                         :disabled="loadingDownload">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -29,8 +29,8 @@
                         Upload Excel
                     </button>
 
-                    <button @click="openCreateModal" style="color: black;"
-                        class="flex items-center gap-2 px-4 py-2 rounded-lg transition">
+                    <button @click="openCreateModal"
+                        class="btn-plain flex items-center gap-2 px-4 py-2 rounded-lg transition">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                         </svg>
@@ -267,8 +267,8 @@
                                 class="btn-cancel flex-1 px-4 py-2 rounded-lg transition">
                                 Batal
                             </button>
-                            <button type="submit" :disabled="isSubmitting" style="color: black;"
-                                class="flex-1 px-4 py-2 rounded-lg transition disabled:opacity-50">
+                            <button type="submit" :disabled="isSubmitting"
+                                class="flex-1 px-4 py-2 rounded-lg transition disabled:opacity-50 text-body">
                                 {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
                             </button>
                         </div>
@@ -453,6 +453,15 @@
     background-color: #dbeafe;
 }
 
+.btn-plain {
+    background-color: transparent;
+    color: inherit;
+}
+
+.btn-plain:hover {
+    background-color: rgba(107, 114, 128, 0.12);
+}
+
 .btn-secondary-emerald {
     background-color: #ecfdf5;
     color: #059669;
@@ -521,6 +530,142 @@
 /* UTILS */
 .modal-overlay {
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+:global(.dark) .text-title {
+    color: #f9fafb;
+}
+
+:global(.dark) .text-subtitle {
+    color: #9ca3af;
+}
+
+:global(.dark) .text-body {
+    color: #e5e7eb;
+}
+
+:global(.dark) .text-muted {
+    color: #9ca3af;
+}
+
+:global(.dark) .th-text {
+    color: #cbd5e1;
+}
+
+:global(.dark) .bg-white {
+    background-color: #111827;
+}
+
+:global(.dark) .bg-subtle {
+    background-color: #0f172a;
+}
+
+:global(.dark) .border-divider {
+    border-color: #243044;
+}
+
+:global(.dark) .divide-border > :not([hidden]) ~ :not([hidden]) {
+    border-color: #243044;
+}
+
+:global(.dark) .card-container {
+    background-color: #0f172a;
+    border-color: #243044;
+}
+
+:global(.dark) .table-header {
+    background-color: #0b1220;
+}
+
+:global(.dark) .row-hover:hover {
+    background-color: #162033;
+}
+
+:global(.dark) .input-field {
+    background-color: #0b1220;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+:global(.dark) .input-field:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 1px #60a5fa;
+}
+
+:global(.dark) .input-field:disabled {
+    background-color: #1f2937;
+    color: #9ca3af;
+}
+
+:global(.dark) .input-file {
+    background-color: #0b1220;
+}
+
+:global(.dark) .btn-secondary-blue {
+    background-color: rgba(37, 99, 235, 0.14);
+    color: #93c5fd;
+}
+
+:global(.dark) .btn-secondary-blue:hover {
+    background-color: rgba(37, 99, 235, 0.24);
+}
+
+:global(.dark) .btn-secondary-emerald {
+    background-color: rgba(16, 185, 129, 0.14);
+    color: #6ee7b7;
+}
+
+:global(.dark) .btn-secondary-emerald:hover {
+    background-color: rgba(16, 185, 129, 0.24);
+}
+
+:global(.dark) .btn-cancel {
+    background-color: #1f2937;
+    color: #e5e7eb;
+}
+
+:global(.dark) .btn-cancel:hover {
+    background-color: #2b3648;
+}
+
+:global(.dark) .btn-icon-blue {
+    background-color: rgba(37, 99, 235, 0.14);
+    color: #93c5fd;
+}
+
+:global(.dark) .btn-icon-blue:hover {
+    background-color: rgba(37, 99, 235, 0.24);
+}
+
+:global(.dark) .btn-icon-red {
+    background-color: rgba(220, 38, 38, 0.14);
+    color: #fca5a5;
+}
+
+:global(.dark) .btn-icon-red:hover {
+    background-color: rgba(220, 38, 38, 0.24);
+}
+
+:global(.dark) .btn-pagination {
+    background-color: #111827;
+    border-color: #334155;
+    color: #e5e7eb;
+}
+
+:global(.dark) .btn-pagination:hover:not(:disabled) {
+    background-color: #1f2937;
+}
+
+:global(.dark) .btn-close {
+    color: #94a3b8;
+}
+
+:global(.dark) .btn-close:hover {
+    color: #e5e7eb;
+}
+
+:global(.dark) .modal-overlay {
+    background-color: rgba(2, 6, 23, 0.7);
 }
 </style>
 
@@ -917,6 +1062,10 @@ const deleteProduct = async (id: string) => {
 }
 
 const downloadProductsExcel = async () => {
+    if (!isSuperAdmin.value) {
+        Swal.fire('Akses Ditolak', 'Hanya super admin yang dapat mengunduh Excel produk.', 'warning');
+        return;
+    }
     loadingDownload.value = true;
     try {
         const response = await axios.get(`${API_BASE_URL}/produk/download/excel`, {
@@ -927,10 +1076,14 @@ const downloadProductsExcel = async () => {
         const blob = new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
+        const disposition = response.headers?.['content-disposition'] || response.headers?.['Content-Disposition'] || '';
+        const filenameMatch = /filename="([^"]+)"/i.exec(disposition);
+        const fallbackName = isSuperAdmin.value ? `produk_semua_toko_${new Date().toISOString().slice(0, 10)}.xlsx` : `produk_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        const fileName = filenameMatch?.[1] || fallbackName;
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `produk_${Date.now()}.xlsx`);
+        link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

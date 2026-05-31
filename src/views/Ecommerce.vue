@@ -21,6 +21,200 @@
 
       <div v-else class="space-y-5">
 
+        <!-- ── SUPER ADMIN REPORT ── -->
+        <div v-if="isSuperAdmin" class="report-shell rounded-3xl border border-sky-100 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Super Admin Report</p>
+              <h2 class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">Laporan Penjualan Hari Ini per Toko</h2>
+              <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                Ringkasan otomatis seluruh toko berdasarkan transaksi pada rentang <span class="font-semibold text-gray-700 dark:text-gray-200">{{ reportRangeLabel }}</span>. Rata-rata transaksi saat ini Rp {{ formatCurrency(averageTransaction) }}.
+              </p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <div class="flex flex-wrap items-end gap-3">
+                <label class="flex flex-col gap-1">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Dari</span>
+                  <input
+                    v-model="reportStartDate"
+                    type="date"
+                    class="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-700 shadow-sm outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                  />
+                </label>
+                <label class="flex flex-col gap-1">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Sampai</span>
+                  <input
+                    v-model="reportEndDate"
+                    type="date"
+                    class="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-700 shadow-sm outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                  />
+                </label>
+                <button
+                  @click="fetchDailyReport"
+                  :disabled="reportLoading"
+                  class="inline-flex h-11 items-center gap-2 rounded-2xl border border-sky-200 bg-sky-50 px-4 text-sm font-semibold text-sky-700 transition hover:-translate-y-0.5 hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300"
+                >
+                  <span v-if="reportLoading" class="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent"></span>
+                  <span v-else class="h-2 w-2 rounded-full bg-sky-500"></span>
+                  Tampilkan
+                </button>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <button
+                  @click="downloadDailyReportPdf"
+                  :disabled="reportDownloading"
+                  class="inline-flex items-center gap-2 rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+                >
+                  <span v-if="reportDownloading" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent dark:border-gray-900"></span>
+                  <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-8m0 8l-3-3m3 3l3-3m6 2.25V19a2 2 0 01-2 2H6a2 2 0 01-2-2v-3.75m16-5.25V7a2 2 0 00-2-2H8.5a2 2 0 00-1.414.586l-2.5 2.5A2 2 0 004 8.5V11"/>
+                  </svg>
+                  PDF
+                </button>
+                <button
+                  @click="downloadDailyReportExcel"
+                  :disabled="reportExcelDownloading"
+                  class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span v-if="reportExcelDownloading" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M9 8h6M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                  </svg>
+                  Excel
+                </button>
+                <button
+                  @click="downloadDailyReportCsv"
+                  :disabled="reportCsvDownloading"
+                  class="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span v-if="reportCsvDownloading" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6M9 12h6M9 19h6M4 5h.01M4 12h.01M4 19h.01"/>
+                  </svg>
+                  CSV
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="reportError" class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+            {{ reportError }}
+          </div>
+
+          <div v-else-if="reportLoading" class="mt-4 flex items-center gap-3 rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent"></span>
+            Memuat ringkasan penjualan harian...
+          </div>
+
+          <div v-else class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl border border-gray-200 bg-gradient-to-br from-sky-50 to-white p-4 shadow-sm dark:border-gray-700 dark:from-sky-500/10 dark:to-slate-900">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Penjualan</p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">Rp {{ formatCurrency(reportData?.data?.summary?.totalSales) }}</p>
+              <p class="mt-1 text-xs text-sky-600 dark:text-sky-300">{{ reportData?.data?.summary?.totalTransactions || 0 }} transaksi hari ini</p>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm dark:border-gray-700 dark:from-emerald-500/10 dark:to-slate-900">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Transaksi</p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ reportData?.data?.summary?.totalTransactions || 0 }}</p>
+              <p class="mt-1 text-xs text-emerald-600 dark:text-emerald-300">{{ reportData?.data?.summary?.totalActiveStores || 0 }} toko aktif</p>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm dark:border-gray-700 dark:from-amber-500/10 dark:to-slate-900">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Toko Aktif</p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ reportData?.data?.summary?.totalActiveStores || 0 }}</p>
+              <p class="mt-1 text-xs text-amber-600 dark:text-amber-300">{{ reportData?.data?.summary?.totalStores || 0 }} toko terdaftar</p>
+            </div>
+            <div class="rounded-2xl border border-gray-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm dark:border-gray-700 dark:from-slate-500/10 dark:to-slate-900">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Toko Terbaik</p>
+              <p class="mt-2 truncate text-2xl font-semibold text-gray-900 dark:text-white">{{ reportData?.data?.summary?.bestStoreName || '-' }}</p>
+              <p class="mt-1 text-xs text-slate-600 dark:text-slate-300">Omzet Rp {{ formatCurrency(reportData?.data?.summary?.bestStoreSales) }}</p>
+            </div>
+          </div>
+
+          <div v-if="reportData?.data?.rows?.length" class="mt-5 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h3 class="section-title">Grafik Omzet per Toko</h3>
+                <p class="section-sub">Visualisasi penjualan pada rentang {{ reportRangeLabel }}</p>
+              </div>
+              <div class="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">
+                {{ reportData?.data?.summary?.totalActiveStores || 0 }} toko aktif
+              </div>
+            </div>
+            <div class="mt-4">
+              <apexchart type="bar" height="320" :options="storeSalesChartOptions" :series="storeSalesChartSeries"></apexchart>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="isSuperAdmin" class="dash-card rounded-2xl p-5">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h3 class="section-title">Jadwal Email Otomatis</h3>
+              <p class="section-sub">Laporan PDF penjualan harian dan Excel produk semua toko akan dikirim otomatis sesuai jadwal ini.</p>
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              <span v-if="emailSettingLoading">Memuat pengaturan...</span>
+              <span v-else-if="emailReportSetting.enabled">Aktif</span>
+              <span v-else>Nonaktif</span>
+            </div>
+          </div>
+
+          <div v-if="emailSettingError" class="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
+            {{ emailSettingError }}
+          </div>
+          <div v-if="emailSettingSuccess" class="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+            {{ emailSettingSuccess }}
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <label class="flex flex-col gap-2">
+              <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Jam Kirim</span>
+              <input
+                v-model="emailReportSetting.send_time"
+                type="time"
+                class="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm text-gray-700 shadow-sm outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+              />
+            </label>
+
+            <label class="flex flex-col gap-2 lg:col-span-2">
+              <span class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Email Tujuan</span>
+              <textarea
+                v-model="emailReportSetting.recipient_email"
+                rows="3"
+                placeholder="email1@domain.com, email2@domain.com"
+                class="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm outline-none transition focus:border-sky-300 focus:ring-4 focus:ring-sky-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+              />
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Pisahkan beberapa email dengan koma, titik koma, atau baris baru.
+              </p>
+            </label>
+          </div>
+
+          <div class="mt-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <label class="inline-flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
+              <input
+                v-model="emailReportSetting.enabled"
+                type="checkbox"
+                class="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+              />
+              Aktifkan pengiriman otomatis setiap hari
+            </label>
+
+            <button
+              @click="saveEmailReportSetting"
+              :disabled="emailSettingSaving || emailSettingLoading"
+              class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+            >
+              <span v-if="emailSettingSaving" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent dark:border-gray-900"></span>
+              <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Simpan Jadwal
+            </button>
+          </div>
+        </div>
+
         <!-- ── KPI CARDS ── -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
@@ -93,6 +287,79 @@
                 {{ dashboardData?.data?.summary?.totalPiutang > 0 ? '⚠ Ada piutang' : '✓ Lancar' }}
               </p>
             </div>
+          </div>
+        </div>
+
+        <!-- ── REPORT TABLE ── -->
+        <div v-if="isSuperAdmin" class="dash-card rounded-2xl p-5">
+          <div class="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 class="section-title">Rincian Penjualan per Toko</h3>
+              <p class="section-sub">Data hari ini yang juga dipakai untuk PDF laporan</p>
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              {{ reportData?.data?.rows?.length || 0 }} toko ditampilkan
+            </div>
+          </div>
+
+          <div v-if="reportLoading" class="flex items-center gap-3 py-10 text-sm text-gray-500 dark:text-gray-400">
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent"></span>
+            Memuat laporan toko...
+          </div>
+
+          <div v-else class="overflow-x-auto custom-scrollbar">
+            <table class="min-w-full">
+              <thead>
+                <tr class="trx-head">
+                  <th class="trx-th text-left">#</th>
+                  <th class="trx-th text-left">Toko</th>
+                  <th class="trx-th text-right">Trx</th>
+                  <th class="trx-th text-right">Item</th>
+                  <th class="trx-th text-right">Qty</th>
+                  <th class="trx-th text-right">Omzet</th>
+                  <th class="trx-th text-right">Bayar</th>
+                  <th class="trx-th text-right">Sisa</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, index) in reportData?.data?.rows || []" :key="row.tokoId" class="trx-row">
+                  <td class="trx-td">
+                    <span class="id-badge">{{ index + 1 }}</span>
+                  </td>
+                  <td class="trx-td">
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ row.namaToko }}</p>
+                      <p class="truncate text-xs text-gray-500 dark:text-gray-400">{{ row.alamatToko }}</p>
+                    </div>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ row.totalTransactions }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ row.totalItem }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">{{ row.totalQty }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm font-semibold text-sky-600 dark:text-sky-300">Rp {{ formatCurrency(row.totalSales) }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm text-emerald-600 dark:text-emerald-300">Rp {{ formatCurrency(row.totalBayar) }}</span>
+                  </td>
+                  <td class="trx-td text-right">
+                    <span class="text-sm" :class="row.totalSisaHutang > 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'">
+                      Rp {{ formatCurrency(row.totalSisaHutang) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="(reportData?.data?.rows?.length || 0) === 0">
+                  <td colspan="8" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    Belum ada transaksi hari ini.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -308,14 +575,36 @@ import AdminLayout from '@/components/layout/AdminLayout.vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import VueApexCharts from 'vue3-apexcharts'
+import Swal from 'sweetalert2'
 const router = useRouter()
 const apexchart = VueApexCharts
 
 const dashboardData = ref(null)
+const reportData = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
 const chartLoading = ref(true)
+const reportLoading = ref(false)
+const reportDownloading = ref(false)
+const reportExcelDownloading = ref(false)
+const reportCsvDownloading = ref(false)
+const reportError = ref(null)
+const emailSettingLoading = ref(false)
+const emailSettingSaving = ref(false)
+const emailSettingError = ref(null)
+const emailSettingSuccess = ref(null)
+const emailReportSetting = ref({
+  send_time: '22:00',
+  enabled: true,
+  recipient_email: ''
+})
 const API_URL = import.meta.env.VITE_API_BASE_URL
+const currentUserRole = ref(localStorage.getItem('role_name') || 'superadmin')
+const isSuperAdmin = computed(() => currentUserRole.value === 'superadmin')
+const getJakartaInputDate = (date = new Date()) =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+const reportStartDate = ref(getJakartaInputDate())
+const reportEndDate = ref(getJakartaInputDate())
 
 const chartSeries = ref([])
 const chartOptions = ref({})
@@ -338,13 +627,322 @@ const averageTransaction = computed(() => {
   if (!summary || !summary.totalTransaksiHariIni || summary.totalTransaksiHariIni === 0) {
     return 0
   }
-  const totalSales = parseFloat(summary.totalPenjualanBulanIni)
+  const totalSales = parseFloat(summary.totalPenjualanHariIni)
   const totalTransactions = summary.totalTransaksiHariIni
 
   if (isNaN(totalSales) || totalTransactions === 0) return 0
 
   return Math.floor(totalSales / totalTransactions)
 })
+
+const getAuthToken = () => localStorage.getItem('authToken')
+
+const getAuthHeaders = () => ({
+  Authorization: `Bearer ${getAuthToken()}`
+})
+
+const getReportParams = () => ({
+  start_date: reportStartDate.value,
+  end_date: reportEndDate.value,
+})
+
+const reportRangeLabel = computed(() => {
+  if (!reportStartDate.value || !reportEndDate.value) return 'Hari ini'
+  const formatPrettyDate = (dateString) => {
+    const date = new Date(`${dateString}T00:00:00Z`)
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
+  }
+  return reportStartDate.value === reportEndDate.value
+    ? formatPrettyDate(reportStartDate.value)
+    : `${formatPrettyDate(reportStartDate.value)} - ${formatPrettyDate(reportEndDate.value)}`
+})
+
+const formatStoreChartLabel = (name) => (name && name.length > 24 ? `${name.slice(0, 24)}...` : name || '-')
+
+const buildReportFilename = (extension) => {
+  const start = reportStartDate.value || new Date().toISOString().slice(0, 10)
+  const end = reportEndDate.value || start
+  const toLocalFileDate = (value) => {
+    const [year, month, day] = String(value).split('-')
+    if (!year || !month || !day) return value
+    return `${day}-${month}-${year}`
+  }
+  const suffix = start === end ? toLocalFileDate(start) : `${toLocalFileDate(start)}_sampai_${toLocalFileDate(end)}`
+  return `laporan-penjualan-harian_${suffix}.${extension}`
+}
+
+const storeSalesChartSeries = computed(() => [{
+  name: 'Omzet per Toko',
+  data: reportData.value?.data?.rows?.map((row) => Number(row.totalSales) || 0) || []
+}])
+
+const storeSalesChartOptions = computed(() => ({
+  chart: {
+    type: 'bar',
+    height: 320,
+    toolbar: { show: false },
+  },
+  plotOptions: {
+    bar: {
+      horizontal: true,
+      borderRadius: 10,
+      distributed: true,
+      barHeight: '56%',
+    },
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: (value) => `Rp ${formatCurrency(value)}`,
+    offsetX: 10,
+    style: {
+      fontSize: '11px',
+      colors: ['#0f172a'],
+    },
+  },
+  colors: ['#0ea5e9', '#14b8a6', '#f59e0b', '#8b5cf6', '#ef4444', '#22c55e', '#6366f1'],
+  xaxis: {
+    categories: reportData.value?.data?.rows?.map((row) => formatStoreChartLabel(row.namaToko)) || [],
+    labels: {
+      formatter: (value) => `Rp ${formatCurrency(value)}`,
+      style: { colors: '#475569', fontSize: '11px' },
+    },
+  },
+  yaxis: {
+    labels: {
+      style: { colors: '#475569', fontSize: '11px' },
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: (value) => `Rp ${formatCurrency(value)}`,
+    },
+  },
+  grid: {
+    borderColor: '#e2e8f0',
+  },
+  legend: {
+    show: false,
+  },
+}))
+
+const fetchDailyReport = async () => {
+  if (!isSuperAdmin.value) return
+
+  reportLoading.value = true
+  reportError.value = null
+
+  const authToken = getAuthToken()
+  if (!authToken) {
+    reportLoading.value = false
+    router.push('/signin')
+    return
+  }
+
+  try {
+    const response = await axios.get(`${API_URL}/dashboard/laporan-penjualan-harian`, {
+      headers: getAuthHeaders(),
+      params: getReportParams(),
+    })
+
+    if (response.data.success) {
+      reportData.value = response.data
+    } else {
+      reportError.value = response.data.message || 'Gagal memuat laporan penjualan.'
+    }
+  } catch (err) {
+    console.error('Fetch report error:', err)
+    if (axios.isAxiosError(err)) {
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem('authToken')
+        router.push('/signin')
+        return
+      }
+
+      reportError.value = err.response?.data?.message || 'Tidak dapat memuat laporan penjualan harian.'
+    } else {
+      reportError.value = 'Terjadi kesalahan tidak terduga saat memuat laporan.'
+    }
+  } finally {
+    reportLoading.value = false
+  }
+}
+
+const downloadReportFile = async (endpoint, extension, mimeType, successTitle) => {
+  if (!isSuperAdmin.value) return
+
+  const authToken = getAuthToken()
+  if (!authToken) {
+    router.push('/signin')
+    return
+  }
+
+  try {
+    const response = await axios.get(`${API_URL}${endpoint}`, {
+      headers: getAuthHeaders(),
+      responseType: 'blob',
+      params: getReportParams(),
+    })
+
+    const blob = new Blob([response.data], { type: mimeType })
+    const downloadUrl = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.download = buildReportFilename(extension)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(downloadUrl)
+
+    await Swal.fire({
+      icon: 'success',
+      title: successTitle,
+      text: `Laporan periode ${reportRangeLabel.value} sudah diunduh.`,
+      timer: 1800,
+      showConfirmButton: false,
+    })
+  } catch (err) {
+    console.error('Download report error:', err)
+    let message = 'Gagal mengunduh laporan.'
+
+    if (axios.isAxiosError(err)) {
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem('authToken')
+        router.push('/signin')
+        return
+      }
+
+      message = err.response?.data?.message || message
+    }
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Unduhan gagal',
+      text: message,
+    })
+  }
+}
+
+const downloadDailyReportPdf = async () => {
+  reportDownloading.value = true
+  try {
+    await downloadReportFile('/dashboard/laporan-penjualan-harian/pdf', 'pdf', 'application/pdf', 'PDF berhasil dibuat')
+  } finally {
+    reportDownloading.value = false
+  }
+}
+
+const downloadDailyReportExcel = async () => {
+  reportExcelDownloading.value = true
+  try {
+    await downloadReportFile(
+      '/dashboard/laporan-penjualan-harian/excel',
+      'xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Excel berhasil dibuat'
+    )
+  } finally {
+    reportExcelDownloading.value = false
+  }
+}
+
+const downloadDailyReportCsv = async () => {
+  reportCsvDownloading.value = true
+  try {
+    await downloadReportFile('/dashboard/laporan-penjualan-harian/csv', 'csv', 'text/csv;charset=utf-8', 'CSV berhasil dibuat')
+  } finally {
+    reportCsvDownloading.value = false
+  }
+}
+
+const fetchEmailReportSetting = async () => {
+  if (!isSuperAdmin.value) return
+
+  emailSettingLoading.value = true
+  emailSettingError.value = null
+  emailSettingSuccess.value = null
+
+  try {
+    const response = await axios.get(`${API_URL}/dashboard/email-report-setting`, {
+      headers: getAuthHeaders(),
+    })
+
+    if (response.data.success && response.data.data) {
+      emailReportSetting.value = {
+        send_time: response.data.data.send_time || '22:00',
+        enabled: Boolean(response.data.data.enabled),
+        recipient_email: response.data.data.recipient_email || ''
+      }
+    } else {
+      emailSettingError.value = response.data.message || 'Gagal memuat pengaturan email.'
+    }
+  } catch (err) {
+    console.error('Fetch email setting error:', err)
+    if (axios.isAxiosError(err)) {
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem('authToken')
+        router.push('/signin')
+        return
+      }
+      emailSettingError.value = err.response?.data?.message || 'Tidak dapat memuat pengaturan email.'
+    } else {
+      emailSettingError.value = 'Terjadi kesalahan tidak terduga saat memuat pengaturan email.'
+    }
+  } finally {
+    emailSettingLoading.value = false
+  }
+}
+
+const saveEmailReportSetting = async () => {
+  if (!isSuperAdmin.value) return
+
+  emailSettingSaving.value = true
+  emailSettingError.value = null
+  emailSettingSuccess.value = null
+
+  try {
+    const response = await axios.put(`${API_URL}/dashboard/email-report-setting`, emailReportSetting.value, {
+      headers: getAuthHeaders(),
+    })
+
+    if (response.data.success) {
+      emailReportSetting.value = {
+        send_time: response.data.data.send_time || emailReportSetting.value.send_time,
+        enabled: Boolean(response.data.data.enabled),
+        recipient_email: response.data.data.recipient_email || ''
+      }
+      emailSettingSuccess.value = response.data.message || 'Pengaturan berhasil disimpan.'
+      await Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: emailSettingSuccess.value,
+        timer: 1800,
+        showConfirmButton: false,
+      })
+    } else {
+      emailSettingError.value = response.data.message || 'Gagal menyimpan pengaturan email.'
+    }
+  } catch (err) {
+    console.error('Save email setting error:', err)
+    if (axios.isAxiosError(err)) {
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem('authToken')
+        router.push('/signin')
+        return
+      }
+      emailSettingError.value = err.response?.data?.message || 'Tidak dapat menyimpan pengaturan email.'
+    } else {
+      emailSettingError.value = 'Terjadi kesalahan tidak terduga saat menyimpan pengaturan email.'
+    }
+
+    await Swal.fire({
+      icon: 'error',
+      title: 'Gagal',
+      text: emailSettingError.value || 'Tidak dapat menyimpan pengaturan email.',
+    })
+  } finally {
+    emailSettingSaving.value = false
+  }
+}
 
 // --- Fungsi Chart (Diperbarui untuk ApexCharts) ---
 
@@ -414,6 +1012,7 @@ const fetchDashboard = async () => {
 
   // PERBAIKAN 1: Jika tidak ada token, langsung lempar ke signin
   if (!authToken) {
+    isLoading.value = false
     router.push('/signin')
     return
   }
@@ -462,6 +1061,10 @@ const fetchDashboard = async () => {
 
 onMounted(() => {
   fetchDashboard()
+  if (isSuperAdmin.value) {
+    fetchDailyReport()
+    fetchEmailReportSetting()
+  }
 })
 </script>
 
