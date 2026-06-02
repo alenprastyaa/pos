@@ -54,7 +54,7 @@
                 <div class="flex justify-between items-center">
                   <span class="font-semibold text-sm text-gray-800">{{ product.nama_produk }}</span>
                   <span class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
-                    {{ formatRupiah(product.harga_jual_biasa || product.harga_jual_ritel || 0) }}
+                    {{ formatRupiah(product.harga_jual_ritel ?? product.harga_jual_biasa ?? 0) }}
                   </span>
                 </div>
               </div>
@@ -187,6 +187,7 @@
                   <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Kode Order</th>
                   <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Tujuan</th>
                   <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Status</th>
+                  <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Detail</th>
                   <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Item</th>
                   <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Qty</th>
                   <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Harga</th>
@@ -195,12 +196,12 @@
               </thead>
               <tbody>
                 <tr v-if="myOrdersLoading">
-                  <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                  <td colspan="9" class="px-6 py-12 text-center text-gray-500">
                     Memuat data order...
                   </td>
                 </tr>
                 <tr v-else-if="myOrders.length === 0">
-                  <td colspan="8" class="px-6 py-12 text-center">
+                  <td colspan="9" class="px-6 py-12 text-center">
                     <div class="flex flex-col items-center justify-center gap-2">
                       <p class="font-semibold text-gray-700">Belum ada order yang kamu kirim.</p>
                       <p class="text-sm text-gray-500">Order yang dikirim akan muncul di sini.</p>
@@ -221,6 +222,20 @@
                       {{ statusLabel(order.status) }}
                     </span>
                   </td>
+                  <td class="px-4 py-3 text-center">
+                    <button
+                      type="button"
+                      @click="openOrderDetailModal(order)"
+                      :disabled="getOrderDetails(order).length === 0"
+                      class="btn-refresh inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Detail
+                    </button>
+                  </td>
                   <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
                     {{ order.total_item || 0 }}
                   </td>
@@ -236,6 +251,90 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showOrderDetailModal && selectedDetailOrder" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="qty-modal-backdrop absolute inset-0 transition-opacity" @click="closeOrderDetailModal"></div>
+
+      <div class="qty-modal-card w-full max-w-3xl rounded-3xl shadow-2xl relative z-10 overflow-hidden">
+        <div class="qty-modal-header px-6 py-5 flex justify-between items-center">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="qty-modal-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M9 12h6m-6 4h6M7 3h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V21H7a2 2 0 01-2-2V5a2 2 0 012-2z" />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-lg font-extrabold text-gray-800">Detail Order</h3>
+              <p class="text-xs text-gray-600 truncate">
+                {{ selectedDetailOrder.order_code }} - {{ selectedDetailOrder.target_toko?.nama_toko || '-' }}
+              </p>
+            </div>
+          </div>
+          <button type="button" @click="closeOrderDetailModal" class="qty-close-btn p-2 rounded-xl transition-all">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Item</p>
+              <p class="mt-1 text-xl font-black text-gray-900">{{ selectedDetailOrder.total_item || 0 }}</p>
+            </div>
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Qty</p>
+              <p class="mt-1 text-xl font-black text-gray-900">{{ selectedDetailOrder.total_qty || 0 }}</p>
+            </div>
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Harga</p>
+              <p class="mt-1 text-xl font-black subtotal-text">{{ formatRupiah(selectedDetailOrder.total_harga || 0) }}</p>
+            </div>
+          </div>
+
+          <div class="cart-table rounded-2xl overflow-hidden">
+            <div class="max-h-[55vh] overflow-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="table-head">
+                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12">No</th>
+                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
+                    <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-20">Qty</th>
+                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
+                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(detail, detailIndex) in getOrderDetails(selectedDetailOrder)"
+                    :key="detail.id || `${selectedDetailOrder.id}-${detail.produk_id}-${detail.barcode}`"
+                    class="cart-row transition-colors"
+                  >
+                    <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ detailIndex + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="text-sm font-bold text-gray-900">{{ detail.nama_produk }}</div>
+                      <div class="text-xs text-gray-500 font-mono">{{ detail.barcode || '-' }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                      {{ detail.qty || 0 }}
+                    </td>
+                    <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                      {{ formatRupiah(detail.harga || 0) }}
+                    </td>
+                    <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
+                      {{ formatRupiah(getDetailSubtotal(detail)) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -349,6 +448,16 @@ interface CartItem {
   qty: number
 }
 
+interface OrderDetail {
+  id?: string
+  produk_id: string
+  barcode: string
+  nama_produk: string
+  harga: number
+  qty: number
+  subtotal?: number
+}
+
 interface OrderSummary {
   id: string
   order_code: string
@@ -361,6 +470,9 @@ interface OrderSummary {
   target_toko?: {
     nama_toko: string
   } | null
+  order_details?: OrderDetail[]
+  OrderDetails?: OrderDetail[]
+  orderDetails?: OrderDetail[]
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -376,8 +488,10 @@ const selectedSearchIndex = ref<number>(-1)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const searchDropdownRef = ref<HTMLElement | null>(null)
 const showQtyModal = ref(false)
+const showOrderDetailModal = ref(false)
 const qtyInputRef = ref<HTMLInputElement | null>(null)
 const selectedQtyProduct = ref<Produk | null>(null)
+const selectedDetailOrder = ref<OrderSummary | null>(null)
 const qtyValue = ref<number>(1)
 const myOrders = ref<OrderSummary[]>([])
 const myOrdersLoading = ref(false)
@@ -399,7 +513,7 @@ const totalHarga = computed(() => cart.value.reduce((sum, item) => sum + Number(
 const canSubmit = computed(() => selectedTargetTokoId.value && cart.value.length > 0 && !submitting.value)
 const selectedQtyProductPrice = computed(() => {
   if (!selectedQtyProduct.value) return 0
-  return Number(selectedQtyProduct.value.harga_jual_biasa ?? selectedQtyProduct.value.harga_jual_ritel ?? 0)
+  return Number(selectedQtyProduct.value.harga_jual_ritel ?? selectedQtyProduct.value.harga_jual_biasa ?? 0)
 })
 const selectedQtyProductSubtotal = computed(() => selectedQtyProductPrice.value * Number(qtyValue.value || 0))
 
@@ -453,6 +567,25 @@ const statusBadgeClass = (status: OrderSummary['status']) => {
     default:
       return `${base} bg-gray-100 text-gray-700`
   }
+}
+
+const getOrderDetails = (order: OrderSummary | null) => {
+  if (!order) return []
+  return order.order_details || order.OrderDetails || order.orderDetails || []
+}
+
+const getDetailSubtotal = (detail: OrderDetail) => {
+  return Number(detail.subtotal ?? Number(detail.qty || 0) * Number(detail.harga || 0))
+}
+
+const openOrderDetailModal = (order: OrderSummary) => {
+  selectedDetailOrder.value = order
+  showOrderDetailModal.value = true
+}
+
+const closeOrderDetailModal = () => {
+  showOrderDetailModal.value = false
+  selectedDetailOrder.value = null
 }
 
 const fetchCurrentUser = async () => {
@@ -592,7 +725,7 @@ const handleSearchKeydown = (event: KeyboardEvent) => {
 
 const addToCart = (product: Produk, qty = 1) => {
   const existing = cart.value.find((item) => item.produk_id === product.id)
-  const harga = Number(product.harga_jual_biasa ?? product.harga_jual_ritel ?? 0)
+  const harga = Number(product.harga_jual_ritel ?? product.harga_jual_biasa ?? 0)
 
   if (existing) {
     existing.qty += qty
