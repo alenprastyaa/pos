@@ -116,10 +116,10 @@
 
         <!-- Modal Detail Transaksi -->
         <div v-if="isModalOpen"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            class="fixed inset-0 z-[100000] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
             <div
-                class="relative p-6 w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all">
-                <div class="flex justify-between items-center pb-3 border-b border-gray-200 dark:border-gray-700">
+                class="relative w-full max-w-2xl max-h-[calc(100vh-2rem)] mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl transform transition-all flex flex-col overflow-hidden">
+                <div class="flex justify-between items-center p-6 pb-3 border-b border-gray-200 dark:border-gray-700 shrink-0">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Detail Transaksi</h3>
                     <button @click="closeModal"
                         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
@@ -131,7 +131,7 @@
                     </button>
                 </div>
 
-                <div v-if="selectedTransaction" class="mt-4 space-y-4">
+                <div v-if="selectedTransaction" class="p-6 pt-4 space-y-4 overflow-y-auto">
                     <div class="grid grid-cols-2 gap-4 text-sm">
                         <div>
                             <p class="font-medium text-gray-700 dark:text-gray-300">ID Transaksi:</p>
@@ -159,7 +159,7 @@
                         class="font-semibold text-gray-900 dark:text-white mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         Rincian Produk
                     </h4>
-                    <div class="overflow-x-auto">
+                    <div class="max-h-[50vh] overflow-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700/30">
                                 <tr>

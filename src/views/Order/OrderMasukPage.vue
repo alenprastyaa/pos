@@ -8,29 +8,10 @@
               <h1 class="text-xl font-bold text-gray-900">Order Masuk</h1>
               <p class="text-sm text-gray-500">Kelola order yang masuk ke toko Anda.</p>
             </div>
-
-            <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                @click="applyFilters"
-                class="btn-confirm h-11 px-4 text-sm font-semibold rounded-2xl transition-all"
-              >
-                Cari
-              </button>
-              <button
-                type="button"
-                @click="clearFilters"
-                class="btn-refresh h-11 px-4 text-sm font-semibold rounded-2xl transition-all"
-              >
-                Reset
-              </button>
-              <button
-                type="button"
-                @click="fetchIncomingOrders"
-                class="btn-bayar h-11 px-4 text-sm font-semibold rounded-2xl transition-all"
-              >
-                Refresh
-              </button>
+            <div
+              class="day-chip-summary h-10 px-4 rounded-full text-sm font-semibold flex items-center"
+            >
+              Realtime aktif
             </div>
           </div>
 
@@ -38,8 +19,12 @@
             <div class="xl:col-span-7">
               <label class="input-label flex items-center gap-2 mb-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
                 Search
               </label>
@@ -47,7 +32,6 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="Cari kode order atau nama toko..."
-                @keyup.enter="applyFilters"
                 class="pos-input w-full h-11 px-4 rounded-xl"
               />
             </div>
@@ -55,12 +39,16 @@
             <div class="xl:col-span-2">
               <label class="input-label flex items-center gap-2 mb-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2l-7 7v5l-4 2v-7L3 6V4z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2l-7 7v5l-4 2v-7L3 6V4z"
+                  />
                 </svg>
                 Limit
               </label>
-              <select v-model.number="pageSize" @change="applyFilters" class="pos-input w-full h-11 px-4 rounded-xl">
+              <select v-model.number="pageSize" class="pos-input w-full h-11 px-4 rounded-xl">
                 <option :value="5">5 / halaman</option>
                 <option :value="10">10 / halaman</option>
                 <option :value="25">25 / halaman</option>
@@ -71,8 +59,12 @@
             <div class="xl:col-span-3">
               <label class="input-label flex items-center gap-2 mb-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
                 Filter Hari
               </label>
@@ -110,7 +102,10 @@
             >
               Kemarin
             </button>
-            <div v-if="selectedDate" class="day-chip-summary h-10 px-4 rounded-full text-sm font-semibold flex items-center">
+            <div
+              v-if="selectedDate"
+              class="day-chip-summary h-10 px-4 rounded-full text-sm font-semibold flex items-center"
+            >
               Filter aktif: {{ selectedDate }}
             </div>
           </div>
@@ -119,35 +114,50 @@
 
       <div class="px-5 pb-4">
         <div class="space-y-4">
-          <div class="input-card rounded-2xl px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between text-sm">
+          <div
+            class="input-card rounded-2xl px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between text-sm"
+          >
             <div class="text-gray-600">
-              Menampilkan <span class="font-semibold text-gray-900">{{ paginationStart }}</span>
-              - <span class="font-semibold text-gray-900">{{ paginationEnd }}</span>
-              dari <span class="font-semibold text-gray-900">{{ totalData }}</span> order
+              Menampilkan <span class="font-semibold text-gray-900">{{ paginationStart }}</span> -
+              <span class="font-semibold text-gray-900">{{ paginationEnd }}</span> dari
+              <span class="font-semibold text-gray-900">{{ totalData }}</span> order
             </div>
             <div class="text-gray-500">
-              Halaman <span class="font-semibold text-gray-900">{{ currentPage }}</span>
-              dari <span class="font-semibold text-gray-900">{{ totalPage }}</span>
+              Halaman <span class="font-semibold text-gray-900">{{ currentPage }}</span> dari
+              <span class="font-semibold text-gray-900">{{ totalPage }}</span>
             </div>
           </div>
 
-          <div v-if="groupedIncomingOrders.length === 0 && !isLoadingOrders" class="cart-table rounded-2xl p-8 text-center text-sm text-gray-500 shadow-sm">
+          <div
+            v-if="groupedIncomingOrders.length === 0 && !isLoadingOrders"
+            class="cart-table rounded-2xl p-8 text-center text-sm text-gray-500 shadow-sm"
+          >
             Belum ada order masuk.
           </div>
 
-          <div v-if="isLoadingOrders" class="cart-table rounded-2xl p-8 text-center text-sm text-gray-500 shadow-sm">
+          <div
+            v-if="isLoadingOrders"
+            class="cart-table rounded-2xl p-8 text-center text-sm text-gray-500 shadow-sm"
+          >
             Memuat order masuk...
           </div>
 
-          <div v-for="group in groupedIncomingOrders" :key="group.dateKey" class="cart-table rounded-2xl overflow-hidden shadow-sm">
-            <div class="px-5 py-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div
+            v-for="group in groupedIncomingOrders"
+            :key="group.dateKey"
+            class="cart-table rounded-2xl overflow-hidden shadow-sm"
+          >
+            <div
+              class="px-5 py-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+            >
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h2 class="text-base font-semibold text-gray-900">{{ group.label }}</h2>
                   <span class="day-count-badge">{{ group.totalOrder }} order</span>
                 </div>
                 <p class="text-sm text-gray-500">
-                  {{ group.dateKey }} • Total qty {{ group.totalQty }} • {{ formatRupiah(group.totalHarga) }}
+                  {{ group.dateKey }} • Total qty {{ group.totalQty }} •
+                  {{ formatRupiah(group.totalHarga) }}
                 </p>
               </div>
               <div class="day-summary-grid grid grid-cols-3 gap-2 text-sm">
@@ -167,7 +177,11 @@
             </div>
 
             <div class="divide-y divide-gray-100">
-              <div v-for="order in group.orders" :key="order.id" class="px-5 py-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div
+                v-for="order in group.orders"
+                :key="order.id"
+                class="px-5 py-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+              >
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
                     <h3 class="text-base font-semibold text-gray-900">{{ order.order_code }}</h3>
@@ -194,18 +208,46 @@
                   </div>
 
                   <div class="flex items-center gap-3">
-                    <p class="text-sm font-semibold text-gray-700">{{ formatRupiah(order.total_harga) }}</p>
-                    <button type="button" @click="printOrder(order)"
-                      class="btn-confirm rounded-xl px-3 py-2 text-sm font-medium transition">
+                    <p class="text-sm font-semibold text-gray-700">
+                      {{ formatRupiah(order.total_harga) }}
+                    </p>
+                    <button
+                      v-if="order.status === 'approved' || order.status === 'completed'"
+                      type="button"
+                      @click="openOrderDetailModal(order)"
+                      class="btn-load rounded-xl px-3 py-2 text-sm font-medium transition"
+                    >
+                      Detail
+                    </button>
+                    <button
+                      type="button"
+                      @click="printOrder(order)"
+                      class="btn-confirm rounded-xl px-3 py-2 text-sm font-medium transition"
+                    >
                       Print
                     </button>
-                    <button v-if="order.status === 'pending' && canManageIncoming" type="button" @click="openReviewModal(order)"
-                      class="btn-load rounded-xl px-3 py-2 text-sm font-medium transition">
+                    <button
+                      v-if="order.status === 'approved' && canManageIncoming"
+                      type="button"
+                      @click="openReviewModal(order)"
+                      class="btn-bayar rounded-xl px-3 py-2 text-sm font-medium transition"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      v-if="order.status === 'pending' && canManageIncoming"
+                      type="button"
+                      @click="openReviewModal(order)"
+                      class="btn-load rounded-xl px-3 py-2 text-sm font-medium transition"
+                    >
                       Review
                     </button>
                     <div v-if="order.status === 'pending' && canManageIncoming" class="flex gap-2">
-                      <button type="button" @click="rejectOrder(order.id)"
-                        class="btn-del rounded-xl px-3 py-2 text-sm font-medium transition">
+                      <button
+                        type="button"
+                        @click="rejectOrder(order.id)"
+                        class="btn-del rounded-xl px-3 py-2 text-sm font-medium transition"
+                      >
                         Tolak
                       </button>
                     </div>
@@ -215,7 +257,10 @@
             </div>
           </div>
 
-          <div v-if="groupedIncomingOrders.length > 0" class="input-card rounded-2xl px-4 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div
+            v-if="groupedIncomingOrders.length > 0"
+            class="input-card rounded-2xl px-4 py-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+          >
             <p class="text-sm text-gray-600">
               Tampilkan data per halaman untuk memudahkan membaca order harian.
             </p>
@@ -254,16 +299,28 @@
       </div>
     </div>
 
-    <div v-if="showReviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="qty-modal-backdrop absolute inset-0 transition-opacity" @click="closeReviewModal"></div>
+    <div
+      v-if="showReviewModal"
+      class="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+    >
+      <div
+        class="qty-modal-backdrop absolute inset-0 transition-opacity"
+        @click="closeReviewModal"
+      ></div>
 
-      <div class="review-modal-card w-full max-w-5xl rounded-3xl shadow-2xl relative z-10 overflow-hidden">
-        <div class="qty-modal-header px-6 py-5 flex justify-between items-center">
+      <div
+        class="review-modal-card w-full max-w-5xl max-h-[calc(100vh-2rem)] rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col"
+      >
+        <div class="qty-modal-header px-6 py-5 flex justify-between items-center shrink-0">
           <div class="flex items-center gap-3 min-w-0">
             <div class="qty-modal-icon w-10 h-10 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                  d="M9 12h6m-3-3v6m7-6v6a2 2 0 01-2 2h-1l-2 3h-4l-2-3H6a2 2 0 01-2-2v-6m16 0V8a2 2 0 00-2-2h-3l-2-3H9L7 6H4a2 2 0 00-2 2v4" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M9 12h6m-3-3v6m7-6v6a2 2 0 01-2 2h-1l-2 3h-4l-2-3H6a2 2 0 01-2-2v-6m16 0V8a2 2 0 00-2-2h-3l-2-3H9L7 6H4a2 2 0 00-2 2v4"
+                />
               </svg>
             </div>
             <div class="min-w-0">
@@ -271,31 +328,46 @@
                 Review Order {{ selectedReviewOrder?.order_code || '-' }}
               </h3>
               <p class="text-xs text-gray-600 truncate">
-                Dari {{ selectedReviewOrder?.source_toko?.nama_toko || '-' }} ke {{ selectedReviewOrder?.target_toko?.nama_toko || '-' }}
+                Dari {{ selectedReviewOrder?.source_toko?.nama_toko || '-' }} ke
+                {{ selectedReviewOrder?.target_toko?.nama_toko || '-' }}
               </p>
             </div>
           </div>
 
           <div class="flex items-center gap-2">
-            <button type="button" @click="printReviewOrder" class="btn-confirm rounded-xl px-4 py-2 text-sm font-semibold transition">
+            <button
+              type="button"
+              @click="printReviewOrder"
+              class="btn-confirm rounded-xl px-4 py-2 text-sm font-semibold transition"
+            >
               Print Order Lengkap
             </button>
-            <button type="button" @click="closeReviewModal" class="qty-close-btn p-2 rounded-xl transition-all">
+            <button
+              type="button"
+              @click="closeReviewModal"
+              class="qty-close-btn p-2 rounded-xl transition-all"
+            >
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
         </div>
 
-        <div class="p-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div class="p-5 grid grid-cols-1 xl:grid-cols-3 gap-5 overflow-y-auto">
           <div class="xl:col-span-2 space-y-4">
             <div class="review-box rounded-2xl p-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p class="text-gray-500">Kode Order</p>
-                  <p class="font-bold text-gray-900">{{ selectedReviewOrder?.order_code || '-' }}</p>
+                  <p class="font-bold text-gray-900">
+                    {{ selectedReviewOrder?.order_code || '-' }}
+                  </p>
                 </div>
                 <div>
                   <p class="text-gray-500">Status</p>
@@ -305,11 +377,15 @@
                 </div>
                 <div>
                   <p class="text-gray-500">Tanggal</p>
-                  <p class="font-bold text-gray-900">{{ formatDate(selectedReviewOrder?.createdAt || '') }}</p>
+                  <p class="font-bold text-gray-900">
+                    {{ formatDate(selectedReviewOrder?.createdAt || '') }}
+                  </p>
                 </div>
                 <div>
                   <p class="text-gray-500">Dari</p>
-                  <p class="font-bold text-gray-900">{{ selectedReviewOrder?.source_toko?.nama_toko || '-' }}</p>
+                  <p class="font-bold text-gray-900">
+                    {{ selectedReviewOrder?.source_toko?.nama_toko || '-' }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -319,22 +395,57 @@
                 <table class="w-full">
                   <thead>
                     <tr class="table-head">
-                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12">No</th>
-                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
-                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-32">Barcode</th>
-                      <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-24">Qty</th>
-                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
-                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
-                      <th v-if="isReviewEditable" class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-24">Aksi</th>
+                      <th
+                        class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12"
+                      >
+                        No
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider"
+                      >
+                        Produk
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-32"
+                      >
+                        Barcode
+                      </th>
+                      <th
+                        class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-24"
+                      >
+                        Qty
+                      </th>
+                      <th
+                        class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider"
+                      >
+                        Harga
+                      </th>
+                      <th
+                        class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider"
+                      >
+                        Subtotal
+                      </th>
+                      <th
+                        v-if="isReviewEditable"
+                        class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-24"
+                      >
+                        Aksi
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(detail, index) in activeReviewDetails" :key="detail.id || `${detail.barcode}-${index}`" class="cart-row">
+                    <tr
+                      v-for="(detail, index) in activeReviewDetails"
+                      :key="detail.id || `${detail.barcode}-${index}`"
+                      class="cart-row"
+                    >
                       <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ index + 1 }}</td>
                       <td class="px-4 py-3">
                         <div class="text-sm font-bold text-gray-900">{{ detail.nama_produk }}</div>
                       </td>
-                      <td class="px-4 py-3 text-sm font-mono text-gray-500">{{ detail.barcode }}</td>
+                      <td class="px-4 py-3 text-sm font-mono text-gray-500">
+                        {{ detail.barcode }}
+                      </td>
                       <td class="px-4 py-3 text-center">
                         <input
                           v-if="isReviewEditable"
@@ -344,25 +455,43 @@
                           class="qty-input w-20 text-center rounded-lg py-1.5 text-sm font-bold"
                           @change="updateReviewItemQty(index, detail.qty)"
                         />
-                        <span v-else class="text-sm font-semibold text-gray-700">{{ detail.qty }}</span>
+                        <span v-else class="text-sm font-semibold text-gray-700">{{
+                          detail.qty
+                        }}</span>
                       </td>
-                      <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">{{ formatRupiah(detail.harga) }}</td>
-                      <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">{{ formatRupiah(detail.subtotal) }}</td>
+                      <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        {{ formatRupiah(detail.harga) }}
+                      </td>
+                      <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
+                        {{ formatRupiah(detail.subtotal) }}
+                      </td>
                       <td v-if="isReviewEditable" class="px-4 py-3 text-center">
                         <button
                           type="button"
                           @click="removeReviewItem(index)"
                           class="del-btn p-2 rounded-xl transition-all"
                         >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         </button>
                       </td>
                     </tr>
                     <tr v-if="activeReviewDetails.length === 0">
-                      <td :colspan="isReviewEditable ? 7 : 6" class="px-6 py-10 text-center text-sm text-gray-500">
+                      <td
+                        :colspan="isReviewEditable ? 7 : 6"
+                        class="px-6 py-10 text-center text-sm text-gray-500"
+                      >
                         Semua item sudah dihapus. Tambahkan lagi sebelum approve.
                       </td>
                     </tr>
@@ -389,23 +518,245 @@
               </div>
             </div>
 
+            <div v-if="isApprovedRevision" class="review-box rounded-2xl p-4 space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-gray-500">
+                Alasan Revisi
+              </label>
+              <textarea
+                v-model="revisionReason"
+                rows="4"
+                class="pos-input w-full px-4 py-3 rounded-xl text-sm"
+                placeholder="Contoh: salah cek qty saat approve"
+              ></textarea>
+            </div>
+
             <div class="space-y-3">
-              <button v-if="isReviewEditable" type="button" @click="approveSelectedOrder"
-                :disabled="activeReviewDetails.length === 0"
-                class="w-full h-14 btn-load rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                v-if="isReviewEditable"
+                type="button"
+                @click="submitReviewOrder"
+                :disabled="
+                  activeReviewDetails.length === 0 || (isApprovedRevision && !revisionReason.trim())
+                "
+                class="w-full h-14 btn-load rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
-                SETUJUI
+                {{ isApprovedRevision ? 'SIMPAN REVISI' : 'SETUJUI' }}
               </button>
-              <button type="button" @click="printReviewOrder"
-                class="w-full h-14 btn-bayar rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all">
+              <button
+                type="button"
+                @click="printReviewOrder"
+                class="w-full h-14 btn-bayar rounded-2xl text-base font-extrabold flex items-center justify-center gap-3 transition-all"
+              >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2h-2m-8 8H5a2 2 0 01-2-2v-4a2 2 0 012-2h2m8 8V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10m8 0a2 2 0 01-2 2H9a2 2 0 01-2-2m8 0H7" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2h-2m-8 8H5a2 2 0 01-2-2v-4a2 2 0 012-2h2m8 8V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10m8 0a2 2 0 01-2 2H9a2 2 0 01-2-2m8 0H7"
+                  />
                 </svg>
                 PRINT
               </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="showOrderDetailModal && selectedDetailOrder"
+      class="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+    >
+      <div
+        class="qty-modal-backdrop absolute inset-0 transition-opacity"
+        @click="closeOrderDetailModal"
+      ></div>
+
+      <div
+        class="qty-modal-card w-full max-w-4xl max-h-[calc(100vh-2rem)] rounded-3xl shadow-2xl relative z-10 overflow-hidden flex flex-col"
+      >
+        <div class="qty-modal-header px-6 py-5 flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-3 min-w-0">
+            <div
+              class="qty-modal-icon w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            >
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M9 12h6m-6 4h6M7 3h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V21H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+                />
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-lg font-extrabold text-gray-800">Detail Order</h3>
+              <p class="text-xs text-gray-600 truncate">
+                {{ selectedDetailOrder.order_code }} -
+                {{ selectedDetailOrder.source_toko?.nama_toko || '-' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              v-if="selectedDetailOrder.status === 'approved' && canManageIncoming"
+              type="button"
+              @click="openReviewModalFromDetail(selectedDetailOrder)"
+              class="btn-bayar rounded-xl px-4 py-2 text-sm font-semibold transition"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              @click="printOrder(selectedDetailOrder)"
+              class="btn-confirm rounded-xl px-4 py-2 text-sm font-semibold transition"
+            >
+              Print
+            </button>
+            <button
+              type="button"
+              @click="closeOrderDetailModal"
+              class="qty-close-btn p-2 rounded-xl transition-all"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4 overflow-y-auto">
+          <div class="review-box rounded-2xl p-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <p class="text-gray-500">Kode Order</p>
+                <p class="font-bold text-gray-900">{{ selectedDetailOrder.order_code }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Status</p>
+                <span :class="statusClass(selectedDetailOrder.status)">
+                  {{ statusLabel(selectedDetailOrder.status) }}
+                </span>
+              </div>
+              <div>
+                <p class="text-gray-500">Tanggal</p>
+                <p class="font-bold text-gray-900">
+                  {{ formatDate(selectedDetailOrder.createdAt) }}
+                </p>
+              </div>
+              <div>
+                <p class="text-gray-500">Dari</p>
+                <p class="font-bold text-gray-900">
+                  {{ selectedDetailOrder.source_toko?.nama_toko || '-' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Item</p>
+              <p class="mt-1 text-xl font-black text-gray-900">
+                {{ selectedDetailOrder.total_item || 0 }}
+              </p>
+            </div>
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Qty</p>
+              <p class="mt-1 text-xl font-black text-gray-900">
+                {{ selectedDetailOrder.total_qty || 0 }}
+              </p>
+            </div>
+            <div class="qty-summary rounded-2xl p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Harga</p>
+              <p class="mt-1 text-xl font-black subtotal-text">
+                {{ formatRupiah(selectedDetailOrder.total_harga || 0) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="cart-table rounded-2xl overflow-hidden">
+            <div class="max-h-[55vh] overflow-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="table-head">
+                    <th
+                      class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12"
+                    >
+                      No
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider"
+                    >
+                      Produk
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-32"
+                    >
+                      Barcode
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-20"
+                    >
+                      Qty
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider"
+                    >
+                      Harga
+                    </th>
+                    <th
+                      class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider"
+                    >
+                      Subtotal
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(detail, detailIndex) in getOrderDetails(selectedDetailOrder)"
+                    :key="
+                      detail.id || `${selectedDetailOrder.id}-${detail.produk_id}-${detail.barcode}`
+                    "
+                    class="cart-row transition-colors"
+                  >
+                    <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ detailIndex + 1 }}</td>
+                    <td class="px-4 py-3">
+                      <div class="text-sm font-bold text-gray-900">{{ detail.nama_produk }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-sm font-mono text-gray-500">
+                      {{ detail.barcode || '-' }}
+                    </td>
+                    <td class="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                      {{ detail.qty || 0 }}
+                    </td>
+                    <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                      {{ formatRupiah(detail.harga || 0) }}
+                    </td>
+                    <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
+                      {{ formatRupiah(getDetailSubtotal(detail)) }}
+                    </td>
+                  </tr>
+                  <tr v-if="getOrderDetails(selectedDetailOrder).length === 0">
+                    <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+                      Detail order tidak tersedia.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -415,11 +766,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import flatPickr from 'vue-flatpickr-component'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import { useRealtimeNotifications } from '@/composables/useRealtimeNotifications'
 import './order-theme.css'
 
 interface Toko {
@@ -485,13 +837,26 @@ const showReviewModal = ref(false)
 const selectedReviewOrder = ref<Order | null>(null)
 const selectedReviewDetails = ref<OrderDetail[]>([])
 const editableReviewDetails = ref<OrderDetail[]>([])
+const revisionReason = ref('')
+const showOrderDetailModal = ref(false)
+const selectedDetailOrder = ref<Order | null>(null)
+const { notifications } = useRealtimeNotifications()
+let filterTimer: ReturnType<typeof setTimeout> | null = null
 
 const authHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 })
 
-const canManageIncoming = computed(() => Boolean(currentUser.value?.toko_id) || currentUser.value?.role_name === 'superadmin')
-const isReviewEditable = computed(() => selectedReviewOrder.value?.status === 'pending')
+const canManageIncoming = computed(
+  () => Boolean(currentUser.value?.toko_id) || currentUser.value?.role_name === 'superadmin',
+)
+const isApprovedRevision = computed(() => selectedReviewOrder.value?.status === 'approved')
+const isReviewEditable = computed(() =>
+  selectedReviewOrder.value
+    ? selectedReviewOrder.value.status === 'pending' ||
+      selectedReviewOrder.value.status === 'approved'
+    : false,
+)
 const activeReviewDetails = computed(() => {
   return isReviewEditable.value ? editableReviewDetails.value : selectedReviewDetails.value
 })
@@ -528,14 +893,17 @@ const groupedIncomingOrders = computed(() => {
     }).format(date)
   }
 
-  const map = new Map<string, {
-    dateKey: string
-    label: string
-    orders: Order[]
-    totalOrder: number
-    totalQty: number
-    totalHarga: number
-  }>()
+  const map = new Map<
+    string,
+    {
+      dateKey: string
+      label: string
+      orders: Order[]
+      totalOrder: number
+      totalQty: number
+      totalHarga: number
+    }
+  >()
 
   for (const order of incomingOrders.value) {
     const date = new Date(order.createdAt)
@@ -639,6 +1007,10 @@ const getOrderDetails = (order: Order | null) => {
   return order.order_details || order.OrderDetails || order.orderDetails || []
 }
 
+const getDetailSubtotal = (detail: OrderDetail) => {
+  return Number(detail.subtotal ?? Number(detail.qty || 0) * Number(detail.harga || 0))
+}
+
 const cloneOrderDetails = (details: OrderDetail[]) => {
   return details.map((detail) => ({
     ...detail,
@@ -688,7 +1060,10 @@ const fetchIncomingOrders = async () => {
         incomingOrders.value = payload.orders || []
         totalData.value = Number(payload.totalData || 0)
         totalPage.value = Math.max(Number(payload.totalPage || 1), 1)
-        currentPage.value = Math.min(Number(payload.currentPage || currentPage.value), totalPage.value)
+        currentPage.value = Math.min(
+          Number(payload.currentPage || currentPage.value),
+          totalPage.value,
+        )
         pageSize.value = Number(payload.limit || pageSize.value)
       }
     }
@@ -708,11 +1083,15 @@ const applyFilters = async () => {
   await fetchIncomingOrders()
 }
 
-const clearFilters = async () => {
-  searchQuery.value = ''
-  selectedDate.value = ''
-  currentPage.value = 1
-  await fetchIncomingOrders()
+const scheduleApplyFilters = () => {
+  if (filterTimer) {
+    clearTimeout(filterTimer)
+  }
+
+  filterTimer = setTimeout(() => {
+    filterTimer = null
+    applyFilters()
+  }, 350)
 }
 
 const goToPage = async (page: number) => {
@@ -723,7 +1102,6 @@ const goToPage = async (page: number) => {
 
 const setQuickDate = async (value: string) => {
   selectedDate.value = value
-  await applyFilters()
 }
 
 const openReviewModal = (order: Order) => {
@@ -738,11 +1116,29 @@ const closeReviewModal = () => {
   selectedReviewOrder.value = null
   selectedReviewDetails.value = []
   editableReviewDetails.value = []
+  revisionReason.value = ''
+}
+
+const openOrderDetailModal = (order: Order) => {
+  selectedDetailOrder.value = order
+  showOrderDetailModal.value = true
+}
+
+const closeOrderDetailModal = () => {
+  showOrderDetailModal.value = false
+  selectedDetailOrder.value = null
+}
+
+const openReviewModalFromDetail = (order: Order) => {
+  closeOrderDetailModal()
+  openReviewModal(order)
 }
 
 const removeReviewItem = (index: number) => {
   if (!isReviewEditable.value) return
-  editableReviewDetails.value = editableReviewDetails.value.filter((_, itemIndex) => itemIndex !== index)
+  editableReviewDetails.value = editableReviewDetails.value.filter(
+    (_, itemIndex) => itemIndex !== index,
+  )
 }
 
 const updateReviewItemQty = (index: number, qty: number) => {
@@ -813,7 +1209,9 @@ const buildReviewHtml = () => {
         </div>
 
         <div style="margin-bottom: 10px;">
-            ${details.map((item) => `
+            ${details
+              .map(
+                (item) => `
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; align-items: flex-start;">
                     <span style="flex: 1; text-align: left; word-break: break-word; padding-right: 5px;">
                         ${item.nama_produk}
@@ -822,7 +1220,9 @@ const buildReviewHtml = () => {
                     <span style="width: 60px; text-align: right;">${formatRupiah(Number(item.harga || 0))}</span>
                     <span style="width: 60px; text-align: right;">${formatRupiah(Number(item.subtotal || 0))}</span>
                 </div>
-            `).join('')}
+            `,
+              )
+              .join('')}
         </div>
 
         <div style="border-top: 2px dashed #000; margin: 10px 0; padding-top: 10px;">
@@ -925,6 +1325,65 @@ const approveSelectedOrder = async () => {
   }
 }
 
+const reviseApprovedOrder = async () => {
+  if (!selectedReviewOrder.value) return
+  if (activeReviewDetails.value.length === 0) {
+    Swal.fire('Peringatan', 'Order tidak boleh kosong.', 'warning')
+    return
+  }
+
+  const reason = revisionReason.value.trim()
+  if (!reason) {
+    Swal.fire('Peringatan', 'Alasan revisi wajib diisi.', 'warning')
+    return
+  }
+
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/order/${selectedReviewOrder.value.id}/revise`,
+      {
+        reason,
+        items: activeReviewDetails.value.map((item) => ({
+          produk_id: item.produk_id,
+          barcode: item.barcode,
+          qty: item.qty,
+          harga: item.harga,
+        })),
+      },
+      { headers: authHeaders() },
+    )
+
+    if (response.data.success) {
+      selectedReviewOrder.value = response.data.data
+      selectedReviewDetails.value = cloneOrderDetails(getOrderDetails(response.data.data))
+      editableReviewDetails.value = cloneOrderDetails(getOrderDetails(response.data.data))
+      revisionReason.value = ''
+      await Swal.fire({
+        icon: 'success',
+        title: 'Order direvisi',
+        text: 'Data order sudah diperbarui. Silakan print ulang jika diperlukan.',
+        timer: 1800,
+      })
+      await fetchIncomingOrders()
+    }
+  } catch (error: any) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Gagal',
+      text: error.response?.data?.message || 'Gagal merevisi order',
+    })
+  }
+}
+
+const submitReviewOrder = async () => {
+  if (isApprovedRevision.value) {
+    await reviseApprovedOrder()
+    return
+  }
+
+  await approveSelectedOrder()
+}
+
 const buildOrderPrintHtml = (order: Order) => {
   const details = getOrderDetails(order)
   const totalHarga = Number(order.total_harga || 0)
@@ -977,7 +1436,9 @@ const buildOrderPrintHtml = (order: Order) => {
         </div>
 
         <div style="margin-bottom: 10px;">
-            ${details.map((item) => `
+            ${details
+              .map(
+                (item) => `
                 <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; align-items: flex-start;">
                     <span style="flex: 1; text-align: left; word-break: break-word; padding-right: 5px;">
                         ${item.nama_produk}
@@ -986,7 +1447,9 @@ const buildOrderPrintHtml = (order: Order) => {
                     <span style="width: 60px; text-align: right;">${formatCurrency(Number(item.harga || 0))}</span>
                     <span style="width: 60px; text-align: right;">${formatCurrency(Number(item.subtotal || 0))}</span>
                 </div>
-            `).join('')}
+            `,
+              )
+              .join('')}
         </div>
 
         <div style="border-top: 2px dashed #000; margin: 10px 0; padding-top: 10px;">
@@ -1047,7 +1510,11 @@ const printOrder = (order: Order) => {
 
 const approveOrder = async (id: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/order/${id}/approve`, {}, { headers: authHeaders() })
+    const response = await axios.post(
+      `${API_BASE_URL}/order/${id}/approve`,
+      {},
+      { headers: authHeaders() },
+    )
     if (response.data.success) {
       openReviewModal(response.data.data)
     }
@@ -1062,7 +1529,11 @@ const approveOrder = async (id: string) => {
 
 const rejectOrder = async (id: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/order/${id}/reject`, {}, { headers: authHeaders() })
+    const response = await axios.post(
+      `${API_BASE_URL}/order/${id}/reject`,
+      {},
+      { headers: authHeaders() },
+    )
     if (response.data.success) {
       await Swal.fire({ icon: 'success', title: 'Order ditolak', timer: 1400 })
       await fetchIncomingOrders()
@@ -1075,6 +1546,30 @@ const rejectOrder = async (id: string) => {
     })
   }
 }
+
+watch(searchQuery, () => {
+  scheduleApplyFilters()
+})
+
+watch(selectedDate, () => {
+  scheduleApplyFilters()
+})
+
+watch(pageSize, () => {
+  scheduleApplyFilters()
+})
+
+watch(
+  () => notifications.value[0]?.id,
+  (newId, oldId) => {
+    if (!newId || newId === oldId) return
+
+    const latest = notifications.value[0]
+    if (latest?.type?.startsWith('order:')) {
+      fetchIncomingOrders()
+    }
+  },
+)
 
 onMounted(async () => {
   try {

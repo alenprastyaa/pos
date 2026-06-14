@@ -29,15 +29,143 @@ const connected = ref(false)
 const connecting = ref(false)
 
 let eventSource: EventSource | null = null
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+let reconnectAttempts = 0
+let activeSubscribers = 0
+let manualClose = false
+let currentToken = ''
+
+const MAX_NOTIFICATIONS = 8
+const MAX_RECONNECT_DELAY = 30000
+const MAX_READ_NOTIFICATION_KEYS = 300
 
 const authToken = () => localStorage.getItem('authToken')
 
-const connectRealtimeNotifications = () => {
+const decodeAuthUserId = () => {
+  const token = authToken()
+  if (!token) return 'guest'
+
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return token.slice(-16)
+    const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(window.atob(normalizedPayload))
+    return decoded.id || decoded.userId || token.slice(-16)
+  } catch {
+    return token.slice(-16)
+  }
+}
+
+const readStorageKey = () => `pos_read_notifications_${decodeAuthUserId()}`
+
+const notificationReadKey = (notification: RealtimeNotification) => {
+  if (notification.orderId || notification.orderCode) {
+    return `order:${notification.orderId || notification.orderCode}:${notification.status || notification.type}`
+  }
+
+  return `notification:${notification.id}`
+}
+
+const readNotificationKeys = () => {
+  try {
+    const raw = localStorage.getItem(readStorageKey())
+    const parsed = raw ? JSON.parse(raw) : []
+    return new Set<string>(Array.isArray(parsed) ? parsed : [])
+  } catch {
+    return new Set<string>()
+  }
+}
+
+const saveReadNotificationKeys = (keys: Set<string>) => {
+  const limitedKeys = Array.from(keys).slice(-MAX_READ_NOTIFICATION_KEYS)
+  localStorage.setItem(readStorageKey(), JSON.stringify(limitedKeys))
+}
+
+const hasReadNotificationState = () => {
+  return localStorage.getItem(readStorageKey()) !== null
+}
+
+const isNotificationRead = (notification: RealtimeNotification) => {
+  return readNotificationKeys().has(notificationReadKey(notification))
+}
+
+const recalculateUnreadCount = () => {
+  const readKeys = readNotificationKeys()
+  unreadCount.value = notifications.value.filter(
+    (notification) => !readKeys.has(notificationReadKey(notification)),
+  ).length
+}
+
+const normalizeNotifications = (items: RealtimeNotification[]) => {
+  const seen = new Set<string>()
+  return items
+    .filter((item) => {
+      if (!item?.id || seen.has(item.id)) return false
+      seen.add(item.id)
+      return true
+    })
+    .slice(0, MAX_NOTIFICATIONS)
+}
+
+const prependNotification = (notification: RealtimeNotification) => {
+  notifications.value = normalizeNotifications([notification, ...notifications.value])
+}
+
+const clearReconnectTimer = () => {
+  if (!reconnectTimer) return
+  clearTimeout(reconnectTimer)
+  reconnectTimer = null
+}
+
+const resetConnection = () => {
+  if (eventSource) {
+    eventSource.onopen = null
+    eventSource.onmessage = null
+    eventSource.onerror = null
+    eventSource.close()
+    eventSource = null
+  }
+  connected.value = false
+  connecting.value = false
+}
+
+const scheduleReconnect = () => {
+  if (manualClose || activeSubscribers === 0 || reconnectTimer) return
+
+  const token = authToken()
+  if (!token) return
+
+  const delay = Math.min(1000 * 2 ** reconnectAttempts, MAX_RECONNECT_DELAY)
+  reconnectAttempts += 1
+
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null
+    connectRealtimeNotifications(false)
+  }, delay)
+}
+
+const connectRealtimeNotifications = (registerSubscriber = true) => {
+  if (registerSubscriber) {
+    activeSubscribers += 1
+  }
+
   if (eventSource || connecting.value) return
 
   const token = authToken()
   if (!token) return
 
+  if (currentToken && currentToken !== token) {
+    manualClose = true
+    clearReconnectTimer()
+    resetConnection()
+    notifications.value = []
+    unreadCount.value = 0
+    incomingOrderCount.value = 0
+  }
+
+  clearReconnectTimer()
+  manualClose = false
+  currentToken = token
   connecting.value = true
   eventSource = new EventSource(
     `${API_BASE_URL}/realtime/stream?token=${encodeURIComponent(token)}`,
@@ -46,6 +174,7 @@ const connectRealtimeNotifications = () => {
   eventSource.onopen = () => {
     connected.value = true
     connecting.value = false
+    reconnectAttempts = 0
   }
 
   eventSource.onmessage = (event) => {
@@ -53,15 +182,28 @@ const connectRealtimeNotifications = () => {
       const payload = JSON.parse(event.data) as RealtimePayload
 
       if (payload.type === 'snapshot') {
-        notifications.value = payload.notifications || []
+        notifications.value = normalizeNotifications(payload.notifications || [])
         incomingOrderCount.value = payload.incomingOrderCount || 0
-        unreadCount.value = payload.unreadCount || notifications.value.length
+        if (!hasReadNotificationState()) {
+          const readKeys = readNotificationKeys()
+          for (const notification of notifications.value) {
+            readKeys.add(notificationReadKey(notification))
+          }
+          saveReadNotificationKeys(readKeys)
+        }
+        recalculateUnreadCount()
         return
       }
 
       if (payload.notification) {
-        notifications.value = [payload.notification, ...notifications.value].slice(0, 8)
-        unreadCount.value += 1
+        const isNewNotification = !notifications.value.some(
+          (item) => item.id === payload.notification?.id,
+        )
+        const wasRead = isNotificationRead(payload.notification)
+        prependNotification(payload.notification)
+        if (isNewNotification && !wasRead) {
+          unreadCount.value += 1
+        }
       }
 
       if (typeof payload.incomingOrderCount === 'number') {
@@ -73,21 +215,26 @@ const connectRealtimeNotifications = () => {
   }
 
   eventSource.onerror = () => {
-    connected.value = false
-    connecting.value = false
+    resetConnection()
+    scheduleReconnect()
   }
 }
 
 const closeRealtimeNotifications = () => {
-  if (eventSource) {
-    eventSource.close()
-    eventSource = null
-  }
-  connected.value = false
-  connecting.value = false
+  activeSubscribers = Math.max(activeSubscribers - 1, 0)
+  if (activeSubscribers > 0) return
+
+  manualClose = true
+  clearReconnectTimer()
+  resetConnection()
 }
 
 const markNotificationsAsRead = () => {
+  const readKeys = readNotificationKeys()
+  for (const notification of notifications.value) {
+    readKeys.add(notificationReadKey(notification))
+  }
+  saveReadNotificationKeys(readKeys)
   unreadCount.value = 0
 }
 
