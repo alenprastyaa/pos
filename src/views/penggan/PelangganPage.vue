@@ -1,6 +1,6 @@
 <template>
   <AdminLayout>
-    <div class="py-3 space-y-5">
+    <div class="page-shell py-3 space-y-5">
       <div class="page-header rounded-2xl border border-divider p-5 shadow-sm">
         <div>
           <p class="text-xl font-bold text-title">Kelola Data Pelanggan</p>
@@ -166,7 +166,7 @@
           </h3>
           <button
             @click="closeModal"
-            class="text-muted bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+            class="modal-close-btn text-muted rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -465,6 +465,10 @@ onMounted(() => {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
+.page-shell {
+  background: transparent;
+}
+
 .summary-card {
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
@@ -504,6 +508,18 @@ onMounted(() => {
 
 .table-row-hover:hover {
   background-color: #f8fafc;
+}
+
+.modal-close-btn {
+  background: transparent;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
 }
 
 .avatar-circle {
@@ -599,5 +615,122 @@ onMounted(() => {
 /* Modal Overlay (Background Semi-transparent) */
 .modal-overlay {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .page-header {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  border-color: #374151;
+}
+
+:global(.dark) .page-shell {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.16) 0%, rgba(15, 23, 42, 0) 100%);
+}
+
+:global(.dark) .summary-card,
+:global(.dark) .card-container,
+:global(.dark) .bg-white {
+  background-color: #111827;
+  border-color: #374151;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+:global(.dark) .text-title {
+  color: #f9fafb;
+}
+
+:global(.dark) .text-main {
+  color: #f3f4f6;
+}
+
+:global(.dark) .text-body {
+  color: #d1d5db;
+}
+
+:global(.dark) .text-muted {
+  color: #94a3b8;
+}
+
+:global(.dark) .border-divider,
+:global(.dark) .divide-divider > :not([hidden]) ~ :not([hidden]) {
+  border-color: #374151;
+}
+
+:global(.dark) .table-header {
+  background-color: #0f172a;
+}
+
+:global(.dark) .table-header th {
+  color: #cbd5e1;
+}
+
+:global(.dark) .table-row-hover:hover {
+  background-color: #1f2937;
+}
+
+:global(.dark) .modal-close-btn {
+  background: transparent;
+}
+
+:global(.dark) .modal-close-btn:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+:global(.dark) .avatar-circle {
+  background: rgba(37, 99, 235, 0.16);
+  color: #93c5fd;
+}
+
+:global(.dark) .debt-badge-danger {
+  background: rgba(220, 38, 38, 0.16);
+  color: #fca5a5;
+}
+
+:global(.dark) .debt-badge-success {
+  background: rgba(16, 185, 129, 0.16);
+  color: #6ee7b7;
+}
+
+:global(.dark) .btn-secondary {
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+:global(.dark) .btn-secondary:hover {
+  background-color: #374151;
+}
+
+:global(.dark) .action-edit {
+  background: rgba(37, 99, 235, 0.14);
+  color: #93c5fd;
+}
+
+:global(.dark) .action-edit:hover {
+  background: rgba(37, 99, 235, 0.24);
+  color: #bfdbfe;
+}
+
+:global(.dark) .action-delete {
+  background: rgba(220, 38, 38, 0.14);
+  color: #fca5a5;
+}
+
+:global(.dark) .action-delete:hover {
+  background: rgba(220, 38, 38, 0.24);
+  color: #fecaca;
+}
+
+:global(.dark) .input-field {
+  border-color: #4b5563;
+  color: #f9fafb;
+  background-color: #1f2937;
+}
+
+:global(.dark) .input-field:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.22);
+}
+
+:global(.dark) .modal-overlay {
+  background-color: rgba(2, 6, 23, 0.75);
 }
 </style>

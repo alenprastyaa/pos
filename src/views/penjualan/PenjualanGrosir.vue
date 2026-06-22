@@ -1280,6 +1280,10 @@ onMounted(async () => {
     cursor: not-allowed;
 }
 
+.pos-input::placeholder {
+    color: #94a3b8;
+}
+
 /* ===== SEARCH DROPDOWN ===== */
 .search-dropdown {
     background: white;
@@ -1595,14 +1599,14 @@ onMounted(async () => {
 }
 
 :global(.dark) .input-card {
-    background: #1e293b;
-    border-color: #334155;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(180deg, #1a1f31 0%, #111827 100%);
+    border-color: #3f3143;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.42);
 }
 
 :global(.dark) .input-card:focus-within {
     border-color: rgba(190, 18, 60, 0.4);
-    box-shadow: 0 4px 24px rgba(190, 18, 60, 0.1);
+    box-shadow: 0 12px 32px rgba(190, 18, 60, 0.12);
 }
 
 :global(.dark) .input-label {
@@ -1613,11 +1617,16 @@ onMounted(async () => {
     background: #0f172a;
     border-color: #334155;
     color: #f1f5f9;
+    color-scheme: dark;
 }
 
 :global(.dark) .pos-input:focus {
     background: #0f172a;
     border-color: #be123c;
+}
+
+:global(.dark) .pos-input::placeholder {
+    color: #64748b;
 }
 
 :global(.dark) .pos-input option {
@@ -1638,6 +1647,10 @@ onMounted(async () => {
     background: #2d1a1e;
 }
 
+:global(.dark) .search-item.border-gray-50 {
+    border-bottom-color: #334155;
+}
+
 :global(.dark) .search-item span {
     color: #e2e8f0;
 }
@@ -1653,8 +1666,8 @@ onMounted(async () => {
 }
 
 :global(.dark) .hutang-badge {
-    background: #0f172a;
-    border-color: #334155;
+    background: rgba(18, 12, 24, 0.88);
+    border-color: #3f3143;
 }
 
 :global(.dark) .pending-section {
@@ -1662,14 +1675,24 @@ onMounted(async () => {
     border-color: #78350f;
 }
 
+:global(.dark) .pending-section .text-amber-700 {
+    color: #fbbf24 !important;
+}
+
+:global(.dark) .pending-section .text-amber-600 {
+    color: #f59e0b !important;
+}
+
 :global(.dark) .pending-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #1a1f31 0%, #111827 100%);
+    border-color: #3f3143;
+    box-shadow: inset 0 1px 0 rgba(251, 113, 133, 0.04);
 }
 
 :global(.dark) .pending-card-active {
-    background: #2d0510;
+    background: linear-gradient(180deg, #320814 0%, #1a0c12 100%);
     border-color: #be123c;
+    box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.18), 0 12px 28px rgba(190, 18, 60, 0.16);
 }
 
 :global(.dark) .btn-del {
@@ -1687,8 +1710,9 @@ onMounted(async () => {
 }
 
 :global(.dark) .cart-table {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #1a1f31 0%, #111827 100%);
+    border-color: #3f3143;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.35);
 }
 
 :global(.dark) .table-head {
@@ -1704,13 +1728,14 @@ onMounted(async () => {
 }
 
 :global(.dark) .empty-cart-icon {
-    background: #263548;
+    background: radial-gradient(circle at top, #3d2a33 0%, #201822 100%);
 }
 
 :global(.dark) .qty-input {
     background: #0f172a;
     border-color: #334155;
     color: #f1f5f9;
+    color-scheme: dark;
 }
 
 :global(.dark) .qty-input:focus {
@@ -1732,15 +1757,16 @@ onMounted(async () => {
 }
 
 :global(.dark) .action-bar {
-    background: #1e293b;
-    border-top-color: #334155;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+    background: rgba(17, 24, 39, 0.92);
+    border-top-color: #3f3143;
+    box-shadow: 0 -12px 32px rgba(2, 6, 23, 0.45);
+    backdrop-filter: blur(14px);
 }
 
 :global(.dark) .btn-pending-action {
-    background: #263548;
+    background: linear-gradient(180deg, #241b2b 0%, #1a1f31 100%);
     color: #e2e8f0;
-    border-color: #334155;
+    border-color: #3f3143;
 }
 
 :global(.dark) .btn-pending-action:hover:not(:disabled) {
@@ -1750,13 +1776,14 @@ onMounted(async () => {
 }
 
 :global(.dark) .modal-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #1a1f31 0%, #111827 100%);
+    border-color: #3f3143;
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.5);
 }
 
 :global(.dark) .modal-header {
-    background: linear-gradient(135deg, #1e293b 0%, #2d0510 100%);
-    border-bottom-color: #334155;
+    background: linear-gradient(135deg, #201b2d 0%, #2d0510 100%);
+    border-bottom-color: #3f3143;
 }
 
 :global(.dark) .close-btn {
@@ -1767,6 +1794,53 @@ onMounted(async () => {
 :global(.dark) .close-btn:hover {
     color: #f87171;
     background: #3b1a1a;
+}
+
+:global(.dark) .page-container .text-gray-900,
+:global(.dark) .modal-card .text-gray-900 {
+    color: #f9fafb !important;
+}
+
+:global(.dark) .page-container .text-gray-800,
+:global(.dark) .modal-card .text-gray-800 {
+    color: #f3f4f6 !important;
+}
+
+:global(.dark) .page-container .text-gray-700,
+:global(.dark) .modal-card .text-gray-700 {
+    color: #d1d5db !important;
+}
+
+:global(.dark) .page-container .text-gray-600,
+:global(.dark) .modal-card .text-gray-600 {
+    color: #9ca3af !important;
+}
+
+:global(.dark) .page-container .text-gray-500,
+:global(.dark) .modal-card .text-gray-500 {
+    color: #94a3b8 !important;
+}
+
+:global(.dark) .payment-input-wrap,
+:global(.dark) .summary-box,
+:global(.dark) .modal-footer {
+    background: rgba(18, 12, 24, 0.88);
+    border-color: #3f3143;
+}
+
+:global(.dark) .payment-input {
+    background: #111827;
+    border-color: #334155;
+    color: #f8fafc;
+    color-scheme: dark;
+}
+
+:global(.dark) .page-container .text-rose-500 {
+    color: #fda4af !important;
+}
+
+:global(.dark) .divider {
+    background: linear-gradient(90deg, transparent, #334155, transparent);
 }
 
 </style>

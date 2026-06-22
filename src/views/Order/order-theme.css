@@ -2,6 +2,10 @@
     background: linear-gradient(160deg, #fff1f2 0%, #f8fafc 60%, #fdf4ff 100%);
 }
 
+.dark .page-container {
+    background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+}
+
 .top-panel { background: transparent; }
 
 .input-card {
@@ -313,5 +317,160 @@
     border: 1px solid #e2e8f0;
 }
 
-@media (prefers-color-scheme: dark) {
+.dark .input-card,
+.dark .cart-table,
+.dark .my-order-card,
+.dark .qty-modal-card,
+.dark .review-modal-card,
+.dark .review-box,
+.dark .review-summary,
+.dark .qty-summary {
+    background: #111827;
+    border-color: #374151;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.dark .qty-modal-header {
+    background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+    border-bottom-color: #374151;
+}
+
+.dark .input-label {
+    color: #fca5a5;
+}
+
+.dark .pos-input,
+.dark .qty-input,
+.dark .qty-modal-input {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #f9fafb;
+}
+
+.dark .pos-input::placeholder,
+.dark .qty-modal-input::placeholder {
+    color: #9ca3af;
+}
+
+.dark .pos-input:focus,
+.dark .qty-input:focus,
+.dark .qty-modal-input:focus {
+    background: #111827;
+    border-color: #fb7185;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.18);
+}
+
+.dark .search-dropdown,
+.dark .search-item {
+    background: #111827;
+    border-color: #374151;
+}
+
+.dark .search-item {
+    border-bottom-color: #1f2937 !important;
+}
+
+.dark .search-item:hover {
+    background: #1f2937;
+}
+
+.dark .search-item .price-tag {
+    background: rgba(16, 185, 129, 0.14);
+    color: #6ee7b7;
+}
+
+.dark .cart-row {
+    border-bottom-color: #1f2937;
+}
+
+.dark .cart-row:hover {
+    background: rgba(31, 41, 55, 0.72);
+}
+
+.dark .empty-cart-icon,
+.dark .qty-input-wrap,
+.dark .day-summary-pill {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.dark .del-btn,
+.dark .qty-close-btn,
+.dark .pagination-btn {
+    background: #1f2937;
+    color: #cbd5e1;
+    border-color: #374151;
+}
+
+.dark .del-btn:hover,
+.dark .qty-close-btn:hover,
+.dark .pagination-btn:hover:not(:disabled) {
+    background: #374151;
+    color: #f9fafb;
+}
+
+.dark .btn-refresh,
+.dark .day-chip-summary {
+    background: rgba(190, 24, 93, 0.14);
+    color: #fda4af;
+    border-color: rgba(244, 114, 182, 0.28);
+}
+
+.dark .btn-refresh:hover {
+    background: rgba(190, 24, 93, 0.22);
+    border-color: rgba(251, 113, 133, 0.4);
+}
+
+.dark .day-chip {
+    background: #1f2937;
+    color: #cbd5e1;
+    border-color: #374151;
+}
+
+.dark .day-chip:hover {
+    background: #374151;
+    color: #fda4af;
+    border-color: #4b5563;
+}
+
+.dark .day-count-badge {
+    background: rgba(190, 24, 93, 0.14);
+    color: #fda4af;
+}
+
+.dark .divider {
+    border-color: #374151;
+}
+
+.dark .page-container .text-gray-900,
+.dark .qty-modal-card .text-gray-900,
+.dark .review-modal-card .text-gray-900 {
+    color: #f9fafb !important;
+}
+
+.dark .page-container .text-gray-800,
+.dark .qty-modal-card .text-gray-800,
+.dark .review-modal-card .text-gray-800 {
+    color: #f3f4f6 !important;
+}
+
+.dark .page-container .text-gray-700,
+.dark .qty-modal-card .text-gray-700,
+.dark .review-modal-card .text-gray-700 {
+    color: #d1d5db !important;
+}
+
+.dark .page-container .text-gray-600,
+.dark .qty-modal-card .text-gray-600,
+.dark .review-modal-card .text-gray-600 {
+    color: #9ca3af !important;
+}
+
+.dark .page-container .text-gray-500,
+.dark .qty-modal-card .text-gray-500,
+.dark .review-modal-card .text-gray-500,
+.dark .page-container .text-gray-400,
+.dark .qty-modal-card .text-gray-400,
+.dark .review-modal-card .text-gray-400 {
+    color: #94a3b8 !important;
 }

@@ -653,6 +653,28 @@
   color: #e5e7eb;
 }
 
+:global(.dark) .btn-plain {
+  color: #e5e7eb;
+}
+
+:global(.dark) .btn-plain:hover {
+  background-color: rgba(148, 163, 184, 0.12);
+}
+
+:global(.dark) .bg-white.rounded-lg.shadow-xl {
+  background-color: #111827;
+  border: 1px solid #334155;
+}
+
+:global(.dark) .input-field::placeholder {
+  color: #94a3b8;
+}
+
+:global(.dark) select.input-field option {
+  background-color: #111827;
+  color: #f8fafc;
+}
+
 :global(.dark) .modal-overlay {
   background-color: rgba(2, 6, 23, 0.7);
 }

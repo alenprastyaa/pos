@@ -338,8 +338,7 @@ const kasirData = ref<any>(null)
 
 // Transaksi Data
 const transactionItems = ref<any[]>([])
-const DEFAULT_PELANGGAN_ID = '02525cd7-3459-4093-bf68-60859ef43600'
-const selectedPelangganId = ref(DEFAULT_PELANGGAN_ID)
+const selectedPelangganId = ref('')
 const pelangganList = ref<any[]>([])
 const loadingPelanggan = ref(false)
 const hutangPelanggan = ref(0)
@@ -725,6 +724,7 @@ const removePendingTransaction = (id: number, notify = true) => {
 // --- Submit & Print ---
 const submitTransaksi = async () => {
     if (isSubmitting.value) return
+    const pendingId = currentPendingId.value
 
     // Konfirmasi jika kurang bayar (hutang)
     if (kembalian.value < 0) {
@@ -774,9 +774,8 @@ const submitTransaksi = async () => {
                 timer: 3000,
             })
 
+            if (pendingId) removePendingTransaction(pendingId, false)
             resetForm()
-            if (currentPendingId.value) removePendingTransaction(currentPendingId.value, false)
-            fetchHutangPelanggan(selectedPelangganId.value) // refresh hutang
         } else {
             Swal.fire('Gagal', response.data.message, 'error')
         }
@@ -788,7 +787,7 @@ const submitTransaksi = async () => {
 }
 
 const resetForm = () => {
-    selectedPelangganId.value = DEFAULT_PELANGGAN_ID
+    selectedPelangganId.value = ''
     transactionItems.value = []
     uangPembayaran.value = 0
     uangPembayaranDisplay.value = ''
@@ -978,6 +977,10 @@ onMounted(() => {
 .pos-input:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.pos-input::placeholder {
+    color: #94a3b8;
 }
 
 /* ===== SEARCH DROPDOWN ===== */
@@ -1238,13 +1241,13 @@ onMounted(() => {
 
 /* Input Cards */
 :global(.dark) .input-card {
-    background: #1e293b;
-    border-color: #334155;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+    background: linear-gradient(180deg, #162033 0%, #111827 100%);
+    border-color: #2f3f57;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.42);
 }
 :global(.dark) .input-card:focus-within {
     border-color: rgba(6,182,212,0.5);
-    box-shadow: 0 4px 24px rgba(6,182,212,0.12);
+    box-shadow: 0 12px 32px rgba(6,182,212,0.12);
 }
 :global(.dark) .input-label {
     color: #7dd3fc;
@@ -1255,10 +1258,14 @@ onMounted(() => {
     background: #0f172a;
     border-color: #334155;
     color: #f1f5f9;
+    color-scheme: dark;
 }
 :global(.dark) .pos-input:focus {
     background: #0f172a;
     border-color: #06b6d4;
+}
+:global(.dark) .pos-input::placeholder {
+    color: #64748b;
 }
 :global(.dark) .pos-input option {
     background: #1e293b;
@@ -1276,6 +1283,9 @@ onMounted(() => {
 :global(.dark) .search-item:hover {
     background: #263548;
 }
+:global(.dark) .search-item.border-gray-50 {
+    border-bottom-color: #334155;
+}
 :global(.dark) .search-item span {
     color: #e2e8f0;
 }
@@ -1290,8 +1300,8 @@ onMounted(() => {
 
 /* Hutang Badge */
 :global(.dark) .hutang-badge {
-    background: #0f172a;
-    border-color: #334155;
+    background: rgba(8, 15, 30, 0.88);
+    border-color: #2f3f57;
 }
 
 /* Pending Section */
@@ -1299,13 +1309,21 @@ onMounted(() => {
     background: linear-gradient(135deg, #1c1506 0%, #27190a 100%);
     border-color: #78350f;
 }
+:global(.dark) .pending-section .text-amber-700 {
+    color: #fbbf24 !important;
+}
+:global(.dark) .pending-section .text-amber-600 {
+    color: #f59e0b !important;
+}
 :global(.dark) .pending-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #162033 0%, #111827 100%);
+    border-color: #2f3f57;
+    box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.05);
 }
 :global(.dark) .pending-card-active {
-    background: #0c2233;
+    background: linear-gradient(180deg, #0b2234 0%, #0f172a 100%);
     border-color: #06b6d4;
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.18), 0 12px 28px rgba(8, 145, 178, 0.14);
 }
 :global(.dark) .btn-del {
     background: #263548;
@@ -1323,8 +1341,9 @@ onMounted(() => {
 
 /* Cart Table */
 :global(.dark) .cart-table {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #162033 0%, #111827 100%);
+    border-color: #2f3f57;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.35);
 }
 :global(.dark) .table-head {
     background: linear-gradient(90deg, #0c4a6e, #0369a1);
@@ -1336,12 +1355,13 @@ onMounted(() => {
     background: #263548;
 }
 :global(.dark) .empty-cart-icon {
-    background: #263548;
+    background: radial-gradient(circle at top, #2a3b54 0%, #1b2638 100%);
 }
 :global(.dark) .qty-input {
     background: #0f172a;
     border-color: #334155;
     color: #f1f5f9;
+    color-scheme: dark;
 }
 :global(.dark) .qty-input:focus {
     background: #0f172a;
@@ -1360,14 +1380,15 @@ onMounted(() => {
 
 /* Action Bar */
 :global(.dark) .action-bar {
-    background: #1e293b;
-    border-top-color: #334155;
-    box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+    background: rgba(15, 23, 42, 0.92);
+    border-top-color: #2f3f57;
+    box-shadow: 0 -12px 32px rgba(2, 6, 23, 0.45);
+    backdrop-filter: blur(14px);
 }
 :global(.dark) .btn-pending-action {
-    background: #263548;
+    background: linear-gradient(180deg, #1d2a3d 0%, #162033 100%);
     color: #e2e8f0;
-    border-color: #334155;
+    border-color: #2f3f57;
 }
 :global(.dark) .btn-pending-action:hover:not(:disabled) {
     border-color: #06b6d4;
@@ -1377,12 +1398,13 @@ onMounted(() => {
 
 /* Modal */
 :global(.dark) .modal-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: linear-gradient(180deg, #162033 0%, #111827 100%);
+    border-color: #2f3f57;
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.5);
 }
 :global(.dark) .modal-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0c2233 100%);
-    border-bottom-color: #334155;
+    background: linear-gradient(135deg, #182336 0%, #0c2233 100%);
+    border-bottom-color: #2f3f57;
 }
 :global(.dark) .close-btn {
     color: #64748b;
@@ -1391,6 +1413,53 @@ onMounted(() => {
 :global(.dark) .close-btn:hover {
     color: #f87171;
     background: #3b1a1a;
+}
+
+:global(.dark) .page-container .text-gray-900,
+:global(.dark) .modal-card .text-gray-900 {
+    color: #f9fafb !important;
+}
+
+:global(.dark) .page-container .text-gray-800,
+:global(.dark) .modal-card .text-gray-800 {
+    color: #f3f4f6 !important;
+}
+
+:global(.dark) .page-container .text-gray-700,
+:global(.dark) .modal-card .text-gray-700 {
+    color: #d1d5db !important;
+}
+
+:global(.dark) .page-container .text-gray-600,
+:global(.dark) .modal-card .text-gray-600 {
+    color: #9ca3af !important;
+}
+
+:global(.dark) .page-container .text-gray-500,
+:global(.dark) .modal-card .text-gray-500 {
+    color: #94a3b8 !important;
+}
+
+:global(.dark) .payment-input-wrap,
+:global(.dark) .summary-box,
+:global(.dark) .modal-footer {
+    background: rgba(8, 15, 30, 0.88);
+    border-color: #2f3f57;
+}
+
+:global(.dark) .payment-input {
+    background: #111827;
+    border-color: #334155;
+    color: #f8fafc;
+    color-scheme: dark;
+}
+
+:global(.dark) .page-container .text-cyan-500 {
+    color: #67e8f9 !important;
+}
+
+:global(.dark) .divider {
+    background: linear-gradient(90deg, transparent, #334155, transparent);
 }
 
 </style>

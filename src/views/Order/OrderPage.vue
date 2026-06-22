@@ -28,29 +28,15 @@
               </svg>
               Cari Produk
             </label>
-            <input
-              ref="searchInputRef"
-              v-model="searchQuery"
-              type="text"
-              placeholder="Ketik nama produk..."
-              :disabled="!selectedTargetTokoId"
-              @input="searchProducts(searchQuery)"
-              @keydown="handleSearchKeydown"
-              class="pos-input w-full h-11 px-4 rounded-xl"
-            />
+            <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="Ketik nama produk..."
+              :disabled="!selectedTargetTokoId" @input="searchProducts(searchQuery)" @keydown="handleSearchKeydown"
+              class="pos-input w-full h-11 px-4 rounded-xl" />
 
-            <div
-              v-if="showSearchResults && searchResults.length > 0"
-              ref="searchDropdownRef"
-              class="search-dropdown absolute left-4 right-4 mt-1 rounded-xl shadow-2xl z-20 max-h-72 overflow-y-auto"
-            >
-              <div
-                v-for="(product, index) in searchResults"
-                :key="product.id"
-                @click="selectProductFromSearch(product)"
+            <div v-if="showSearchResults && searchResults.length > 0" ref="searchDropdownRef"
+              class="search-dropdown absolute left-4 right-4 mt-1 rounded-xl shadow-2xl z-20 max-h-72 overflow-y-auto">
+              <div v-for="(product, index) in searchResults" :key="product.id" @click="selectProductFromSearch(product)"
                 :class="index === selectedSearchIndex ? 'search-item-active' : 'search-item'"
-                class="px-4 py-2.5 cursor-pointer transition-all border-b border-gray-50 last:border-0"
-              >
+                class="px-4 py-2.5 cursor-pointer transition-all border-b border-gray-50 last:border-0">
                 <div class="flex justify-between items-center">
                   <span class="font-semibold text-sm text-gray-800">{{ product.nama_produk }}</span>
                   <span class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
@@ -71,12 +57,18 @@
                 <table class="w-full">
                   <thead>
                     <tr class="table-head">
-                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-10">No</th>
-                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
-                      <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Qty</th>
-                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
-                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
-                      <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-16">Hapus</th>
+                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-10">No
+                      </th>
+                      <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk
+                      </th>
+                      <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">
+                        Qty</th>
+                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga
+                      </th>
+                      <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">
+                        Subtotal</th>
+                      <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-16">
+                        Hapus</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -166,11 +158,8 @@
               <h3 class="text-lg font-extrabold text-gray-900">My Order</h3>
               <p class="text-sm text-gray-500">Daftar order yang kamu kirim ke toko lain</p>
             </div>
-            <button
-              type="button"
-              @click="fetchMyOrders"
-              class="btn-refresh inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all"
-            >
+            <button type="button" @click="fetchMyOrders"
+              class="btn-refresh inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M4 4v6h6M20 20v-6h-6M20 10a8 8 0 00-14.83-4M4 14a8 8 0 0014.83 4" />
@@ -184,14 +173,21 @@
               <thead>
                 <tr class="table-head">
                   <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12">No</th>
-                  <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Kode Order</th>
+                  <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Kode Order
+                  </th>
                   <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Tujuan</th>
-                  <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Status</th>
-                  <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">Detail</th>
-                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Item</th>
-                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Qty</th>
-                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Harga</th>
-                  <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-40">Tanggal</th>
+                  <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">
+                    Status</th>
+                  <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-28">
+                    Detail</th>
+                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Item
+                  </th>
+                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Qty
+                  </th>
+                  <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Total Harga
+                  </th>
+                  <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-40">Tanggal
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -223,12 +219,9 @@
                     </span>
                   </td>
                   <td class="px-4 py-3 text-center">
-                    <button
-                      type="button"
-                      @click="openOrderDetailModal(order)"
+                    <button type="button" @click="openOrderDetailModal(order)"
                       :disabled="getOrderDetails(order).length === 0"
-                      class="btn-refresh inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40"
-                    >
+                      class="btn-refresh inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40">
                       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z" />
@@ -256,7 +249,8 @@
       </div>
     </div>
 
-    <div v-if="showOrderDetailModal && selectedDetailOrder" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div v-if="showOrderDetailModal && selectedDetailOrder"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="qty-modal-backdrop absolute inset-0 transition-opacity" @click="closeOrderDetailModal"></div>
 
       <div class="qty-modal-card w-full max-w-3xl rounded-3xl shadow-2xl relative z-10 overflow-hidden">
@@ -277,8 +271,7 @@
           </div>
           <button type="button" @click="closeOrderDetailModal" class="qty-close-btn p-2 rounded-xl transition-all">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -295,7 +288,8 @@
             </div>
             <div class="qty-summary rounded-2xl p-4">
               <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Total Harga</p>
-              <p class="mt-1 text-xl font-black subtotal-text">{{ formatRupiah(selectedDetailOrder.total_harga || 0) }}</p>
+              <p class="mt-1 text-xl font-black subtotal-text">{{ formatRupiah(selectedDetailOrder.total_harga || 0) }}
+              </p>
             </div>
           </div>
 
@@ -304,19 +298,22 @@
               <table class="w-full">
                 <thead>
                   <tr class="table-head">
-                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12">No</th>
-                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk</th>
-                    <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-20">Qty</th>
-                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga</th>
-                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal</th>
+                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider w-12">No
+                    </th>
+                    <th class="px-4 py-3 text-left text-white text-xs font-semibold uppercase tracking-wider">Produk
+                    </th>
+                    <th class="px-4 py-3 text-center text-white text-xs font-semibold uppercase tracking-wider w-20">Qty
+                    </th>
+                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Harga
+                    </th>
+                    <th class="px-4 py-3 text-right text-white text-xs font-semibold uppercase tracking-wider">Subtotal
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(detail, detailIndex) in getOrderDetails(selectedDetailOrder)"
+                  <tr v-for="(detail, detailIndex) in getOrderDetails(selectedDetailOrder)"
                     :key="detail.id || `${selectedDetailOrder.id}-${detail.produk_id}-${detail.barcode}`"
-                    class="cart-row transition-colors"
-                  >
+                    class="cart-row transition-colors">
                     <td class="px-4 py-3 text-sm font-bold text-gray-500">{{ detailIndex + 1 }}</td>
                     <td class="px-4 py-3">
                       <div class="text-sm font-bold text-gray-900">{{ detail.nama_produk }}</div>
@@ -361,8 +358,7 @@
           </div>
           <button type="button" @click="closeQtyModal" class="qty-close-btn p-2 rounded-xl transition-all">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -372,17 +368,9 @@
             <label class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 block">
               Jumlah yang dipesan
             </label>
-            <input
-              ref="qtyInputRef"
-              v-model.number="qtyValue"
-              type="number"
-              min="1"
-              step="1"
-              class="qty-modal-input w-full h-16 px-4 rounded-xl text-4xl font-black text-gray-900"
-              placeholder="1"
-              @keydown.enter.prevent="confirmQtyModal"
-              @keydown.esc.prevent="closeQtyModal"
-            />
+            <input ref="qtyInputRef" v-model.number="qtyValue" type="number" min="1" step="1"
+              class="qty-modal-input w-full h-16 px-4 rounded-xl text-4xl font-black text-gray-900" placeholder="1"
+              @keydown.enter.prevent="confirmQtyModal" @keydown.esc.prevent="closeQtyModal" />
           </div>
 
           <div class="qty-summary rounded-2xl p-4 space-y-2.5">
@@ -557,15 +545,15 @@ const statusBadgeClass = (status: OrderSummary['status']) => {
 
   switch (status) {
     case 'pending':
-      return `${base} bg-amber-100 text-amber-700`
+      return `${base} bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300`
     case 'approved':
-      return `${base} bg-emerald-100 text-emerald-700`
+      return `${base} bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300`
     case 'rejected':
-      return `${base} bg-rose-100 text-rose-700`
+      return `${base} bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300`
     case 'completed':
-      return `${base} bg-sky-100 text-sky-700`
+      return `${base} bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300`
     default:
-      return `${base} bg-gray-100 text-gray-700`
+      return `${base} bg-gray-100 text-gray-700 dark:bg-gray-500/15 dark:text-gray-300`
   }
 }
 
