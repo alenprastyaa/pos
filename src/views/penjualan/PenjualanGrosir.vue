@@ -29,7 +29,7 @@
                                     <span class="font-semibold text-sm text-gray-800">{{ product.nama_produk }}</span>
                                     <span
                                         class="price-tag text-xs font-bold px-2 py-1 rounded-lg ml-2 whitespace-nowrap">
-                                        {{ formatRupiah(product.harga_jual_ritel) }}
+                                        {{ formatRupiah(product.harga_jual_grosir) }}
                                     </span>
                                 </div>
                             </div>
@@ -177,10 +177,10 @@
                                         class="qty-input w-20 text-center rounded-lg py-1.5 text-sm font-bold" />
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-semibold text-gray-700">
-                                    {{ formatRupiah(item.harga_jual_ritel) }}
+                                    {{ formatRupiah(item.harga_jual_grosir) }}
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-extrabold subtotal-text">
-                                    {{ formatRupiah(item.qty * item.harga_jual_ritel) }}
+                                    {{ formatRupiah(item.qty * item.harga_jual_grosir) }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <button type="button" @click="confirmRemoveItem(item)"
@@ -342,11 +342,9 @@ import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-const PENDING_TRANSACTIONS_KEY = 'pendingTransactions'
+const PENDING_TRANSACTIONS_KEY = 'pendingTransactions_grosir'
 const hutangPelanggan = ref(0)
 const role_name = localStorage.getItem('role_name')
 
@@ -373,7 +371,7 @@ interface CartItem {
     barcode: string
     qty: number
     nama_produk: string
-    harga_jual_ritel: number
+    harga_jual_grosir: number
 }
 
 interface PendingTransaction {
@@ -398,11 +396,15 @@ interface TransaksiResponseData {
         total_bayar: number
         total_kembalian: number
         sisa_hutang: number
+        hutang_lama?: number
+        total_tagihan?: number
         kasir_name: string
         createdAt: string
     }
     pelanggan: {
         nama_pelanggan: string
+        hutang_sebelumnya: number
+        total_hutang_sekarang: number
     }
 }
 
@@ -431,9 +433,9 @@ const getAuthHeader = () => {
 const isSuperAdmin = computed(() => kasirData.value?.role_name === 'superadmin')
 const uangPembayaranDisplay = ref('')
 const totalYangHarusDibayar = computed(() => {
-    const hutang = Number(hutangPelanggan.value) || 0
-    const belanja = Number(totalBelanja.value) || 0
-    return hutang + belanja
+    const hutangLama = Number(hutangPelanggan.value) || 0
+    const totalTransaksi = Number(totalBelanja.value) || 0
+    return hutangLama + totalTransaksi
 })
 
 const pembayaranInputRef = ref<HTMLInputElement | null>(null)
@@ -446,6 +448,15 @@ const preventNumber = (e: KeyboardEvent) => {
         e.preventDefault()
     }
 }
+
+const getHargaGrosir = (product: any) => {
+    const prices = [product.harga_jual_ritel, product.harga_jual_biasa]
+        .map((price) => Number(price))
+        .filter((price) => Number.isFinite(price) && price > 0)
+
+    return prices.length > 0 ? Math.min(...prices) : 0
+}
+
 const formatInputRupiah = (value: string) => {
     const numbers = value.replace(/\D/g, '')
     const numberValue = parseInt(numbers) || 0
@@ -534,7 +545,7 @@ const searchProducts = async (searchTerm: string) => {
                 barcode: product.barcode,
                 qty: 1,
                 nama_produk: product.nama_produk,
-                harga_jual_ritel: parseFloat(product.harga_jual_ritel),
+                harga_jual_grosir: getHargaGrosir(product),
             }))
             showSearchResults.value = true
             selectedSearchIndex.value = -1
@@ -633,7 +644,10 @@ const getPelangganName = (id: string) => {
 }
 
 const totalBelanja = computed(() => {
-    return transactionItems.value.reduce((sum, item) => sum + item.qty * item.harga_jual_ritel, 0)
+    return transactionItems.value.reduce(
+        (sum, item) => sum + item.qty * item.harga_jual_grosir,
+        0,
+    )
 })
 
 const kembalian = computed(() => {
@@ -728,7 +742,7 @@ const addOrUpdateItem = (product: CartItem, qty: number = 1) => {
             barcode: product.barcode,
             qty: qty,
             nama_produk: product.nama_produk,
-            harga_jual_ritel: parseFloat(product.harga_jual_ritel.toString()),
+            harga_jual_grosir: parseFloat(product.harga_jual_grosir.toString()),
         })
     }
 }
@@ -846,6 +860,8 @@ const generateReceiptHTML = (
     // Setup Variable
     const total_bayar = trx.total_bayar;
     const total_harga = trx.total_harga;
+    const hutang_lama = trx.hutang_lama || 0;
+    const total_tagihan = trx.total_tagihan || total_harga;
     const kembalian = trx.total_kembalian;
     const sisa_hutang = trx.sisa_hutang;
 
@@ -909,8 +925,8 @@ const generateReceiptHTML = (
                         ${item.nama_produk}
                     </span>
                     <span style="width: 30px; text-align: center;">${item.qty}</span>
-                    <span style="width: 60px; text-align: right;">${formatCurrency(item.harga_jual_ritel)}</span>
-                    <span style="width: 60px; text-align: right;">${formatCurrency(item.qty * item.harga_jual_ritel)}</span>
+                    <span style="width: 60px; text-align: right;">${formatCurrency(item.harga_jual_grosir)}</span>
+                    <span style="width: 60px; text-align: right;">${formatCurrency(item.qty * item.harga_jual_grosir)}</span>
                 </div>
             `).join('')}
         </div>
@@ -921,6 +937,18 @@ const generateReceiptHTML = (
                 <span>TOTAL BELANJA:</span>
                 <span>Rp ${formatCurrency(total_harga)}</span>
             </div>
+
+            ${hutang_lama > 0 ? `
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span>Hutang Lama:</span>
+                    <span>Rp ${formatCurrency(hutang_lama)}</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin: 6px 0; padding-top: 6px; border-top: 1px dashed #000;">
+                    <span>TOTAL TAGIHAN:</span>
+                    <span>Rp ${formatCurrency(total_tagihan)}</span>
+                </div>
+            ` : ''}
 
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                 <span>Tunai:</span>
@@ -1000,6 +1028,8 @@ const printStruk = (
 };
 
 const submitTransaksi = async () => {
+    if (isSubmitting.value) return
+
     if (!selectedPelangganId.value) {
         Swal.fire('Peringatan', 'Pelanggan harus dipilih.', 'warning')
         return
@@ -1084,24 +1114,24 @@ const submitTransaksi = async () => {
         const response = await axios.post<
             any,
             { data: { success: boolean; data: TransaksiResponseData; message?: string } }
-        >(`${API_BASE_URL}/transaksi/create/ritel`, payload, {
+        >(`${API_BASE_URL}/transaksi/create/grosir`, payload, {
             headers: getAuthHeader(),
         })
 
         if (response.data.success) {
             const dataTransaksi = response.data.data.transaksi
-            const sisaHutangAkhir = dataTransaksi.sisa_hutang || 0
+            const sisaHutangAkhir =
+                Number(response.data.data.pelanggan.total_hutang_sekarang) || 0
             const kembalianAkhir = dataTransaksi.total_kembalian || 0
             const namaPelanggan = response.data.data.pelanggan.nama_pelanggan
-
-            printStruk(
-                dataTransaksi,
-                namaPelanggan,
-                itemsForPrint,
-                kasirData.value!.full_name,
-                kasirData.value!.toko.nama_toko,
-                kasirData.value!.toko.alamat,
-            )
+            const dataStruk = {
+                ...dataTransaksi,
+                sisa_hutang: sisaHutangAkhir,
+                hutang_lama: Number(response.data.data.pelanggan.hutang_sebelumnya) || 0,
+                total_tagihan:
+                    Number(dataTransaksi.total_harga) +
+                    (Number(response.data.data.pelanggan.hutang_sebelumnya) || 0),
+            }
 
             let title: string
             let message: string
@@ -1124,35 +1154,47 @@ const submitTransaksi = async () => {
                     title = 'Transaksi Berhasil!'
                     message = `<p class="text-lg font-bold mt-2">Pembayaran Lunas Pas!</p>`
                 }
-                router.push('/penjualan-grosir')
             } else {
                 icon = 'error'
                 title = 'Error Logika Transaksi!'
                 message = `<p class="text-lg font-bold mt-2">Terdeteksi error internal. Hubungi Admin.</p>`
             }
 
-            Swal.fire({
+            // Tutup modal pembayaran sebelum menampilkan hasil agar fokus keyboard
+            // tidak terperangkap di antara dua modal.
+            showPaymentModal.value = false
+
+            const result = await Swal.fire({
                 icon: icon,
                 title: title,
                 html: message,
-                confirmButtonText: 'OK',
+                confirmButtonText: 'OK & CETAK',
                 confirmButtonColor: '#0891b2',
-                allowOutsideClick: false,
-                allowEscapeKey: false,
+                showCloseButton: true,
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                keydownListenerCapture: true,
+                returnFocus: false,
                 didOpen: () => {
-                    const confirmBtn = document.querySelector('.swal2-confirm') as HTMLButtonElement
-                    if (confirmBtn) {
-                        confirmBtn.focus()
-                    }
+                    Swal.getConfirmButton()?.focus()
                 },
-            }).then(() => {
-                if (currentPendingId.value !== null) {
-                    removePendingTransaction(currentPendingId.value, false)
-                }
-
-                fetchHutangPelanggan(selectedPelangganId.value)
-                resetForm()
             })
+
+            if (result.isConfirmed) {
+                printStruk(
+                    dataStruk,
+                    namaPelanggan,
+                    itemsForPrint,
+                    kasirData.value!.full_name,
+                    kasirData.value!.toko.nama_toko,
+                    kasirData.value!.toko.alamat,
+                )
+            }
+
+            if (currentPendingId.value !== null) {
+                removePendingTransaction(currentPendingId.value, false)
+            }
+            resetForm()
         } else {
             Swal.fire({
                 icon: 'error',

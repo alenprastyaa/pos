@@ -325,11 +325,10 @@ import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const PENDING_TRANSACTIONS_KEY = 'pendingTransactions_eceran' // Key beda dgn grosir biar gak clash
+const DEFAULT_PELANGGAN_ID = '02525cd7-3459-4093-bf68-60859ef43600'
 const successAudio = new Audio('/barcode.mp3')
 
 // --- State Variables ---
@@ -431,7 +430,15 @@ const fetchPelanggan = async () => {
     loadingPelanggan.value = true
     try {
         const response = await axios.get(`${API_BASE_URL}/pelanggan`, { headers: getAuthHeader() })
-        if (response.data.success) pelangganList.value = response.data.data
+        if (response.data.success) {
+            pelangganList.value = response.data.data
+            const defaultPelangganTersedia = pelangganList.value.some(
+                (pelanggan) => pelanggan.id === DEFAULT_PELANGGAN_ID,
+            )
+            if (defaultPelangganTersedia && !selectedPelangganId.value) {
+                selectedPelangganId.value = DEFAULT_PELANGGAN_ID
+            }
+        }
     } catch (error) {
         console.error(error)
     } finally {
@@ -755,24 +762,45 @@ const submitTransaksi = async () => {
         if (response.data.success) {
             const trxData = response.data.data.transaksi
             const plgData = response.data.data.pelanggan
+            const itemsForPrint = [...transactionItems.value]
+            const totalHutangAkhir = Number(plgData.total_hutang_sekarang) || 0
+            const hutangLama = Number(plgData.hutang_sebelumnya) || 0
+            const trxForPrint = {
+                ...trxData,
+                sisa_hutang: totalHutangAkhir,
+                hutang_lama: hutangLama,
+                total_tagihan: Number(trxData.total_harga) + hutangLama,
+            }
 
-            // Cetak Struk
-            printStruk(
-                trxData,
-                plgData.nama_pelanggan,
-                transactionItems.value,
-                kasirData.value.full_name,
-                kasirData.value.toko.nama_toko,
-                kasirData.value.toko.alamat,
-            )
-
-            // Tampilkan Kembalian
-            await Swal.fire({
-                icon: 'success',
-                title: 'Transaksi Berhasil',
-                html: `Kembalian: <b style="font-size: 1.5em; color: green">${formatRupiah(trxData.total_kembalian)}</b>`,
-                timer: 3000,
+            showPaymentModal.value = false
+            const result = await Swal.fire({
+                icon: totalHutangAkhir > 0 ? 'warning' : 'success',
+                title: totalHutangAkhir > 0 ? 'Transaksi Tercatat sebagai Hutang' : 'Transaksi Berhasil',
+                html:
+                    totalHutangAkhir > 0
+                        ? `Sisa Hutang: <b style="font-size: 1.5em; color: red">${formatRupiah(totalHutangAkhir)}</b>`
+                        : `Kembalian: <b style="font-size: 1.5em; color: green">${formatRupiah(trxData.total_kembalian)}</b>`,
+                showDenyButton: true,
+                confirmButtonText: 'Cetak Struk',
+                denyButtonText: 'Tanpa Cetak',
+                confirmButtonColor: '#0891b2',
+                denyButtonColor: '#64748b',
+                allowEscapeKey: true,
+                showCloseButton: true,
+                returnFocus: false,
+                didOpen: () => Swal.getConfirmButton()?.focus(),
             })
+
+            if (result.isConfirmed) {
+                printStruk(
+                    trxForPrint,
+                    plgData.nama_pelanggan,
+                    itemsForPrint,
+                    kasirData.value.full_name,
+                    kasirData.value.toko.nama_toko,
+                    kasirData.value.toko.alamat,
+                )
+            }
 
             if (pendingId) removePendingTransaction(pendingId, false)
             resetForm()
@@ -787,12 +815,13 @@ const submitTransaksi = async () => {
 }
 
 const resetForm = () => {
-    selectedPelangganId.value = ''
+    selectedPelangganId.value = DEFAULT_PELANGGAN_ID
     transactionItems.value = []
     uangPembayaran.value = 0
     uangPembayaranDisplay.value = ''
     currentPendingId.value = null
     closePaymentModal()
+    fetchHutangPelanggan(DEFAULT_PELANGGAN_ID)
 }
 
 // --- Printing Logic ---
@@ -883,6 +912,18 @@ const printStruk = (
                         <span>${formatRupiah(trx.total_harga)}</span>
                     </div>
 
+                    ${trx.hutang_lama > 0 ? `
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                            <span>Hutang Lama:</span>
+                            <span>${formatRupiah(trx.hutang_lama)}</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin: 6px 0; padding-top: 6px; border-top: 1px dashed #000;">
+                            <span>TOTAL TAGIHAN:</span>
+                            <span>${formatRupiah(trx.total_tagihan)}</span>
+                        </div>
+                    ` : ''}
+
                     <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
                         <span>Tunai:</span>
                         <span>${formatRupiah(trx.total_bayar)}</span>
@@ -897,7 +938,7 @@ const printStruk = (
 
                     ${trx.sisa_hutang > 0 ? `
                         <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold;">
-                            <span>Hutang:</span>
+                            <span>Sisa Hutang:</span>
                             <span>${formatRupiah(trx.sisa_hutang)}</span>
                         </div>
                     ` : ''}
